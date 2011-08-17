@@ -1888,8 +1888,9 @@ attribute: attr
 	^ 0
 ! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'jens 2/11/2011 01:22'!
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/17/2011 12:06'!
 children
+
 	^ ScratchListMorph on: self instances! !
 
 !ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'jens 1/10/2011 22:59'!
@@ -2162,13 +2163,16 @@ setRotationStyle: aNumber
 	self undeleteAttribute: #rotationStyle.
 	self passiveRotationStyle: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'jens 5/19/2011 13:46'!
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/17/2011 13:55'!
 spawn
 
 	| stage child |
 "
 	(frame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ nil].
 "
+	"If we're a clone, clone the prototype instead"
+	self prototype ifNotNil: [ ^ prototype spawn ].
+
 	stage _ self ownerThatIsA: ScratchStageMorph.
 	stage ifNil: [^ self].
 	child _ self fullCopy.
@@ -2183,6 +2187,10 @@ spawn
 	child deleteAttributes: self deletedAttributes.
 	child deleteAttribute: #costumes.
 	child deleteAttribute: #sounds.
+
+	"new for system scratch"
+	"child undeleteAllAttributes."
+	child position: (child position + 20).
 
 	^ child	! !
 
@@ -2209,6 +2217,16 @@ penShade
 
 	^ penShade! !
 
+
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/17/2011 12:13'!
+cloneCount
+
+	^ (self children asArray size + 1) asString.! !
+
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/17/2011 11:38'!
+cloneCount: aNumber
+
+	Transcript show: 'ScratchSpriteMorph received cloneCount: ' , aNumber asString.! !
 
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:33'!
 syncToPrototype

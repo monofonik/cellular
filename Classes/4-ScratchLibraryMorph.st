@@ -1,5 +1,5 @@
 DividedImageFrameMorph subclass: #ScratchLibraryMorph
-	instanceVariableNames: 'scrollPane stagePane thumbWidth clonesWidth itemExtent spritePane buttonPane spriteLabel '
+	instanceVariableNames: 'scrollPane stagePane thumbWidth itemExtent spritePane buttonPane spriteLabel '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-UI-Panes'!
@@ -8,7 +8,7 @@ I am a Scratch library viewer. I display thumbnails of all the Scratch objects t
 !
 
 
-!ScratchLibraryMorph methodsFor: 'initialization' stamp: 'jm 5/1/2009 10:45'!
+!ScratchLibraryMorph methodsFor: 'initialization' stamp: 'JM 8/17/2011 10:39'!
 buildPanes
 	"Build my scroll pane."
 
@@ -85,7 +85,7 @@ initialize
 	self extent: 200@100.
 ! !
 
-!ScratchLibraryMorph methodsFor: 'initialization' stamp: 'jm 3/20/2009 16:59'!
+!ScratchLibraryMorph methodsFor: 'initialization' stamp: 'JM 8/17/2011 10:54'!
 makeNewSpriteButtons: aScratchFrameMorph
 	"Return a morph containing a set of new sprite buttons."
 
@@ -255,36 +255,40 @@ stepTime
 ! !
 
 
-!ScratchLibraryMorph methodsFor: 'private' stamp: 'JM 8/16/2011 13:49'!
+!ScratchLibraryMorph methodsFor: 'private' stamp: 'JM 8/17/2011 13:17'!
 addThumbnailFor: aMorph
 	"Add a thumbnail for the given morph."
 
-	| newThumbnail |
+	| newThumbnail isSprite |
+	
+	"If this is a clone, dont bother"
+	aMorph prototype ifNotNil: [ ^ self ].
+
 	newThumbnail _ LibraryItemMorph new.
+	isSprite _ (aMorph isKindOf: ScratchStageMorph) not.
 
 	"Different width for stage sprite icon - no clone count"
-	(aMorph isKindOf: ScratchStageMorph) 
-		ifTrue: [ newThumbnail extent: itemExtent thumbWidth: thumbWidth clonesWidth: 0. ]
-		ifFalse: [ newThumbnail extent: itemExtent thumbWidth: thumbWidth clonesWidth: clonesWidth ].
+	newThumbnail extent: itemExtent thumbWidth: thumbWidth isSprite: isSprite.
 	
-	newThumbnail  target: aMorph.
+	newThumbnail target: aMorph.
 	(newThumbnail target isKindOf: ScratchStageMorph)
 		ifTrue: [ stagePane addMorph: newThumbnail. ]
 		ifFalse: [scrollPane contents addMorphBack: newThumbnail ].
 	newThumbnail step.
 ! !
 
-!ScratchLibraryMorph methodsFor: 'private' stamp: 'JM 8/16/2011 12:41'!
+!ScratchLibraryMorph methodsFor: 'private' stamp: 'JM 8/17/2011 11:13'!
 extent: aRectangle
 
-	| nameHeight |
+	| nameHeight cloneCountHeight |
 	super extent: aRectangle.
 	scrollPane isNil | stagePane isNil ifTrue: [^ self].
 	
 	thumbWidth _ 50.
-	clonesWidth _ 25.
 	nameHeight _ (ScratchTranslator stringExtent: ('Sprite1' localized) font: (ScratchFrameMorph getFont: #LibraryItemName)) y.
-	itemExtent _ (54 + clonesWidth)@(54 + nameHeight).
+	cloneCountHeight _ (UpdatingStringFieldMorph new) height.
+
+	itemExtent _ (70)@(54 + nameHeight + cloneCountHeight).
 
 
 

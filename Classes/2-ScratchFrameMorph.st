@@ -7720,7 +7720,7 @@ getFont: aSymbol
 		ifFalse: [Fonts at: aSymbol].
 ! !
 
-!ScratchFrameMorph class methodsFor: 'scratch skin' stamp: 'jm 5/7/2009 11:42'!
+!ScratchFrameMorph class methodsFor: 'scratch skin' stamp: 'JM 8/17/2011 11:50'!
 initFonts
 	"self initFonts"
 
@@ -7751,6 +7751,7 @@ initFonts
 		"Library"
 		(LibraryItemName			VerdanaBold		9	ArialBold		14)
 		(LibraryItemInfo			Verdana		6	Verdana		10)
+		(LibraryItemClones			VerdanaBold		10	VerdanaBold		12)
 		(MediaItemInfo				Verdana		9	Arial			14)
 
 		"Dialog Boxes"

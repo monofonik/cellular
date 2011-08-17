@@ -1,5 +1,5 @@
 Morph subclass: #LibraryItemMorph
-	instanceVariableNames: 'target thumbnailMorph nameMorph scriptCountMorph cloneCountMorph isSelected rolloverOn lastUpdateMSecs highlightForm currentForm thumbWidth clonesWidth rolloverForm rotationToggleMorph '
+	instanceVariableNames: 'target thumbnailMorph nameMorph cloneCountMorph isSelected rolloverOn lastUpdateMSecs highlightForm currentForm thumbWidth rolloverForm rotationToggleMorph '
 	classVariableNames: 'InfoFont NameFont '
 	poolDictionaries: ''
 	category: 'Scratch-UI-Support'!
@@ -26,13 +26,13 @@ buildRotationToggleMorph
 	self addMorph: rotationToggleMorph.
 ! !
 
-!LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 8/16/2011 14:00'!
-buildSubmorphs
+!LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 8/17/2011 12:03'!
+buildSubmorphs: isSprite
 	"LibraryItemMorph open"
 
 	thumbnailMorph _ ImageMorph new
 		form: (Form extent: thumbWidth@thumbWidth depth: 16) fillWhite;
-		position: (((self width - thumbWidth) - clonesWidth) // 2) @ 0.
+		position: ((self width - thumbWidth) // 2) @ 0.
 	self addMorph: thumbnailMorph.
 
 	nameMorph _ StringMorph new
@@ -46,26 +46,40 @@ buildSubmorphs
 		position: 0 @ nameMorph bottom.
 	self addMorph: scriptCountMorph."
 
-	cloneCountMorph _ StringMorph new
-		font: (ScratchFrameMorph getFont: #LibraryItemName);
-		contents: 'clones';
-		position: ((((self width - thumbWidth) - clonesWidth) // 2) + thumbWidth) @ 0.
-	self addMorph: cloneCountMorph.
+	isSprite ifTrue: [
+		cloneCountMorph _ UpdatingStringFieldMorph new
+			font: (ScratchFrameMorph getFont: #LibraryItemClones);
+			contents: '1';
+			acceptWhenFocusLost: true;
+			"target: self target; -- target is set with self: target"
+			getSelector: #cloneCount;
+			putSelector: #cloneCount:;
+			isEditable: true;
+			width: 40;
+			position: ((self width - 40) // 2) @ (nameMorph bottom + 2).
+
+		self addMorph: cloneCountMorph.
+		].
+
+	"incrButton _ IconicButton new
+		extent: 15@5;
+		position: thumbWidth + ((self width - thumbWidth) // 2) - (7.5)@0.
+		label: '+' font: ((ScratchFrameMorph) getFont: #LibraryItemInfo).
+	self addMorph: incrButton."
 
 	self color: Color transparent.
 
 	self buildRotationToggleMorph
 ! !
 
-!LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 8/16/2011 12:39'!
-extent: aRectangle thumbWidth: w clonesWidth: c
+!LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 8/17/2011 11:23'!
+extent: aRectangle thumbWidth: w isSprite: s
 
 	lastUpdateMSecs _ -1.
 	self extent: aRectangle.
 	thumbWidth _ w.
-	clonesWidth _ c.
 
-	self buildSubmorphs.
+	self buildSubmorphs: s.
 	self target: nil.
 	isSelected _ nil.
 	rolloverOn _ false.
@@ -176,10 +190,13 @@ target
 	^ target
 ! !
 
-!LibraryItemMorph methodsFor: 'accessing' stamp: 'jm 6/30/2004 13:47'!
+!LibraryItemMorph methodsFor: 'accessing' stamp: 'JM 8/17/2011 11:59'!
 target: aMorph
 
 	target _ aMorph.
+	
+	cloneCountMorph ifNotNil: [ cloneCountMorph target: aMorph. ].
+	
 	self updateThumbnail.
 ! !
 
@@ -587,3 +604,9 @@ stageMenu
 
 	menu localize; invokeOn: library.
 ! !
+
+
+!LibraryItemMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/17/2011 11:33'!
+getCloneCount
+
+	^ target getCloneCount.! !
