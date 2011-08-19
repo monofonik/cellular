@@ -19,7 +19,7 @@ The leftRight style is useful for side-views of things such as cars, horses, etc
 !
 
 
-!ScratchSpriteMorph methodsFor: 'initialization' stamp: 'jens 7/13/2009 21:59'!
+!ScratchSpriteMorph methodsFor: 'initialization' stamp: 'JM 8/19/2011 15:04'!
 initialize
 
 	super initialize.
@@ -36,6 +36,7 @@ initialize
 	penShade _ 50.
 	self penColor: Color blue.
 	self extent: rotatedForm extent.
+	self hide.	"default state is hidden, we unhide the clones upon creation".
 ! !
 
 
@@ -299,25 +300,25 @@ ypos: aNumber
 	self passiveYpos: aNumber! !
 
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jm 4/1/2005 13:31'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:55'!
 changePenHueBy: aNumber
 	"Change the pen hue by given number."
-
+	self prototype ifNil: [ ^ self ].
 	self setPenHueTo: penHue + aNumber.
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jm 4/1/2005 13:33'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:55'!
 changePenShadeBy: aNumber
 	"Change the pen shade (lightness) by given number"
-
+	self prototype ifNil: [ ^ self ].
 	self setPenShadeTo: penShade + aNumber.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jm 3/16/2005 11:31'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:55'!
 changePenSizeBy: aNumber
 	"Change my pen width."
-
+	self prototype ifNil: [ ^ self ].
 	self penSize: penSize + aNumber.
 ! !
 
@@ -336,10 +337,10 @@ penColor
 	^ penColor
 ! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jens 2/9/2011 23:30'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:56'!
 penColor: aColor
 	"Set my pen color."
-
+	self prototype ifNil: [ ^ self ].
 	self undeleteAttribute: #penColor.
 	self passivePenColor: aColor! !
 
@@ -355,9 +356,9 @@ penDown
 	^ penDown
 ! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jens 2/9/2011 01:07'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:56'!
 penDown: aBoolean
-
+	self prototype ifNil: [ ^ self ].
 	self undeleteAttribute: #penDown.
 	self passivePenDown: aBoolean! !
 
@@ -379,32 +380,35 @@ penSize
 	^ penSize
 ! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jens 2/9/2011 01:12'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:56'!
 penSize: aNumber
 	"Set my pen width."
-
+	self prototype ifNil: [ ^ self ].
 	self undeleteAttribute: #penSize.
 	self passivePenSize: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jm 2/5/2005 11:41'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:56'!
 putPenDown
 	"Put down my drawing pen (i.e. start drawing a pen trail)."
-
+	self prototype ifNil: [ ^ self ].
 	self penDown: true.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jm 2/5/2005 11:40'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:56'!
 putPenUp
 	"Put up my drawing pen (i.e. stop drawing a pen trail)."
-
+	self prototype ifNil: [ ^ self ].
 	self penDown: false.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jm 2/10/2008 22:20'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:56'!
 setPenColorFromCostumedNamed: costumeNameOrIndex x: x y: y
 	"Set my pen color from my costume of the given name at the given point. If the point is off the edge, set my color to black."
 
 	| cName m f pixel |
+
+	self prototype ifNil: [ ^ self ].
+
 	cName _ costumeNameOrIndex.
 	cName isNumber ifTrue: [cName _ self costumeNameFromNumber: costumeNameOrIndex].
 	m _ media
@@ -424,37 +428,47 @@ setPenColorFromCostumedNamed: costumeNameOrIndex x: x y: y
 		ifFalse: [self penColor: (Color colorFromPixelValue: pixel depth: 24)].
 ! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jens 2/9/2011 01:10'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:56'!
 setPenHueTo: aNumber
 	"Set the pen hue to given number between 0 and 200. (That makes 100 the 'maximum' distance away from the original color on the color wheel.)"
+
+	self prototype ifNil: [ ^ self ].
 
 	self undeleteAttribute: #penColor.
 	self passiveSetPenHueTo: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jens 2/9/2011 01:11'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 14:56'!
 setPenShadeTo: aNumber
 	"Set the pen shade (lightness) to given number between 0 and 100. A shade of 0 is black, 100 is white, and 50 is fully saturated color."
 	"Details: We don't want to get all the way to pure black or white, so we divide the range 0..50 by a number > 50 when computing the fraction of the original color to mix with black or white."
 
+	self prototype ifNil: [ ^ self ].
+
 	self undeleteAttribute: #penShade.
 	self passiveSetPenShadeTo: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'jm 8/2/2005 18:52'!
+!ScratchSpriteMorph methodsFor: 'pen ops' stamp: 'JM 8/19/2011 15:07'!
 stampCostume
 	"Stamp a copy of my current costume on the pen trails layer."
 
 	| m |
+
+	self prototype ifNil: [ ^ self ].
+
 	self step.  "update costume if necessary"
 	(m _ self ownerThatIsA: ScratchStageMorph)
 		ifNotNil: [m stampCostume: self].
 ! !
 
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 2/8/2011 22:16'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:57'!
 bounceOffEdge
 	"Set my direction to bounce off the edge."
 
 	| myBox edgeBox dirX dirY |
+
+	self prototype ifNil: [ ^ self ].
+
 	owner ifNil: [^ self].
 	ownerSprite ifNotNil: [^ self].
 	myBox _ self allBounds.
@@ -476,10 +490,11 @@ bounceOffEdge
 	self ypos: self ypos 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 2/8/2011 21:51'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:57'!
 changeXposBy: aNumber
 	"Move right by the given amount."
 
+	self prototype ifNil: [ ^ self ].
 	self xpos: self xpos + aNumber
 
 "
@@ -487,10 +502,11 @@ changeXposBy: aNumber
 	self spread
 "! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 2/8/2011 21:49'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:57'!
 changeYposBy: aNumber
 	"Move up by the given amount."
 
+	self prototype ifNil: [ ^ self ].
 	self ypos: self ypos + aNumber
 
 "
@@ -498,11 +514,14 @@ changeYposBy: aNumber
 	self spread
 "! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 7/16/2009 23:40'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:57'!
 color: sensitiveColor sees: soughtColor
 	"Return true if any of my pixels of sensitiveColor intersect with pixels of soughtColor in the world."
 
 	| r myImage sensitivePixelsMask map index imageBelowMe result |
+
+	self prototype ifNil: [ ^ false ].
+
 	r _ self bounds intersect: owner bounds.
 	r area = 0 ifTrue: [^ false].
 
@@ -553,11 +572,14 @@ directionMenu
 	^ menu
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jm 3/28/2009 20:15'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:58'!
 distanceTo: anObject
 	"Answer the distance to the given sprite."
 
 	| aSpriteOrSymbol |
+
+	self prototype ifNil: [ ^ 10000 ].
+
 	aSpriteOrSymbol _ self coerceSpriteArg: anObject.
 
 	aSpriteOrSymbol = #mouse ifTrue: [
@@ -567,12 +589,15 @@ distanceTo: anObject
 	^ (aSpriteOrSymbol referencePosition - self referencePosition) r
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 2/8/2011 22:17'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 forward: distance
 	"Move the object forward (i.e., the direction of its heading) by the given distance.
 	Avoid infinite or NaN coordinates"
 
 	| radians deltaP newPos newX newY |
+
+	self prototype ifNil: [ ^ self ].
+
 	radians _ rotationDegrees degreesToRadians.
 	deltaP _ ((radians cos)@(radians sin)) * distance.
 	newPos _ self position + deltaP.
@@ -591,11 +616,14 @@ forward: distance
 	self ypos: self ypos 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 2/8/2011 22:05'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 glideSecs: duration toX: endX y: endY elapsed: elapsed from: startPoint
 	"Interpolate my position from my current postion to the given x and y over the given duration. If startPoint is nil, just answer my current position; this sets the starting point for the interpolation."
 
 	| fraction endPoint rPos |
+
+	self prototype ifNil: [ ^ self ].
+
 	startPoint ifNil: [
 		^ self referencePosition].
 	endPoint _ endX@endY.
@@ -626,11 +654,14 @@ glideSecs: duration toX: endX y: endY elapsed: elapsed from: startPoint
 
 "! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 4/28/2010 22:42'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 gotoSpriteOrMouse: anObject
 	"Go to the given sprite or mouse position."
 
 	| x y len aSpriteOrSymbol p |
+
+	self prototype ifNil: [ ^ self ].
+
 	(anObject isKindOf: ScratchListMorph) ifTrue: [ "try to go the coordinates specified in a list"
 		x _ self xpos.
 		y _ self ypos.
@@ -650,8 +681,10 @@ gotoSpriteOrMouse: anObject
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 2/8/2011 21:53'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 gotoX: x y: y
+
+	self prototype ifNil: [ ^ self ].
 
 	self xpos: x; ypos: y
 
@@ -664,11 +697,14 @@ gotoX: x y: y
 	self releaseSubsprites.
 "! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jm 10/12/2005 22:08'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 gotoX: endX y: endY duration: duration elapsed: elapsed from: startPoint
 	"Interpolate my position from startPoint to endPoint over the given duration. If startPoint is nil, just answer my current position; this sets the starting point for the interpolation."
 
 	| fraction endPoint |
+
+	self prototype ifNil: [ ^ self ].
+
 	startPoint ifNil: [^ self referencePosition].
 	endPoint _ endX@endY.
 	duration < 0.001
@@ -685,11 +721,14 @@ isClone
 	^ isClone
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 7/15/2009 18:21'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
 isOnEdge
 	"Answer true if I'm touching the edge of my owner."
 
 	| result |
+	
+	self prototype ifNil: [ ^ false ].
+
 	owner ifNil: [^ false].
 	result _ (owner bounds containsRect: self bounds) not.
 	result ifTrue: [^true]. 
@@ -697,11 +736,14 @@ isOnEdge
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 7/21/2009 17:33'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
 pointToX: x y: y
 	"Set my heading to point at the given point."
 
 	| delta angle |
+
+	self prototype ifNil: [ ^ self ].
+
 	delta _ (x@y) - self referencePosition.
 	angle _ (delta x abs < 0.001)
 		ifTrue: [
@@ -717,11 +759,14 @@ pointToX: x y: y
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jm 3/28/2009 20:16'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
 pointTowards: anObject
 	"Point toward the given sprite."
 
 	| aSpriteOrSymbol p |
+
+	self prototype ifNil: [ ^ self ].
+
 	aSpriteOrSymbol _ self coerceSpriteArg: anObject.
 
 	aSpriteOrSymbol = #mouse ifTrue: [^ self pointToX: self mouseX y: self mouseY].
@@ -731,12 +776,15 @@ pointTowards: anObject
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 7/15/2009 18:16'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
 touching: anObject
 	"Answer true if any visible part of me touches a visible part of the given sprite."
 	"Details: Currently uses the bounding box; should follow this up with comparison of visible pixels."
 
 	| aSpriteOrSymbol stage intersection f1 f2 map oldVis result |
+
+	self prototype ifNil: [ ^ self ].
+
 	aSpriteOrSymbol _ self coerceSpriteArg: anObject.
 
 	aSpriteOrSymbol = #mouse ifTrue: [
@@ -779,18 +827,23 @@ touching: anObject
 	^(subsprites collect: [:sub | sub touching: anObject ]) includes: true 			"are any pixels of the result non-zero?"
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 2/8/2011 20:29'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
 turn: degrees
 	"Turn clockwise the given number of degrees."
+
+	self prototype ifNil: [ ^ self ].
 
 	self undeleteAttribute: #heading.
 	self passiveTurn: degrees! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jm 12/2/2005 14:03'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
 turnAwayFromEdge
 	"Turn away from the nearest edge."
 
 	| dirX dirY refP delta |
+
+	self prototype ifNil: [ ^ self ].
+
 	dirX _ self rotationDegrees degreesToRadians cos.
 	dirY _ self rotationDegrees degreesToRadians sin negated.
 	refP _ self referencePosition.
@@ -810,11 +863,14 @@ turnAwayFromEdge
 	self rotationDegrees: (dirY negated asFloat arcTan: dirX) radiansToDegrees.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 7/23/2009 00:02'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
 turnLeft: degrees
 	"Turn counter-clockwise the given number of degrees."
 
 	| newPos |
+
+	self prototype ifNil: [ ^ self ].
+
 	self rotationDegrees: rotationDegrees - degrees.
 
 	subsprites do: [:sub |
@@ -825,10 +881,12 @@ turnLeft: degrees
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'jens 7/23/2009 00:02'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
 turnRight: degrees
 	| newPos |
 	"Turn clockwise the given number of degrees."
+
+	self prototype ifNil: [ ^ self ].
 
 	self rotationDegrees: rotationDegrees + degrees.
 
@@ -841,11 +899,14 @@ turnRight: degrees
 ! !
 
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jens 1/20/2011 21:51'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:00'!
 bubble: obj thinkFlag: thinkFlag promptFlag: promptFlag
 	"Make a talk bubble with the given string."
 
 	| s talkBubble objToShow |
+
+	self prototype ifNil: [ ^ self ].
+
 	self sayNothing.
 
 	(obj respondsTo: #morphToShow)
@@ -880,25 +941,32 @@ bubble: obj thinkFlag: thinkFlag promptFlag: promptFlag
 	^ talkBubble
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jens 7/16/2009 16:33'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:08'!
 changeSizeBy: delta
 	"Change my size by the given delta."
+
+	self prototype ifNil: [ ^ self ].
 
 	self setSizeTo: (self virtualScale + delta).
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jm 12/1/2006 11:23'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:07'!
 changeStretchBy: delta
 	"Change my aspect ratio by the given amount."
 
 	| currentStretch |
+
+	self prototype ifNil: [ ^ self ].
+
 	currentStretch _ (100.0 * scalePoint x) / scalePoint y.
 	self setStretchTo: (currentStretch + delta).
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jens 2/9/2011 16:36'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:00'!
 goBackByLayers: aNumber
 	"Decrease my layer by (i.e., move me towards the back by) the given number of layers."
+
+	self prototype ifNil: [ ^ self ].
 
 	self setLayerTo: self layer + aNumber truncated
 
@@ -919,10 +987,13 @@ hide
 	self spread
 "! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jm 5/10/2004 16:54'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:07'!
 layer: aNumber
 
 	| n submorphsMinusMe newSubmorphs |
+
+	self prototype ifNil: [ ^ self ].
+
 	owner ifNil: [^ 1].
 	n _ (aNumber rounded max: 1) min: owner submorphCount.
 	submorphsMinusMe _ owner submorphs copyWithout: self.
@@ -934,25 +1005,32 @@ layer: aNumber
 	self changed.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jens 3/15/2011 00:01'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:07'!
 lookLike: costumeName
+
+	"self prototype ifNil: [ ^ self ]."
 
 	self undeleteAttribute: #costumeIndex.
 	self passiveLookLike: costumeName.
 	costumeName isNumber ifFalse: [
 		self lookLike: self costumeIndex ].! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jm 12/1/2006 11:22'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:01'!
 multiplySizeBy: factor
 	"Used by the magnifying glass tool. Multiply my scale by the given factor."
 
+	self prototype ifNil: [ ^ self ].
+	
 	self setSizeTo: 100.0 * (self scalePoint x max: self scalePoint y) * factor.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'nb 1/7/2008 13:00'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:01'!
 recordScene: sceneName
 
 	| state |
+
+	self prototype ifNil: [ ^ self ].
+	
 	self isHidden ifTrue: [
 		sceneStates removeKey: sceneName ifAbsent: [].
 		^ self ].
@@ -964,25 +1042,32 @@ recordScene: sceneName
 	sceneStates at: sceneName put: state.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'ee 3/1/2009 12:30'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:01'!
 say: aValue
 	"Present a talk bubble with the given string."
+
+	self prototype ifNil: [ ^ self ].
 
 	self bubble: aValue thinkFlag: false promptFlag: false.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jm 12/1/2006 19:21'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:01'!
 say: stringOrNum duration: durationSecs elapsed: elapsedMSecs from: startPoint
+
+	self prototype ifNil: [ ^ self ].
 
 	startPoint ifNil: [^ self say: stringOrNum].  "first call, show talk bubble"
 	elapsedMSecs >= (1000 * durationSecs) ifTrue: [self sayNothing].  "clear bubble"
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jm 4/30/2004 19:05'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:01'!
 sayNothing
 	"Delete my talk bubble if I have one."
 
 	| talkBubble |
+
+	self prototype ifNil: [ ^ self ].
+
 	(talkBubble _ self valueOfProperty: #talkBubble) ifNil: [^ self].
 	talkBubble delete.
 	self setProperty: #talkBubble toValue: nil.
@@ -1005,19 +1090,24 @@ setScene: sceneName
 	self heading: (sceneState at: #heading).
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jens 2/8/2011 23:17'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:05'!
 setSizeTo: percent
 	"Set my size to the given percent of the original size. Limit the range to avoid accidentally making me invisibly tiny or really huge. Retain my aspect ratio (i.e., my stretch)."
+
+	"self prototype ifNil: [ ^ self ]."
 
 	self undeleteAttribute: #size.
 	self passiveSetSizeTo: percent
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jm 12/1/2006 11:29'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:05'!
 setStretchTo: percent
 	"Set x stretch percent relative to y. For example, a stretch of 200 stretches x by a factor of two relative to y while a stretch of 50 compresses x by a factor of two. As my stretch is changed, my x scale changes but my y scale remains the same."
 
 	| baseScale origExtent minStretch maxStretch newStretchFactor |
+
+	"self prototype ifNil: [ ^ self ]."
+
 	baseScale _ scalePoint y.
 	origExtent _ self costumeForm extent.
 	minStretch _ 8.0 / (baseScale * origExtent x).  "min width 8 pixels"
@@ -1026,27 +1116,29 @@ setStretchTo: percent
 	self scalePoint: baseScale * (newStretchFactor @ 1.0).
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jens 2/9/2011 16:16'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 14:45'!
 show
 	"Make myself visible."
 
-	self setHideFlagTo: false
+	prototype ifNotNil: [ self setHideFlagTo: false ]. "only ever unhide clones"
 
 "
 	self isHidden: false.
 	self spread
 "! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'ee 3/1/2009 12:30'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:02'!
 think: aValue
 	"Present a thought bubble with the given string."
 
+	self prototype ifNil: [ ^ self ].
 	self bubble: aValue thinkFlag: true promptFlag: false.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'jm 12/1/2006 19:21'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:02'!
 think: stringOrNum duration: durationSecs elapsed: elapsedMSecs from: startPoint
 
+	self prototype ifNil: [ ^ self ].
 	startPoint ifNil: [^ self think: stringOrNum].  "first call, show think bubble"
 	elapsedMSecs >= (1000 * durationSecs) ifTrue: [self sayNothing].  "clear bubble"
 ! !
@@ -1091,10 +1183,11 @@ hideQuestion
 	"Hide my question prompt."
 ! !
 
-!ScratchSpriteMorph methodsFor: 'sensing ops' stamp: 'ee 3/1/2009 12:29'!
+!ScratchSpriteMorph methodsFor: 'sensing ops' stamp: 'JM 8/19/2011 15:03'!
 showQuestion: aString
 	"Show the given question prompt."
 
+	self prototype ifNil: [ ^ self ].
 	self bubble: aString thinkFlag: false promptFlag: true.
 ! !
 
@@ -1117,11 +1210,14 @@ cloneAndSend: msgName
 ! !
 
 
-!ScratchSpriteMorph methodsFor: 'drawing' stamp: 'jm 1/8/2006 18:42'!
+!ScratchSpriteMorph methodsFor: 'drawing' stamp: 'JM 8/19/2011 15:08'!
 drawOn: aCanvas
 	"Draw myself if my visibility is > 0. If my visibility is 1, draw using the normal 'paint' mode. Otherwise, draw using 'alpha' resulting in a partially transparent rendering."
 
 	| f alpha |
+
+	self prototype ifNil: [ ^ self ].
+
 	f _ self filteredForm.
 	visibility < 100 ifTrue: [
 		visibility > 0 ifTrue: [
@@ -1132,19 +1228,22 @@ drawOn: aCanvas
 	aCanvas paintImage: f at: bounds origin.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'drawing' stamp: 'jm 7/9/2008 10:12'!
+!ScratchSpriteMorph methodsFor: 'drawing' stamp: 'JM 8/19/2011 15:08'!
 drawSubmorphsOn: aCanvas
 	"Display submorphs back to front, but do not draw and talk/think bubble submorphs."
+
+	self prototype ifNil: [ ^ self ].
 
 	submorphs reverseDo: [:m |
 		(m isKindOf: ScratchTalkBubbleMorph) ifFalse: [
 			aCanvas fullDrawMorph: m]].
 ! !
 
-!ScratchSpriteMorph methodsFor: 'drawing' stamp: 'jm 7/9/2008 10:12'!
+!ScratchSpriteMorph methodsFor: 'drawing' stamp: 'JM 8/19/2011 15:03'!
 drawTalkBubbleOn: aCanvas
 	"Draw and talk/think bubble submorphs."
 
+	self prototype ifNil: [ ^ self ].
 	submorphs size = 0 ifTrue: [^ self].
 	submorphs reverseDo: [:m |
 		(m isKindOf: ScratchTalkBubbleMorph) ifTrue: [
@@ -1152,9 +1251,10 @@ drawTalkBubbleOn: aCanvas
 ! !
 
 
-!ScratchSpriteMorph methodsFor: 'geometry' stamp: 'jm 4/30/2004 19:05'!
+!ScratchSpriteMorph methodsFor: 'geometry' stamp: 'JM 8/19/2011 15:03'!
 containsPoint: aPoint
 
+	self prototype ifNil: [ ^ false ].
 	^ (self bounds containsPoint: aPoint) and:
 	  [(self rotatedForm isTransparentAt: aPoint - bounds origin) not]
 ! !
@@ -1839,8 +1939,11 @@ virtualScale: aPoint
 	virtualScale _ aPoint! !
 
 
-!ScratchSpriteMorph methodsFor: 'stepping' stamp: 'jens 7/20/2009 00:26'!
+!ScratchSpriteMorph methodsFor: 'stepping' stamp: 'JM 8/19/2011 14:31'!
 step
+
+	" If we're a prototype, keep outtadaway!! "
+	"self "
 
 	offset notNil & ownerSprite notNil ifTrue: [
 		self referencePosition: ownerSprite referencePosition + offset ].
@@ -2163,7 +2266,7 @@ setRotationStyle: aNumber
 	self undeleteAttribute: #rotationStyle.
 	self passiveRotationStyle: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/17/2011 13:55'!
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/19/2011 14:50'!
 spawn
 
 	| stage child |
@@ -2191,6 +2294,7 @@ spawn
 	"new for system scratch"
 	"child undeleteAllAttributes."
 	child position: (child position + 20).
+	child show.
 
 	^ child	! !
 
@@ -2218,15 +2322,22 @@ penShade
 	^ penShade! !
 
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/17/2011 12:13'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/19/2011 14:47'!
 cloneCount
 
-	^ (self children asArray size + 1) asString.! !
+	^ (self children asArray size) asString.! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/17/2011 11:38'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/19/2011 15:33'!
 cloneCount: aNumber
 
-	Transcript show: 'ScratchSpriteMorph received cloneCount: ' , aNumber asString.! !
+	"Transcript show: 'ScratchSpriteMorph received cloneCount: ' , aNumber asString."
+
+	" Set the number of clones on the stage to the given number "
+
+	[self cloneCount < aNumber ] whileTrue: [ self spawn ].
+
+	[self cloneCount > aNumber ] whileTrue: [ (self children at: 1) deleteSprite.  ].
+! !
 
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:33'!
 syncToPrototype

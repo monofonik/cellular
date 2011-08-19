@@ -4895,7 +4895,7 @@ costumeChanged
 	self keepOnScreen.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'private' stamp: 'jens 3/22/2011 23:29'!
+!ScriptableScratchMorph methodsFor: 'private' stamp: 'JM 8/19/2011 15:11'!
 deleteSprite
 	"Delete the sprite and all watchers that are associated with it."
 
@@ -4916,7 +4916,8 @@ deleteSprite
 
 	self delete.
 	instances do: [:each |
-		each prototype: nil].
+		"each prototype: nil]."
+		each delete ].
 
 	frame libraryPane fixLayout.
 
