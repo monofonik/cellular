@@ -2322,21 +2322,21 @@ penShade
 	^ penShade! !
 
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/19/2011 14:47'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 12:59'!
 cloneCount
 
-	^ (self children asArray size) asString.! !
+	^ (self instances size) asString.! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/19/2011 15:33'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 13:06'!
 cloneCount: aNumber
 
 	"Transcript show: 'ScratchSpriteMorph received cloneCount: ' , aNumber asString."
 
 	" Set the number of clones on the stage to the given number "
 
-	[self cloneCount < aNumber ] whileTrue: [ self spawn ].
+	[self cloneCount < aNumber ] whileTrue: [ Transcript show: 'spawning' ; cr. self spawn ].
 
-	[self cloneCount > aNumber ] whileTrue: [ (self children at: 1) deleteSprite.  ].
+	[self cloneCount > aNumber ] whileTrue: [ Transcript show: 'killing' ; cr. (self instances at: 1) deleteSprite.  ].
 ! !
 
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:33'!
