@@ -2266,7 +2266,7 @@ setRotationStyle: aNumber
 	self undeleteAttribute: #rotationStyle.
 	self passiveRotationStyle: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/19/2011 14:50'!
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/23/2011 15:52'!
 spawn
 
 	| stage child |
@@ -2274,7 +2274,7 @@ spawn
 	(frame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ nil].
 "
 	"If we're a clone, clone the prototype instead"
-	self prototype ifNotNil: [ ^ prototype spawn ].
+	self prototype ifNotNil: [ ^ prototype spawnAt: self position ].
 
 	stage _ self ownerThatIsA: ScratchStageMorph.
 	stage ifNil: [^ self].
@@ -2293,10 +2293,15 @@ spawn
 
 	"new for system scratch"
 	"child undeleteAllAttributes."
-	child position: (child position + 20).
 	child show.
 
 	^ child	! !
+
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/23/2011 15:49'!
+spawnAt: aLocation
+
+	self spawn position: aLocation.
+! !
 
 
 !ScratchSpriteMorph methodsFor: 'BYOB attributes' stamp: 'jens 2/10/2011 00:03'!

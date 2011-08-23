@@ -4895,11 +4895,12 @@ costumeChanged
 	self keepOnScreen.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'private' stamp: 'JM 8/19/2011 15:11'!
+!ScriptableScratchMorph methodsFor: 'private' stamp: 'JM 8/23/2011 15:47'!
 deleteSprite
 	"Delete the sprite and all watchers that are associated with it."
 
 	| frame sprites i presenter instances |
+
 	frame _ self ownerThatIsA: ScratchFrameMorph. 
 	frame ifNil: [
 		presenter _ World findA: ScratchPresenterMorph.
