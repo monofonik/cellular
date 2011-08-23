@@ -2327,21 +2327,23 @@ penShade
 	^ penShade! !
 
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 12:59'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 16:31'!
 cloneCount
 
 	^ (self instances size) asString.! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 13:06'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 16:32'!
 cloneCount: aNumber
+
+	| num |
+
+	num _ [ aNumber asNumber ] ifError: [ Transcript show: 'Unable to parse number'; cr. ^ self ].
 
 	"Transcript show: 'ScratchSpriteMorph received cloneCount: ' , aNumber asString."
 
 	" Set the number of clones on the stage to the given number "
-
-	[self cloneCount < aNumber ] whileTrue: [ Transcript show: 'spawning' ; cr. self spawn ].
-
-	[self cloneCount > aNumber ] whileTrue: [ Transcript show: 'killing' ; cr. (self instances at: 1) deleteSprite.  ].
+	[ (self cloneCount asNumber) < num ] whileTrue: [ Transcript show: 'spawning' ; cr. self spawn ].
+	[ (self cloneCount asNumber) > num ] whileTrue: [ Transcript show: 'killing' ; cr. (self instances at: 1) deleteSprite. ].
 ! !
 
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:33'!

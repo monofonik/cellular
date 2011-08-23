@@ -26,7 +26,7 @@ buildRotationToggleMorph
 	self addMorph: rotationToggleMorph.
 ! !
 
-!LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 8/17/2011 12:03'!
+!LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 8/23/2011 16:08'!
 buildSubmorphs: isSprite
 	"LibraryItemMorph open"
 
@@ -60,12 +60,6 @@ buildSubmorphs: isSprite
 
 		self addMorph: cloneCountMorph.
 		].
-
-	"incrButton _ IconicButton new
-		extent: 15@5;
-		position: thumbWidth + ((self width - thumbWidth) // 2) - (7.5)@0.
-		label: '+' font: ((ScratchFrameMorph) getFont: #LibraryItemInfo).
-	self addMorph: incrButton."
 
 	self color: Color transparent.
 
@@ -605,8 +599,3 @@ stageMenu
 	menu localize; invokeOn: library.
 ! !
 
-
-!LibraryItemMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/17/2011 11:33'!
-getCloneCount
-
-	^ target getCloneCount.! !
