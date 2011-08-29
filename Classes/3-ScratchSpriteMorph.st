@@ -1090,14 +1090,19 @@ setScene: sceneName
 	self heading: (sceneState at: #heading).
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:05'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/26/2011 15:50'!
 setSizeTo: percent
 	"Set my size to the given percent of the original size. Limit the range to avoid accidentally making me invisibly tiny or really huge. Retain my aspect ratio (i.e., my stretch)."
 
 	"self prototype ifNil: [ ^ self ]."
 
+	"Added for system scratch"
+	self prototype ifNotNil: [ ^ self prototype setSizeTo: percent ].
+
 	self undeleteAttribute: #size.
-	self passiveSetSizeTo: percent
+	self passiveSetSizeTo: percent.
+
+	self instances do: [ :sprite | sprite passiveSetSizeTo: percent ]
 ! !
 
 !ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/19/2011 15:05'!
@@ -1559,7 +1564,7 @@ rotationDegrees: newRotationDegrees scalePoint: newScalePoint
 ! !
 
 
-!ScratchSpriteMorph methodsFor: 'handle ops' stamp: 'jens 10/27/2008 10:58'!
+!ScratchSpriteMorph methodsFor: 'handle ops' stamp: 'JM 8/26/2011 15:46'!
 resizeHandle
 
 	SpriteHandleMorph resize: self! !
@@ -1598,6 +1603,13 @@ allSubsprites
 	subsprites do: [: sub |
 		all addAll: sub allSubsprites ].
 	^ all! !
+
+!ScratchSpriteMorph methodsFor: 'nesting' stamp: 'JM 8/26/2011 16:02'!
+breed
+
+	"Spawns  new sprite from this one, unless we're the prototype"
+	self prototype ifNotNil: [ self spawn ].
+	(self ownerThatIsA: ScratchStageMorph) broadcastEventNamed: 'Scratch-StartClicked' with: 0.! !
 
 !ScratchSpriteMorph methodsFor: 'nesting' stamp: 'jens 8/10/2009 15:39'!
 cacheRefPos
@@ -2332,7 +2344,7 @@ cloneCount
 
 	^ (self instances size) asString.! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 16:32'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 16:22'!
 cloneCount: aNumber
 
 	| num |
@@ -2342,9 +2354,15 @@ cloneCount: aNumber
 	"Transcript show: 'ScratchSpriteMorph received cloneCount: ' , aNumber asString."
 
 	" Set the number of clones on the stage to the given number "
-	[ (self cloneCount asNumber) < num ] whileTrue: [ Transcript show: 'spawning' ; cr. self spawn ].
-	[ (self cloneCount asNumber) > num ] whileTrue: [ Transcript show: 'killing' ; cr. (self instances at: 1) deleteSprite. ].
+	[ (self cloneCount asNumber) < num ] whileTrue: [ self spawn ].
+	[ (self cloneCount asNumber) > num ] whileTrue: [ (self instances at: 1) deleteSprite. ].
 ! !
+
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 15:45'!
+die
+
+	"Deletes this sprite, unless it's the prototype"
+	self prototype ifNotNil: [ self deleteSprite ].! !
 
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:33'!
 syncToPrototype
@@ -2361,11 +2379,15 @@ syncToPrototype
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'jens 3/21/2011 00:38'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 8/26/2011 15:41'!
 blockSpecs
 
 	| blocks |
 	blocks _ #(
+		'control'
+			('breed'							-	breed)
+			('die'							-	die)
+			-
 		'motion'
 			('move %n steps'				-	forward:)
 			('turn %n degrees'				-	turnRight: 15)	"icon shows turn direction"
@@ -2461,7 +2483,6 @@ blockSpecs
 			=
 			('object %m'						r	getObject:)
 			('attribute %a'						r	get:)
-
 		).
 
 	^ blocks, super blockSpecs

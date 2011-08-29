@@ -6984,10 +6984,10 @@ surpriseSpriteMorph
 	m referencePosition: ((e x negated) to: e x) atRandom @ ((e y negated) to: e y) atRandom.
 ! !
 
-!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:40'!
+!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 16:36'!
 syncClones
 
-	(self workPane submorphs select: [ :sub | sub prototype isNil not ])
+	((self workPane submorphs select: [ :sub | sub isKindOf: ScratchSpriteMorph ]) select:[ :sub | sub prototype isNil not ])
 		do: [ :sub | sub syncToPrototype ].! !
 
 !ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'jm 9/29/2003 23:19'!
@@ -7686,10 +7686,10 @@ zoomOutTool
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:40'!
+!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 16:36'!
 syncClones
 
-	(self workPane submorphs select: [ :sub | sub prototype isNil not ])
+	((self workPane submorphs select: [ :sub | sub isKindOf: ScratchSpriteMorph ]) select:[ :sub | sub prototype isNil not ])
 		do: [ :sub | sub syncToPrototype ].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!

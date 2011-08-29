@@ -6735,7 +6735,7 @@ blockSpecDict
 
 ! !
 
-!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'jens 3/21/2011 00:37'!
+!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 8/26/2011 15:28'!
 blockSpecs
 	"Answer a collection of block specifications for the blocks that are common to all objects. Block specificatons (Arrays) are interspersed with category names (Strings). A block specification is an Array of the form: (<block spec string> <block type> <selector> [optional initial argument values]).
 
