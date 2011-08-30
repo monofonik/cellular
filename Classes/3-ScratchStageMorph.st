@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchStageMorph
-	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph '
+	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -8,7 +8,7 @@ I represent the background of the Scratch work pane. Like a sprite, I have a set
 !
 
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'jm 6/4/2009 12:03'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 8/30/2011 16:11'!
 initialize
 
 	super initialize.
@@ -28,6 +28,7 @@ initialize
 	obsoleteSavedState _ nil.
 	sprites _ OrderedCollection new.
 	showMotorBlocks _ false.
+	stepLength _ 100.
 ! !
 
 
@@ -819,6 +820,23 @@ startProcessFor: topBlock
 	^ proc
 ! !
 
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 16:04'!
+stepLength
+
+	"The amount of time in msecs to step each cycle"
+
+	^ stepLength.! !
+
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 16:53'!
+stepLength: aNumber
+	
+	"sets the amount of time in MSecs that should be processed between screen updates"
+	stepLength _ aNumber.
+
+	"if step length at min value, enable highlighting of blocks"
+	(stepLength = 1.0) ifTrue: [ ScratchProcess blockHighlightMSecs: 1 ]
+		ifFalse: [ ScratchProcess blockHighlightMSecs: 0].! !
+
 !ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'jm 12/12/2008 14:08'!
 stepProcesses
 	"Run each Scratch process until it gives up control, then filter out any processes that have terminated."
@@ -844,12 +862,12 @@ stepProcesses
 	inProcessStep _ false.
 ! !
 
-!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 14:43'!
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 16:10'!
 stepProcessesTurbo
 	"Run each Scratch process until it gives up control, then filter out any processes that have terminated. Do this repeatedly until time is up."
 
 	| sliceMSecs startMSecs now proc |
-	sliceMSecs _ ScratchProcess blockHighlightMSecs.
+	sliceMSecs _ self stepLength.
 	inProcessStep ifTrue: [^ self].
 	inProcessStep _ true.
 
@@ -2096,7 +2114,7 @@ initFieldsFrom: anObjStream version: classVersion
 	lists ifNil: [lists _ Dictionary new].  "work around"
 ! !
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'jm 6/4/2009 12:03'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 8/30/2011 16:11'!
 initialize
 
 	super initialize.
@@ -2116,6 +2134,7 @@ initialize
 	obsoleteSavedState _ nil.
 	sprites _ OrderedCollection new.
 	showMotorBlocks _ false.
+	stepLength _ 100.
 ! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 12/10/2008 13:57'!
@@ -2774,6 +2793,23 @@ step
 
 ! !
 
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 16:04'!
+stepLength
+
+	"The amount of time in msecs to step each cycle"
+
+	^ stepLength.! !
+
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 16:53'!
+stepLength: aNumber
+	
+	"sets the amount of time in MSecs that should be processed between screen updates"
+	stepLength _ aNumber.
+
+	"if step length at min value, enable highlighting of blocks"
+	(stepLength = 1.0) ifTrue: [ ScratchProcess blockHighlightMSecs: 1 ]
+		ifFalse: [ ScratchProcess blockHighlightMSecs: 0].! !
+
 !ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'jm 12/12/2008 14:08'!
 stepProcesses
 	"Run each Scratch process until it gives up control, then filter out any processes that have terminated."
@@ -2799,12 +2835,12 @@ stepProcesses
 	inProcessStep _ false.
 ! !
 
-!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 14:43'!
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 16:10'!
 stepProcessesTurbo
 	"Run each Scratch process until it gives up control, then filter out any processes that have terminated. Do this repeatedly until time is up."
 
 	| sliceMSecs startMSecs now proc |
-	sliceMSecs _ ScratchProcess blockHighlightMSecs.
+	sliceMSecs _ self stepLength.
 	inProcessStep ifTrue: [^ self].
 	inProcessStep _ true.
 

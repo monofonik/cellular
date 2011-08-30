@@ -93,7 +93,7 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 14:55'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 16:34'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
@@ -112,13 +112,14 @@ createStageButtonsPanel
 		addMorphBack: projectTitleMorph;
 		addMorphBack: (AlignmentMorph newSpacer: Color transparent).
 
+	"a slider to set the playback speed"
 	speedSlider _ SimpleSliderMorph new.
 	speedSlider width: 100;
 		height: 20;
-		target: ScratchProcess;
-		actionSelector: #blockHighlightMSecs:;
+		target: self;
+		actionSelector: #stepLength:;
 		minVal: 1;
-		maxVal: 500.
+		maxVal: 200.
 	stageButtonsPanel addMorphBack: speedSlider.
 
 
@@ -318,7 +319,7 @@ author: aString
 
 ! !
 
-!ScratchFrameMorph methodsFor: 'accessing' stamp: 'jens 2/24/2011 20:13'!
+!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 8/30/2011 16:49'!
 editMenu: aMenuTitleMorph
 
 	| menu onstage |
@@ -334,12 +335,13 @@ editMenu: aMenuTitleMorph
 	menu add: 'Undo last drop' action: #undoLastDrop.
 
 	menu addLine.
-
+"
 	menu addIcon: (self checkBoxLabelled: 'Turbo'
 				marked: self isTurbo
 				width: onstage width)
 			toolTip: 'check to squeeze more computational steps into one display cycle'
 			action: #toggleTurboMode.
+"
 "
 	menu addIcon: (self checkBoxLabelled: 'Single Stepping'
 				marked: (ScratchProcess blockHighlightMSecs <= 1) not
@@ -1211,6 +1213,12 @@ startHostingScratchSession
 	workPane scratchServer startHosting.
 	self showNetworkAddress.
 ! !
+
+!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 8/30/2011 16:38'!
+stepLength: aNumber
+
+	"Update the step length in MSecs of the stage"
+	workPane stepLength: aNumber.! !
 
 !ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'jens 5/18/2010 01:57'!
 stopAll
@@ -4355,7 +4363,7 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 14:55'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 16:34'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
@@ -4374,13 +4382,14 @@ createStageButtonsPanel
 		addMorphBack: projectTitleMorph;
 		addMorphBack: (AlignmentMorph newSpacer: Color transparent).
 
+	"a slider to set the playback speed"
 	speedSlider _ SimpleSliderMorph new.
 	speedSlider width: 100;
 		height: 20;
-		target: ScratchProcess;
-		actionSelector: #blockHighlightMSecs:;
+		target: self;
+		actionSelector: #stepLength:;
 		minVal: 1;
-		maxVal: 500.
+		maxVal: 200.
 	stageButtonsPanel addMorphBack: speedSlider.
 
 
@@ -4602,7 +4611,7 @@ editBlockDefinition: aCustomBlockDefinition for: aScriptableScratchMorph
 	editor getUserResponse.
 	blockEditors remove: editor ifAbsent: []! !
 
-!ScratchFrameMorph methodsFor: 'accessing' stamp: 'jens 2/24/2011 20:13'!
+!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 8/30/2011 16:49'!
 editMenu: aMenuTitleMorph
 
 	| menu onstage |
@@ -4618,12 +4627,13 @@ editMenu: aMenuTitleMorph
 	menu add: 'Undo last drop' action: #undoLastDrop.
 
 	menu addLine.
-
+"
 	menu addIcon: (self checkBoxLabelled: 'Turbo'
 				marked: self isTurbo
 				width: onstage width)
 			toolTip: 'check to squeeze more computational steps into one display cycle'
 			action: #toggleTurboMode.
+"
 "
 	menu addIcon: (self checkBoxLabelled: 'Single Stepping'
 				marked: (ScratchProcess blockHighlightMSecs <= 1) not
@@ -6419,13 +6429,6 @@ refreshBlocks
 		category: viewerPane currentCategory].
 ! !
 
-!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 14:40'!
-refreshInteveralMSecs: aNumber
-
-"sets the refresh speed in milliseconds"
-
-	ScratchProcess blockHighlightMSecs: aNumber.! !
-
 !ScratchFrameMorph methodsFor: 'byob' stamp: 'jens 6/10/2010 21:18'!
 removeBlockEditor: aBlockEditor
 	blockEditors remove: aBlockEditor! !
@@ -6956,6 +6959,12 @@ step
 		ifTrue: [flagButton on]
 		ifFalse: [flagButton off. self showPause]
 ! !
+
+!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 8/30/2011 16:38'!
+stepLength: aNumber
+
+	"Update the step length in MSecs of the stage"
+	workPane stepLength: aNumber.! !
 
 !ScratchFrameMorph methodsFor: 'stepping' stamp: 'jm 7/9/2003 12:02'!
 stepTime
@@ -7717,13 +7726,6 @@ zoomOutTool
 
 ! !
 
-
-!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 14:40'!
-refreshInteveralMSecs: aNumber
-
-"sets the refresh speed in milliseconds"
-
-	ScratchProcess blockHighlightMSecs: aNumber.! !
 
 !ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 16:36'!
 syncClones
