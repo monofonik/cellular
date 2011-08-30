@@ -3,7 +3,7 @@ Morph subclass: #HandMorph
 	classVariableNames: 'DoubleClickTime HoldTime NormalCursor PasteBuffer TranslucencyWhenDragging TranslucentWhenDragging '
 	poolDictionaries: ''
 	category: 'Morphic-Kernel'!
-!HandMorph commentStamp: 'jm 10/14/2002 07:36' prior: 0!
+!HandMorph commentStamp: '<historical>' prior: 0!
 The cursor may be thought of as the HandMorph. The hand's submorphs hold anything being carried by dragging. There can be multiple hands in the same world, in which case the user initials are displayed for each remote hand.
 !
 

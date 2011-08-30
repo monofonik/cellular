@@ -3,7 +3,7 @@ DividedImageFrameMorph subclass: #ScratchLibraryMorph
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-UI-Panes'!
-!ScratchLibraryMorph commentStamp: 'jm 10/28/2008 10:13' prior: 0!
+!ScratchLibraryMorph commentStamp: '<historical>' prior: 0!
 I am a Scratch library viewer. I display thumbnails of all the Scratch objects that exist in the world including the stage. Clicking on one of these thumbnails views the associated scratch object.
 !
 

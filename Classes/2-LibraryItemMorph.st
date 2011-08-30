@@ -3,7 +3,7 @@ Morph subclass: #LibraryItemMorph
 	classVariableNames: 'InfoFont NameFont '
 	poolDictionaries: ''
 	category: 'Scratch-UI-Support'!
-!LibraryItemMorph commentStamp: 'jm 2/25/2005 14:10' prior: 0!
+!LibraryItemMorph commentStamp: '<historical>' prior: 0!
 I represent a scriptable morph in the library pane. I display a thumbnail of the morph, its name, and some information about it.
 !
 
@@ -24,6 +24,31 @@ buildRotationToggleMorph
 		target: self;
 		actionSelector: #toggleRotationRule.
 	self addMorph: rotationToggleMorph.
+! !
+
+!LibraryItemMorph methodsFor: 'initialization' stamp: 'jens 7/28/2009 22:02'!
+buildSubmorphs
+	"LibraryItemMorph open"
+
+	thumbnailMorph _ ImageMorph new
+		form: (Form extent: thumbWidth@thumbWidth depth: 16) fillWhite;
+		position: ((self width - thumbWidth) // 2) @ 0.
+	self addMorph: thumbnailMorph.
+
+	nameMorph _ StringMorph new
+		font: (ScratchFrameMorph getFont: #LibraryItemName);
+		position: 0 @ (thumbnailMorph bottom -2).
+	self addMorph: nameMorph.
+
+	"scriptCountMorph _ StringMorph new
+		font: (ScratchFrameMorph getFont: #LibraryItemInfo);
+		contents: '';
+		position: 0 @ nameMorph bottom.
+	self addMorph: scriptCountMorph."
+
+	self color: Color transparent.
+
+	self buildRotationToggleMorph
 ! !
 
 !LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 8/23/2011 16:08'!
@@ -64,6 +89,25 @@ buildSubmorphs: isSprite
 	self color: Color transparent.
 
 	self buildRotationToggleMorph
+! !
+
+!LibraryItemMorph methodsFor: 'initialization' stamp: 'ee 3/25/2009 09:17'!
+extent: aRectangle thumbWidth: w
+
+	lastUpdateMSecs _ -1.
+	self extent: aRectangle.
+	thumbWidth _ w.
+
+	self buildSubmorphs.
+	self target: nil.
+	isSelected _ nil.
+	rolloverOn _ false.
+	highlightForm _ ImageFrameMorph new initFromForm: (ScratchFrameMorph skinAt: #librarySelected).
+	highlightForm extent: self extent.
+	rolloverForm _ ImageFrameMorph new initFromForm: (ScratchFrameMorph skinAt: #libraryRollover).
+	rolloverForm extent: self extent.
+	currentForm _ nil.
+	self highlight: false.
 ! !
 
 !LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 8/17/2011 11:23'!
@@ -529,7 +573,6 @@ rightButtonMenu
 ! !
 
 
-
 !LibraryItemMorph methodsFor: 'private' stamp: 'jens 9/16/2010 23:21'!
 toggleRotationRule
 
@@ -599,3 +642,8 @@ stageMenu
 	menu localize; invokeOn: library.
 ! !
 
+
+!LibraryItemMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/17/2011 11:33'!
+getCloneCount
+
+	^ target getCloneCount.! !

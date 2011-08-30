@@ -3,7 +3,7 @@ ReporterBlockMorph subclass: #VariableBlockMorph
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Blocks'!
-!VariableBlockMorph commentStamp: 'jm 2/20/2004 18:45' prior: 0!
+!VariableBlockMorph commentStamp: '<historical>' prior: 0!
 I am a block that reports the value of either a built-in or a user variable. When dropped into the workspace, I turn into a WatcherMorph for that variable with an optional slider.
 !
 

@@ -3,7 +3,7 @@ ScriptableScratchMorph subclass: #ScratchStageMorph
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
-!ScratchStageMorph commentStamp: 'jm 6/4/2004 14:17' prior: 0!
+!ScratchStageMorph commentStamp: '<historical>' prior: 0!
 I represent the background of the Scratch work pane. Like a sprite, I have a set of media and can change my costume. I also have my own scripts and variables. The main difference between me and a sprite is that I am fixed in position: I cannot move or rotate.
 !
 
@@ -844,12 +844,12 @@ stepProcesses
 	inProcessStep _ false.
 ! !
 
-!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'jm 6/4/2009 12:03'!
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 14:43'!
 stepProcessesTurbo
 	"Run each Scratch process until it gives up control, then filter out any processes that have terminated. Do this repeatedly until time is up."
 
 	| sliceMSecs startMSecs now proc |
-	sliceMSecs _ 100.
+	sliceMSecs _ ScratchProcess blockHighlightMSecs.
 	inProcessStep ifTrue: [^ self].
 	inProcessStep _ true.
 
@@ -2799,12 +2799,12 @@ stepProcesses
 	inProcessStep _ false.
 ! !
 
-!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'jm 6/4/2009 12:03'!
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 8/30/2011 14:43'!
 stepProcessesTurbo
 	"Run each Scratch process until it gives up control, then filter out any processes that have terminated. Do this repeatedly until time is up."
 
 	| sliceMSecs startMSecs now proc |
-	sliceMSecs _ 100.
+	sliceMSecs _ ScratchProcess blockHighlightMSecs.
 	inProcessStep ifTrue: [^ self].
 	inProcessStep _ true.
 

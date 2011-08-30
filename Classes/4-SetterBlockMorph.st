@@ -3,7 +3,7 @@ CommandBlockMorph subclass: #SetterBlockMorph
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Blocks'!
-!SetterBlockMorph commentStamp: 'jm 11/25/2003 13:04' prior: 0!
+!SetterBlockMorph commentStamp: '<historical>' prior: 0!
 I am a block for setting a variable.
 !
 

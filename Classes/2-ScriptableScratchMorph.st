@@ -3,7 +3,7 @@ Morph subclass: #ScriptableScratchMorph
 	classVariableNames: 'BlockColorDict BlockSpecDict DefaultBackgroundForm DefaultSpriteForm DoubleSize Experimental KeepOnStage ListBlockColor MeowSound ObjEncoding OldMeowPrefixReversed PopSound RandomGen Recorder ScratchOrigin TimerStartMSecs '
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
-!ScriptableScratchMorph commentStamp: 'jm 6/4/2004 14:16' prior: 0!
+!ScriptableScratchMorph commentStamp: '<historical>' prior: 0!
 I am the superclass of all scriptable Scratch morphs.
 
 Scriptable morphs:

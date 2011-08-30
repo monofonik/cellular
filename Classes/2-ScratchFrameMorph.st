@@ -3,7 +3,7 @@ Morph subclass: #ScratchFrameMorph
 	classVariableNames: 'AllowSharing Clipboard DefaultNotes DefaultSprite Fonts FontsXO IsXO ScratchServers ScratchSkin ScratchSkinXO ShareServer ShareServerPath SupportServer SupportServerPath TakeOverScreen UseErrorCatcher Version VersionDate VisibleDrives WorkpaneExtent '
 	poolDictionaries: ''
 	category: 'Scratch-UI-Panes'!
-!ScratchFrameMorph commentStamp: 'jm 7/20/2003 14:21' prior: 0!
+!ScratchFrameMorph commentStamp: '<historical>' prior: 0!
 I am the top level user interface for Scratch. I tile the screen with a toolbar, a work pane (for content), a viewer pane, and a script editor pane. I can resize myself to fill the entire Squeak window.
 
 I keep a list of Scratch processes (threads) and run each one to the its next stopping point when I am stepped each screen update cycle.
@@ -93,7 +93,7 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 13:10'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 14:55'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
@@ -114,9 +114,12 @@ createStageButtonsPanel
 
 	speedSlider _ SimpleSliderMorph new.
 	speedSlider width: 100;
-		height: 20.
+		height: 20;
+		target: ScratchProcess;
+		actionSelector: #blockHighlightMSecs:;
+		minVal: 1;
+		maxVal: 500.
 	stageButtonsPanel addMorphBack: speedSlider.
-	
 
 
 	"buttonSpecs defines the toolbar buttons; first is icon name, second is selector"
@@ -4352,7 +4355,7 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 13:10'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 14:55'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
@@ -4373,9 +4376,12 @@ createStageButtonsPanel
 
 	speedSlider _ SimpleSliderMorph new.
 	speedSlider width: 100;
-		height: 20.
+		height: 20;
+		target: ScratchProcess;
+		actionSelector: #blockHighlightMSecs:;
+		minVal: 1;
+		maxVal: 500.
 	stageButtonsPanel addMorphBack: speedSlider.
-	
 
 
 	"buttonSpecs defines the toolbar buttons; first is icon name, second is selector"
@@ -6413,6 +6419,13 @@ refreshBlocks
 		category: viewerPane currentCategory].
 ! !
 
+!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 14:40'!
+refreshInteveralMSecs: aNumber
+
+"sets the refresh speed in milliseconds"
+
+	ScratchProcess blockHighlightMSecs: aNumber.! !
+
 !ScratchFrameMorph methodsFor: 'byob' stamp: 'jens 6/10/2010 21:18'!
 removeBlockEditor: aBlockEditor
 	blockEditors remove: aBlockEditor! !
@@ -7361,6 +7374,11 @@ versionControlExport
 	
 	dir fileOutClassesChangedSince: date.	! !
 
+!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 14:34'!
+versionControlImport
+
+	self class versionControlDirectory fileInContents.! !
+
 !ScratchFrameMorph methodsFor: 'other' stamp: 'ee 11/4/2008 11:45'!
 view: aMorph tab: t category: c
 	"Add given morph to the work pane and view it."
@@ -7700,11 +7718,23 @@ zoomOutTool
 ! !
 
 
+!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 14:40'!
+refreshInteveralMSecs: aNumber
+
+"sets the refresh speed in milliseconds"
+
+	ScratchProcess blockHighlightMSecs: aNumber.! !
+
 !ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 16:36'!
 syncClones
 
 	((self workPane submorphs select: [ :sub | sub isKindOf: ScratchSpriteMorph ]) select:[ :sub | sub prototype isNil not ])
 		do: [ :sub | sub syncToPrototype ].! !
+
+!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 14:34'!
+versionControlImport
+
+	self class versionControlDirectory fileInContents.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 

@@ -3,7 +3,7 @@ Morph subclass: #BlockMorph
 	classVariableNames: 'ArgFont CBlockBracketThickness Contrast DebugMenu LabelColor LabelFont PuzzleInset PuzzleWidth '
 	poolDictionaries: ''
 	category: 'Scratch-Blocks'!
-!BlockMorph commentStamp: 'jm 3/13/2003 17:16' prior: 0!
+!BlockMorph commentStamp: '<historical>' prior: 0!
 I and my subclasses represent statements in a block-based graphical programming language.
 !
 
