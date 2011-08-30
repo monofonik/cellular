@@ -93,11 +93,11 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'jens 5/19/2010 03:35'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 13:10'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
-	| buttonSpecs bName button |
+	| buttonSpecs bName button speedSlider |
 	"create panel"
 	stageButtonsPanel _ AlignmentMorph new
 		color: Color transparent;
@@ -111,6 +111,13 @@ createStageButtonsPanel
 	stageButtonsPanel
 		addMorphBack: projectTitleMorph;
 		addMorphBack: (AlignmentMorph newSpacer: Color transparent).
+
+	speedSlider _ SimpleSliderMorph new.
+	speedSlider width: 100;
+		height: 20.
+	stageButtonsPanel addMorphBack: speedSlider.
+	
+
 
 	"buttonSpecs defines the toolbar buttons; first is icon name, second is selector"
 	buttonSpecs _ #(
@@ -4345,11 +4352,11 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'jens 5/19/2010 03:35'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 13:10'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
-	| buttonSpecs bName button |
+	| buttonSpecs bName button speedSlider |
 	"create panel"
 	stageButtonsPanel _ AlignmentMorph new
 		color: Color transparent;
@@ -4363,6 +4370,13 @@ createStageButtonsPanel
 	stageButtonsPanel
 		addMorphBack: projectTitleMorph;
 		addMorphBack: (AlignmentMorph newSpacer: Color transparent).
+
+	speedSlider _ SimpleSliderMorph new.
+	speedSlider width: 100;
+		height: 20.
+	stageButtonsPanel addMorphBack: speedSlider.
+	
+
 
 	"buttonSpecs defines the toolbar buttons; first is icon name, second is selector"
 	buttonSpecs _ #(

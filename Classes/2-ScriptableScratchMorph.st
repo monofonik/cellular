@@ -6684,6 +6684,12 @@ undeleteAttribute: aSymbol
 	w ifNil: [^ self].
 	w setCategoryColor: block color! !
 
+
+!ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 12:19'!
+layer: aNumber
+
+	"Override this in a subclass if it is meaningful" ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 ScriptableScratchMorph class
