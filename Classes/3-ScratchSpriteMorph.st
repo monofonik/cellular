@@ -2364,6 +2364,14 @@ die
 	"Deletes this sprite, unless it's the prototype"
 	self prototype ifNotNil: [ self deleteSprite ].! !
 
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 15:35'!
+setCellValue: aNumber
+
+	"update the value of the cell behind this sprite"
+	prototype ifNil: [ ^ self ].
+	((self ownerThatIsA: ScratchStageMorph) cellBehind: self) setValue: aNumber
+	! !
+
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:33'!
 syncToPrototype
 

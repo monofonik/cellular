@@ -1566,13 +1566,35 @@ passiveLookLike: costumeName
 	self propagate: #costumeIndex! !
 
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 15:05'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:35'!
+adjacentCellsTo: aSprite
+
+	| adjCells x y |
+
+	" returns 4 adjacent cells to the given sprite, which should be a ScratchCellMorph "
+	(aSprite isKindOf: ScratchCellMorph)	ifFalse: [ self halt ].
+
+	adjCells _ Set new.
+	x _ aSprite gridLocation x.
+	y _ aSprite gridLocation y.
+
+	x > 1 ifTrue: [ adjCells add: ((cells at: y) at: x - 1) ].
+	x < 48 ifTrue: [ adjCells add: ((cells at: y) at: x + 1) ].
+	y > 1 ifTrue: [ adjCells add: ((cells at: y - 1) at: x) ].
+	y < 36 ifTrue: [ adjCells add: ((cells at: y + 1) at: x) ].
+
+	^ adjCells
+	
+
+	! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 15:13'!
 cellBehind: aSprite
 
 	| cell |
 
-	cell _ (self morphsAt: aSprite position) select: [ :sub | sub isKindOf: ScratchCellMorph ].
-	cell size = 1 ifFalse: [ self halt ]. "should only be one cell returned"
+	cell _ (self morphsAt: (aSprite position + ((aSprite extent x / 2) @ (aSprite extent y / 2)))) select: [ :sub | sub isKindOf: ScratchCellMorph ].
+	cell size = 1 ifFalse: [ self halt ]. "only one cell should ever be returned"
 	^ cell at: 1.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 11:48'!
@@ -1582,31 +1604,24 @@ clearCells
 	cells do: [ :outer | outer do: [ :inner | inner clearCell ]]
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 14:59'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:13'!
 initialiseCells
 
-	| indx indy |
-
-	"cells _ Array new: 36."
-
-	indy _ 0.
-
-	36 timesRepeat: [
-		indy _ indy + 1.
-		"row _ Array new: 48."
-		indx _ 0.
-		48 timesRepeat: [ 
-			indx _ indx + 1.
-			self newCellAt: (indx - 1) * 10 at: (indy - 1) * 10.
+	cells _ Array new: 36.
+	1 to: 36 do:  [ :y |
+		cells at: y put: (Array new: 48).
+		1 to: 48 do: [ :x |
+			(cells at: y) at: x put: (self newCellAt: x at: y)
 		]
 	]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 12:55'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:15'!
 newCellAt: xLoc at: yLoc
 
 	| cell |
 	cell _ ScratchCellMorph new.
-	cell position: xLoc @ yLoc.
+	cell gridLocation: xLoc @ yLoc.
+	cell position: ((xLoc - 1) * 10) @ ((yLoc - 1) * 10).
 	self addMorphBack: cell.
 	^ cell.
 ! !
@@ -1626,6 +1641,28 @@ acceptDroppingMorph: aMorph event: evt
 	self changed.
 
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:35'!
+adjacentCellsTo: aSprite
+
+	| adjCells x y |
+
+	" returns 4 adjacent cells to the given sprite, which should be a ScratchCellMorph "
+	(aSprite isKindOf: ScratchCellMorph)	ifFalse: [ self halt ].
+
+	adjCells _ Set new.
+	x _ aSprite gridLocation x.
+	y _ aSprite gridLocation y.
+
+	x > 1 ifTrue: [ adjCells add: ((cells at: y) at: x - 1) ].
+	x < 48 ifTrue: [ adjCells add: ((cells at: y) at: x + 1) ].
+	y > 1 ifTrue: [ adjCells add: ((cells at: y - 1) at: x) ].
+	y < 36 ifTrue: [ adjCells add: ((cells at: y + 1) at: x) ].
+
+	^ adjCells
+	
+
+	! !
 
 !ScratchStageMorph methodsFor: '-- all --' stamp: 'jens 7/27/2009 23:14'!
 adjustedCursorPoint
@@ -1730,13 +1767,13 @@ broadcastEventNamed: name with: value
 	^ newProcs asArray
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 15:05'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 15:13'!
 cellBehind: aSprite
 
 	| cell |
 
-	cell _ (self morphsAt: aSprite position) select: [ :sub | sub isKindOf: ScratchCellMorph ].
-	cell size = 1 ifFalse: [ self halt ]. "should only be one cell returned"
+	cell _ (self morphsAt: (aSprite position + ((aSprite extent x / 2) @ (aSprite extent y / 2)))) select: [ :sub | sub isKindOf: ScratchCellMorph ].
+	cell size = 1 ifFalse: [ self halt ]. "only one cell should ever be returned"
 	^ cell at: 1.! !
 
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 10/6/2006 22:22'!
@@ -2180,22 +2217,14 @@ initFieldsFrom: anObjStream version: classVersion
 	lists ifNil: [lists _ Dictionary new].  "work around"
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 14:59'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:13'!
 initialiseCells
 
-	| indx indy |
-
-	"cells _ Array new: 36."
-
-	indy _ 0.
-
-	36 timesRepeat: [
-		indy _ indy + 1.
-		"row _ Array new: 48."
-		indx _ 0.
-		48 timesRepeat: [ 
-			indx _ indx + 1.
-			self newCellAt: (indx - 1) * 10 at: (indy - 1) * 10.
+	cells _ Array new: 36.
+	1 to: 36 do:  [ :y |
+		cells at: y put: (Array new: 48).
+		1 to: 48 do: [ :x |
+			(cells at: y) at: x put: (self newCellAt: x at: y)
 		]
 	]! !
 
@@ -2342,12 +2371,13 @@ mouseDown: evt
 		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 12:55'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:15'!
 newCellAt: xLoc at: yLoc
 
 	| cell |
 	cell _ ScratchCellMorph new.
-	cell position: xLoc @ yLoc.
+	cell gridLocation: xLoc @ yLoc.
+	cell position: ((xLoc - 1) * 10) @ ((yLoc - 1) * 10).
 	self addMorphBack: cell.
 	^ cell.
 ! !
