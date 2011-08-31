@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchStageMorph
-	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength '
+	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cells cellsForm '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -8,7 +8,7 @@ I represent the background of the Scratch work pane. Like a sprite, I have a set
 !
 
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 8/30/2011 16:11'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 8/31/2011 12:44'!
 initialize
 
 	super initialize.
@@ -29,7 +29,11 @@ initialize
 	sprites _ OrderedCollection new.
 	showMotorBlocks _ false.
 	stepLength _ 100.
-! !
+	self initialiseCells.
+
+	
+		
+	! !
 
 
 !ScratchStageMorph methodsFor: 'accessing' stamp: 'jm 8/2/2004 20:14'!
@@ -1562,6 +1566,52 @@ passiveLookLike: costumeName
 	self propagate: #costumeIndex! !
 
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 15:05'!
+cellBehind: aSprite
+
+	| cell |
+
+	cell _ (self morphsAt: aSprite position) select: [ :sub | sub isKindOf: ScratchCellMorph ].
+	cell size = 1 ifFalse: [ self halt ]. "should only be one cell returned"
+	^ cell at: 1.! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 11:48'!
+clearCells
+
+	"clear all cells"
+	cells do: [ :outer | outer do: [ :inner | inner clearCell ]]
+	! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 14:59'!
+initialiseCells
+
+	| indx indy |
+
+	"cells _ Array new: 36."
+
+	indy _ 0.
+
+	36 timesRepeat: [
+		indy _ indy + 1.
+		"row _ Array new: 48."
+		indx _ 0.
+		48 timesRepeat: [ 
+			indx _ indx + 1.
+			self newCellAt: (indx - 1) * 10 at: (indy - 1) * 10.
+		]
+	]! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 12:55'!
+newCellAt: xLoc at: yLoc
+
+	| cell |
+	cell _ ScratchCellMorph new.
+	cell position: xLoc @ yLoc.
+	self addMorphBack: cell.
+	^ cell.
+! !
+
+
 !ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'jm 11/18/2008 17:43'!
 acceptDroppingMorph: aMorph event: evt
 
@@ -1680,6 +1730,15 @@ broadcastEventNamed: name with: value
 	^ newProcs asArray
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 15:05'!
+cellBehind: aSprite
+
+	| cell |
+
+	cell _ (self morphsAt: aSprite position) select: [ :sub | sub isKindOf: ScratchCellMorph ].
+	cell size = 1 ifFalse: [ self halt ]. "should only be one cell returned"
+	^ cell at: 1.! !
+
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 10/6/2006 22:22'!
 changeBackgroundIndexBy: aNumber
 	"Change my background index by the given amount."
@@ -1718,6 +1777,13 @@ clearAllVariables
 	sprites do: [:each |
 		each clearVariables]
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 11:48'!
+clearCells
+
+	"clear all cells"
+	cells do: [ :outer | outer do: [ :inner | inner clearCell ]]
+	! !
 
 !ScratchStageMorph methodsFor: 'pen support' stamp: 'jm 2/5/2005 11:31'!
 clearPenTrails
@@ -2114,7 +2180,26 @@ initFieldsFrom: anObjStream version: classVersion
 	lists ifNil: [lists _ Dictionary new].  "work around"
 ! !
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 8/30/2011 16:11'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 14:59'!
+initialiseCells
+
+	| indx indy |
+
+	"cells _ Array new: 36."
+
+	indy _ 0.
+
+	36 timesRepeat: [
+		indy _ indy + 1.
+		"row _ Array new: 48."
+		indx _ 0.
+		48 timesRepeat: [ 
+			indx _ indx + 1.
+			self newCellAt: (indx - 1) * 10 at: (indy - 1) * 10.
+		]
+	]! !
+
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 8/31/2011 12:44'!
 initialize
 
 	super initialize.
@@ -2135,7 +2220,11 @@ initialize
 	sprites _ OrderedCollection new.
 	showMotorBlocks _ false.
 	stepLength _ 100.
-! !
+	self initialiseCells.
+
+	
+		
+	! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 12/10/2008 13:57'!
 invalidRect: damageRect
@@ -2251,6 +2340,16 @@ mouseDown: evt
 	evt rightButtonPressed
 		ifTrue: [Sensor waitNoButton. ^ self rightButtonMenu]
 		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
+! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 12:55'!
+newCellAt: xLoc at: yLoc
+
+	| cell |
+	cell _ ScratchCellMorph new.
+	cell position: xLoc @ yLoc.
+	self addMorphBack: cell.
+	^ cell.
 ! !
 
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'ee 6/27/2008 17:46'!
