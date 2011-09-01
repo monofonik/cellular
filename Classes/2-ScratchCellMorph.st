@@ -1,5 +1,5 @@
 Morph subclass: #ScratchCellMorph
-	instanceVariableNames: 'gridLocation value changed spread '
+	instanceVariableNames: 'gridLocation values colors '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -7,40 +7,49 @@ Morph subclass: #ScratchCellMorph
 I am a cell that represents an area of the stage environment. Sprites that are at my location can query and update my properties.!
 
 
-!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 8/31/2011 16:01'!
+!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/1/2011 14:05'!
 initialize
 
 	super initialize.
-	spread _ 2.
-	value _ 0.
+	values _ Dictionary new.
 	self extent: 10@10.
-	self color: (Color fromString: 'white').
+	self color: (Color fromString: 'white'). "default cell color with no attributes"
 ! !
 
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 15:53'!
-changeValue: aNumber
-
-	^ self changeValue: aNumber spread: spread.! !
-
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 16:55'!
-changeValue: aValue spread: aSpread
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 14:43'!
+changeValue: aString by: aNumber spread: aSpread
 
 	" check for a spread amount and update neighbouring cells "
 	| myVal |	
-	myVal _ value.
+	(values includes: aString) 
+		ifTrue: [myVal _ values at: aString ]
+		ifFalse: [ myVal _ 0 ].
 
 	aSpread > 0 ifTrue: [ 
 		"spread the value to adjacent cells, halving each time"
-		((self ownerThatIsA: ScratchStageMorph) adjacentCellsTo: self) do: [ :cell | cell changeValue: aValue / 2 spread: aSpread - 1 ].
+		((self ownerThatIsA: ScratchStageMorph) adjacentCellsTo: self) do: [ :cell | cell changeValue: aString by: aNumber / 2 spread: aSpread - 1 ].
 	].
 
-	^ self value: myVal + aValue.! !
+	values at: aString put: myVal + aNumber.! !
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 15:38'!
-clearCell
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 11:36'!
+clearValue: aString spread: aSpread
 	
-	self changeValue: value negated.! !
+	self changeValue: aString to: (values at: aString) value negated spread: aSpread! !
+
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 11:36'!
+clearValues
+	
+	values keys do: [ :key |
+		self changeValue: key to: (values at: key) negated.
+	]! !
+
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 13:45'!
+deleteValue: aString
+
+	values removeKey: aString.
+	colors removeKey: aString! !
 
 !ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 16:11'!
 gridLocation
@@ -52,24 +61,44 @@ gridLocation: aPoint
 
 	gridLocation _ aPoint.! !
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 16:44'!
-setValue: aValue
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 12:17'!
+setValue: aString to: aNumber spread: aSpread
 
-	self changeValue: aValue - value spread: spread! !
+	| oldval |
+	(values includes: aString) ifFalse: [ oldval _ 0 ] ifTrue: [ oldval _ values at: aString ].
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 16:44'!
-setValue: aValue spread: aSpread
+	self changeValue: aString by: aNumber - oldval spread: aSpread! !
 
-	self changeValue: aValue - value spread: aSpread! !
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 14:45'!
+update: aDictionary
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 16:38'!
-value
+	"updates the cell colour using a dictionary of attribute specs"
 
-	^ value.! !
+	| keys col |
+	keys _ aDictionary keysSortedSafely.
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 16:38'!
-value: aNumber
+	"If no attributes, just use white"
+	keys size = 0 
+		ifTrue: [ col _ Color fromString: 'white' ]
+		ifFalse: [
+			| key attr val |
+			key _ keys removeFirst.
+			attr _ aDictionary at: key.
+			val _ values at: key.
 
-	value _ (aNumber min: 100) max: 0.
-	self color: (Color r: 1 g: 0 b: 0 alpha: aNumber / 100).
+			"get the initial colour"
+			col _ Color h: attr hue s: val / (attr max - attr min) v: 1.
+
+			"mix with any other attribute colors"
+			[ keys size > 0 ] whileTrue: [
+				key _ keys removeFirst.
+				attr _ aDictionary at: key.
+				val _ values at: key.
+				col _ col mixed: 0.5 with: (Color h: attr hue s: val / (attr max - attr min) v: 1).
+			]
+		].
+
+	"update the color for this cell"
+	self color: col.
+	
 	self changed.! !

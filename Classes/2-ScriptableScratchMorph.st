@@ -2345,6 +2345,32 @@ addComment: aScratchCommentMorph
 	blocksBin addMorph: aScratchCommentMorph.
 ! !
 
+!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 9/1/2011 16:52'!
+addEnvironmentAttribute
+	"Ask the user for the details of a new environment attribute"
+
+	| sFrame results attrName min max default spread hue |
+	(sFrame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ self beep].
+
+	results _ NewEnvAttributeDialog ask: 'Attribute name?'.
+	attrName _ results at: 1.
+	min _ results at: 2.
+	max _ results at: 3.
+	default _ results at: 4.
+	spread _ results at: 5.
+	hue _ results at: 6.
+
+	attrName size = 0 ifTrue: [^ self].
+	attrName _ attrName asUTF8.
+	(sFrame workPane hasAttribute: attrName) ifTrue: [
+		self beep.
+		DialogBoxMorph warn: 'That attribute name is already in use'.
+		^ self].
+
+	sFrame workPane createAttribute: attrName min: min max: max default: default spread: spread hue: hue.
+	sFrame viewerPane categoryChanged: 'pen'.
+! !
+
 !ScriptableScratchMorph methodsFor: 'scripts' stamp: 'jm 6/26/2006 09:57'!
 addStack: aBlockStack
 	"Aligns the newly added script below the lowest script in the pane."
@@ -6684,6 +6710,26 @@ undeleteAttribute: aSymbol
 	w ifNil: [^ self].
 	w setCategoryColor: block color! !
 
+
+!ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 15:23'!
+addEnvAttribute
+	"Ask the user for a variable name, then add a background (global) variable of that name."
+
+	| sFrame varName |
+	(sFrame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ self beep].
+
+	varName _ StringDialog ask: 'Variable name?'.
+	varName size = 0 ifTrue: [^ self].
+	varName _ varName asUTF8.
+	(sFrame workPane variableNameInUse: varName) ifTrue: [
+		self beep.
+		DialogBoxMorph warn: 'That variable name is already in use'.
+		^ self].
+
+	sFrame workPane addVariable: varName.
+	sFrame viewerPane categoryChanged: 'variables'.
+	self addWatcherForNewVariable: varName withScope: sFrame workPane.
+! !
 
 !ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 12:19'!
 layer: aNumber

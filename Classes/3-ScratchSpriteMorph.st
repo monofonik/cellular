@@ -2339,19 +2339,54 @@ penShade
 	^ penShade! !
 
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:49'!
+changeCellBy: aNumber
+
+	| cell |
+
+	"set the value of the cell behind this sprite"
+	prototype ifNil: [ ^ self ].
+	cell _ self currentCell.
+	cell ifNotNil: [ cell changeValue: aNumber ].! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:57'!
+clearCell
+
+	| cell |
+	"clears the value of the current cell"
+	cell _ self currentCell.
+	cell ifNotNil: [ cell clearCell ].
+	! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:58'!
+currentCell
+
+	"return the cell that this sprite is standing on"
+	self prototype ifNil: [ ^ nil ].
+	^ (self ownerThatIsA: ScratchStageMorph) cellBehind: self! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:58'!
+setCellTo: aNumber
+
+	| cell |
+
+	"set the value of the cell behind this sprite"
+	cell _ self currentCell.
+	cell ifNotNil: [ cell setValue: aNumber ]
+	! !
+
+
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 16:31'!
 cloneCount
 
 	^ (self instances size) asString.! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 16:22'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 09:39'!
 cloneCount: aNumber
 
 	| num |
 
 	num _ [ aNumber asNumber ] ifError: [ Transcript show: 'Unable to parse number'; cr. ^ self ].
-
-	"Transcript show: 'ScratchSpriteMorph received cloneCount: ' , aNumber asString."
 
 	" Set the number of clones on the stage to the given number "
 	[ (self cloneCount asNumber) < num ] whileTrue: [ self spawn ].
@@ -2363,14 +2398,6 @@ die
 
 	"Deletes this sprite, unless it's the prototype"
 	self prototype ifNotNil: [ self deleteSprite ].! !
-
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/31/2011 15:35'!
-setCellValue: aNumber
-
-	"update the value of the cell behind this sprite"
-	prototype ifNil: [ ^ self ].
-	((self ownerThatIsA: ScratchStageMorph) cellBehind: self) setValue: aNumber
-	! !
 
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:33'!
 syncToPrototype
@@ -2387,7 +2414,7 @@ syncToPrototype
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 8/26/2011 15:41'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/1/2011 09:45'!
 blockSpecs
 
 	| blocks |
@@ -2419,6 +2446,11 @@ blockSpecs
 			('y position'						r	ypos)
 			('direction'						r	heading)
 		'pen'
+			('change cell by %n'			-	changeCellBy: 0)
+			('set cell to %n'					-	setCellTo: 0)
+			('clear cell'						-	clearCell)
+			-		
+	
 			('clear'							-	clearPenTrails)
 			-
 			('pen down'						-	putPenDown)
