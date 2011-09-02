@@ -22,6 +22,14 @@ initChangerForVar: varName
 	self variable: var.
 ! !
 
+!SetterBlockMorph methodsFor: 'initialization' stamp: 'JM 9/2/2011 14:05'!
+initSetterForEnvAttribute
+
+	self commandSpec: (ScratchTranslator translationFor: 'set %3 to %n').
+	argPermutation _ CommandBlockMorph argPermutationForSpec: 'set %3 to %n' withTranslation: commandSpec.
+	self selector: #setCell:to:.
+! !
+
 !SetterBlockMorph methodsFor: 'initialization' stamp: 'jens 2/28/2011 02:06'!
 initSetterForVar: varName
 

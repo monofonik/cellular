@@ -1566,6 +1566,31 @@ passiveLookLike: costumeName
 	self propagate: #costumeIndex! !
 
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 11:58'!
+addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
+
+	| addButton deleteButton x y |
+
+	x _ xLoc.
+	y _ yLoc.
+
+	addButton _ ScratchFrameMorph
+			buttonLabel: 'Make an env. attribute' localized
+			selector: #addEnvironmentAttribute.
+	aPane addMorph: (addButton target: self; position: x@y).
+	y _ y + 25.
+
+	deleteButton _ ScratchFrameMorph
+			buttonLabel: 'Delete an env. attribute' localized
+			selector: #deleteEnvironmentAttribute.
+	aPane addMorph: (deleteButton target: self; position: x@y).
+	y _ y + 25.
+
+	aPane addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
+	y _ y + 20. "insert a line"
+
+	^ y.! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:35'!
 adjacentCellsTo: aSprite
 
@@ -1612,6 +1637,21 @@ allCellsDo: aSelector with: anArg with: anotherArg with: lastArg
 	"perform the provided action on all cells"
 	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]]! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:28'!
+cellAttribute: aString
+
+	^ cellAttributes at: aString ifAbsent: [ self halt ].! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:40'!
+cellAttributeNames
+
+	^ cellAttributes keys! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 14:45'!
+cellAttributes
+
+	^ cellAttributes! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 09:48'!
 cellBehind: aSprite
 
@@ -1622,6 +1662,16 @@ cellBehind: aSprite
 		ifFalse: [ ^ nil ].
 	
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:07'!
+cellValue: aString for: aSprite
+
+	| cell |
+	
+	cell _ self cellBehind: aSprite.
+
+	cell ifNotNil: [ ^ cell value: aString ].
+	^ 0.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:40'!
 changeCellValue: aString for: aSprite by: aNumber
@@ -1645,15 +1695,15 @@ clearCellValue: aString for: aSprite
 	cell clearValue: aString spread: attr spread.
 	cell update: cellAttributes.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:40'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:53'!
 clearCells
 
 	"clear all cells values for every attribute"
 	self allCellsDo: #clearValues.
-	self allCellsDo: #update: with: cellAttributes.
+	"self allCellsDo: #update: with: cellAttributes."
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 16:51'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:22'!
 createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hue: aHue 
 
 	| attr |
@@ -1671,8 +1721,8 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hu
 	cellAttributes at: aString put: attr.
 		
 	"update all cells"
-	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: aSpread.
-	self allCellsDo: #update: with: cellAttributes.! !
+	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
+	"self allCellsDo: #update: with: cellAttributes."! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:39'!
 deleteAttribute: aString
@@ -1682,10 +1732,10 @@ deleteAttribute: aString
 	self allCellsDo: #update: with: cellAttributes.
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 16:45'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 11:59'!
 hasAttribute: aString
 
-	^ cellAttributes contains: aString! !
+	^ cellAttributes includes: aString! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 16:52'!
 initialiseCells
@@ -1714,7 +1764,7 @@ newCellAt: xLoc at: yLoc
 	^ cell.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:38'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 14:44'!
 setCellValue: aString for: aSprite to: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -1722,8 +1772,9 @@ setCellValue: aString for: aSprite to: aNumber
 	cell _ self cellBehind: aSprite.
 	attr _ cellAttributes at: aString.
 
-	cell setValue: aString to: aNumber spread: attr spread.
-	cell update: cellAttributes.! !
+	cell ifNotNil: [ 
+		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
+	]! !
 
 
 !ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'jm 11/18/2008 17:43'!
@@ -1740,6 +1791,31 @@ acceptDroppingMorph: aMorph event: evt
 	self changed.
 
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 11:58'!
+addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
+
+	| addButton deleteButton x y |
+
+	x _ xLoc.
+	y _ yLoc.
+
+	addButton _ ScratchFrameMorph
+			buttonLabel: 'Make an env. attribute' localized
+			selector: #addEnvironmentAttribute.
+	aPane addMorph: (addButton target: self; position: x@y).
+	y _ y + 25.
+
+	deleteButton _ ScratchFrameMorph
+			buttonLabel: 'Delete an env. attribute' localized
+			selector: #deleteEnvironmentAttribute.
+	aPane addMorph: (deleteButton target: self; position: x@y).
+	y _ y + 25.
+
+	aPane addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
+	y _ y + 20. "insert a line"
+
+	^ y.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:35'!
 adjacentCellsTo: aSprite
@@ -1890,6 +1966,21 @@ broadcastEventNamed: name with: value
 	^ newProcs asArray
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:28'!
+cellAttribute: aString
+
+	^ cellAttributes at: aString ifAbsent: [ self halt ].! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:40'!
+cellAttributeNames
+
+	^ cellAttributes keys! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 14:45'!
+cellAttributes
+
+	^ cellAttributes! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 09:48'!
 cellBehind: aSprite
 
@@ -1900,6 +1991,16 @@ cellBehind: aSprite
 		ifFalse: [ ^ nil ].
 	
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:07'!
+cellValue: aString for: aSprite
+
+	| cell |
+	
+	cell _ self cellBehind: aSprite.
+
+	cell ifNotNil: [ ^ cell value: aString ].
+	^ 0.! !
 
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 10/6/2006 22:22'!
 changeBackgroundIndexBy: aNumber
@@ -1962,12 +2063,12 @@ clearCellValue: aString for: aSprite
 	cell clearValue: aString spread: attr spread.
 	cell update: cellAttributes.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:40'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:53'!
 clearCells
 
 	"clear all cells values for every attribute"
 	self allCellsDo: #clearValues.
-	self allCellsDo: #update: with: cellAttributes.
+	"self allCellsDo: #update: with: cellAttributes."
 	! !
 
 !ScratchStageMorph methodsFor: 'pen support' stamp: 'jm 2/5/2005 11:31'!
@@ -2010,7 +2111,7 @@ costumeChanged
 	self changed.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 16:51'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:22'!
 createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hue: aHue 
 
 	| attr |
@@ -2028,8 +2129,8 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hu
 	cellAttributes at: aString put: attr.
 		
 	"update all cells"
-	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: aSpread.
-	self allCellsDo: #update: with: cellAttributes.! !
+	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
+	"self allCellsDo: #update: with: cellAttributes."! !
 
 !ScratchStageMorph methodsFor: 'pen support' stamp: 'jm 2/11/2005 21:56'!
 createOrResizeTrailsForm
@@ -2331,10 +2432,10 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 16:45'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 11:59'!
 hasAttribute: aString
 
-	^ cellAttributes contains: aString! !
+	^ cellAttributes includes: aString! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 11/8/2006 18:09'!
 incrRedraw: damageList
@@ -2922,7 +3023,7 @@ sensorBoard: aSensorBoardMorph
 	sensorBoard _ aSensorBoardMorph.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:38'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 14:44'!
 setCellValue: aString for: aSprite to: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -2930,8 +3031,9 @@ setCellValue: aString for: aSprite to: aNumber
 	cell _ self cellBehind: aSprite.
 	attr _ cellAttributes at: aString.
 
-	cell setValue: aString to: aNumber spread: attr spread.
-	cell update: cellAttributes.! !
+	cell ifNotNil: [ 
+		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
+	]! !
 
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 6/2/2004 19:00'!
 setHPanTo: aNumber
@@ -3445,12 +3547,14 @@ userSelectSpriteDefault: defaultSprite butNotAnyOf: excludeArray
 ScratchStageMorph class
 	instanceVariableNames: ''!
 
-!ScratchStageMorph class methodsFor: 'block specs' stamp: 'JM 9/1/2011 10:01'!
+!ScratchStageMorph class methodsFor: 'block specs' stamp: 'JM 9/2/2011 15:09'!
 blockSpecs
 
 	| blocks |
 	blocks _ #(
 		'sensing'
+			('clear environment'		-	clearCells)
+			-
 			('ask %s and wait'			s	doAsk 'What''s your name?')
 			('answer'					r	answer)
 			-
@@ -3486,7 +3590,6 @@ blockSpecs
 			-
 "xxx			('place sprites for scene %x'	-	showScene:) "
 		'pen'
-			('clear cells'				-	clearCells)
 			('clear'						-	clearPenTrails)
 	).
 

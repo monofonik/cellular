@@ -2345,7 +2345,7 @@ addComment: aScratchCommentMorph
 	blocksBin addMorph: aScratchCommentMorph.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 9/1/2011 16:52'!
+!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 9/2/2011 12:23'!
 addEnvironmentAttribute
 	"Ask the user for the details of a new environment attribute"
 
@@ -2353,6 +2353,8 @@ addEnvironmentAttribute
 	(sFrame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ self beep].
 
 	results _ NewEnvAttributeDialog ask: 'Attribute name?'.
+	results = #cancelled ifTrue: [^ self].
+
 	attrName _ results at: 1.
 	min _ results at: 2.
 	max _ results at: 3.
@@ -2368,7 +2370,7 @@ addEnvironmentAttribute
 		^ self].
 
 	sFrame workPane createAttribute: attrName min: min max: max default: default spread: spread hue: hue.
-	sFrame viewerPane categoryChanged: 'pen'.
+	"sFrame viewerPane categoryChanged: 'pen'."
 ! !
 
 !ScriptableScratchMorph methodsFor: 'scripts' stamp: 'jm 6/26/2006 09:57'!
@@ -4089,7 +4091,7 @@ viewerPageForMotion
 	^ bin
 ! !
 
-!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'jens 1/7/2010 03:16'!
+!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'JM 9/2/2011 11:54'!
 viewerPageForSensing
 	"Answer a morph containing mtion blocks for the given category for use in the given ScratchViewer."
 
@@ -4097,6 +4099,9 @@ viewerPageForSensing
 	bin _ ScratchBlockPaletteMorph new.
 	x _ 12.
 	y _ 10.
+	
+	y _ self addEnvironmentBlocksTo: bin x: x y: y.
+
 	(self blocksFor: 'sensing') do: [:blockOrSym |
 		(blockOrSym = #-) | (blockOrSym = #~) |  (blockOrSym = #=)
 			ifTrue: [
@@ -5254,7 +5259,7 @@ addCustomBlocksTo: page y: startY
 			page addMorph: (b position: (x@y)).
 			y _ y + b height + 3 ]].! !
 
-!ScriptableScratchMorph methodsFor: 'byob' stamp: 'jens 2/11/2011 01:45'!
+!ScriptableScratchMorph methodsFor: 'byob' stamp: 'JM 9/2/2011 12:24'!
 addVariable
 	"Ask the user for a variable name, then add a user variable of that name. This version is for sprites and supports the option of making the variable specific to the sprite (i.e. local)."
 
@@ -5263,6 +5268,7 @@ addVariable
 
 	result _ NewVariableDialog ask: 'Variable name?'.
 	result = #cancelled ifTrue: [^ self].
+
 	varName _ result first asUTF8.
 	varOwner _ result second ifTrue: [self] ifFalse: [sFrame workPane].
 	(varOwner variableNameInUse: varName) ifTrue: [
@@ -6711,25 +6717,10 @@ undeleteAttribute: aSymbol
 	w setCategoryColor: block color! !
 
 
-!ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 15:23'!
-addEnvAttribute
-	"Ask the user for a variable name, then add a background (global) variable of that name."
+!ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 11:52'!
+addEnvironmentBlocksTo: aPane x: x y: y
 
-	| sFrame varName |
-	(sFrame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ self beep].
-
-	varName _ StringDialog ask: 'Variable name?'.
-	varName size = 0 ifTrue: [^ self].
-	varName _ varName asUTF8.
-	(sFrame workPane variableNameInUse: varName) ifTrue: [
-		self beep.
-		DialogBoxMorph warn: 'That variable name is already in use'.
-		^ self].
-
-	sFrame workPane addVariable: varName.
-	sFrame viewerPane categoryChanged: 'variables'.
-	self addWatcherForNewVariable: varName withScope: sFrame workPane.
-! !
+	self subclassResponsibility! !
 
 !ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 12:19'!
 layer: aNumber

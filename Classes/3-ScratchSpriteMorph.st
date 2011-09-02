@@ -2339,42 +2339,79 @@ penShade
 	^ penShade! !
 
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:49'!
-changeCellBy: aNumber
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 13:51'!
+addEnvAttributeBlocksTo: page x: x y: startY
 
-	| cell |
+	| y vName stage block varBlocks |
+	y _ startY.
 
-	"set the value of the cell behind this sprite"
-	prototype ifNil: [ ^ self ].
-	cell _ self currentCell.
-	cell ifNotNil: [ cell changeValue: aNumber ].! !
+	"pick a default variable name"
+	vName _ nil.
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	(stage notNil and: [stage varNames size > 0])
+		ifTrue: [
+			vName _ stage varNames first]
+		ifFalse: [
+			self varNames size = 0
+				ifTrue: [vName = ''  "^ y"]
+				ifFalse: [vName _ self varNames first]].
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:57'!
-clearCell
+	vName ifNil: [vName _ ''].
 
-	| cell |
-	"clears the value of the current cell"
-	cell _ self currentCell.
-	cell ifNotNil: [ cell clearCell ].
-	! !
+	varBlocks _ OrderedCollection new.
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:58'!
-currentCell
+	block _ SetterBlockMorph new
+		initSetterForVar: vName;
+		receiver: self blockReceiver.
+	block expressionArg stringExpression: '0'.
+	varBlocks add: block.
 
-	"return the cell that this sprite is standing on"
-	self prototype ifNil: [ ^ nil ].
-	^ (self ownerThatIsA: ScratchStageMorph) cellBehind: self! !
+	block _ SetterBlockMorph new
+		initChangerForVar: vName;
+		receiver: self blockReceiver.
+	block expressionArg numExpression: '1'.
+	varBlocks add: block.
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:58'!
-setCellTo: aNumber
+	(self blocksFor: 'variables') do: [:b |
+		(b isKindOf: BlockMorph) ifTrue: [
+			b defaultArgs: (Array with: vName)].
+			varBlocks add: b].
 
-	| cell |
+	block _ VariableDeclarationBlockMorph new
+		minArgs: 1; 
+		commandSpec: 'script variables' localized; 
+		receiver: self blockReceiver;
+		addItem;
+		isSpecialForm: true;
+		selector: #doDeclareVariables.
+	varBlocks add: block afterIndex: 5.
 
-	"set the value of the cell behind this sprite"
-	cell _ self currentCell.
-	cell ifNotNil: [ cell setValue: aNumber ]
-	! !
+	varBlocks do: [:blockOrSym |
+		(blockOrSym = #-) | (blockOrSym = #~) | (blockOrSym = #=)
+			ifTrue: [
+				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"
+				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"
+				(blockOrSym = #=) ifTrue: [
+					y _ y + 7.
+					page addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
+					y _ y + 20]]  "insert a line"
+			ifFalse: [
+				blockOrSym color: ((blockOrSym isKindOf: VariableDeclarationBlockMorph)
+									ifTrue: [Color gray]
+									ifFalse: [ self variableBlockColor]).
+				page addMorph: (blockOrSym position: x@y).
+				y _ blockOrSym bottom + 3]].
+"
 
+
+[:b |
+		b color: self variableBlockColor.
+		page addMorph: (b position: x@y).
+		y _ b bottom + 3].
+"
+	^ y
+
+! !
 
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 16:31'!
 cloneCount
@@ -2399,22 +2436,112 @@ die
 	"Deletes this sprite, unless it's the prototype"
 	self prototype ifNotNil: [ self deleteSprite ].! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/16/2011 09:33'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 14:19'!
 syncToPrototype
 
 	"Updates this sprites blocks bin with a full copy of its prototypes"
 
 	self prototype ifNotNil: [ blocksBin _ self prototype blocksBin fullCopy ].
-
 	blocksBin submorphs do: [ :block |
 		block receiver: self. ]! !
+
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:58'!
+addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
+
+	| stage x y |
+	x _ xLoc.
+	y _ yLoc.
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	
+	stage ifNotNil: [
+		
+		stage cellAttributeNames do: [ :name | | reporter |
+
+			reporter _ EnvAttributeBlockMorph new.
+			reporter selector: #envAttr.
+			reporter commandSpec: name.
+			reporter updateLabel.
+			aPane addMorph: ( reporter receiver: self; position: x@y ).
+
+			y _ y + 25.
+			
+		]
+	].
+
+	^ y! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:34'!
+cellValue: aString
+
+	self prototype ifNil: [ ^ 0 ].
+	^ self currentCell value:aString! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:40'!
+changeCellValue: aString by: aNumber
+
+	| cell |
+
+	"set the value of the cell behind this sprite"
+	prototype ifNil: [ ^ self ].
+	cell _ self currentCell.
+	cell ifNotNil: [ cell changeValue: aString by: aNumber ].! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:36'!
+clearCell
+
+	"clears the value of the current cell"
+
+	self prototype ifNil: [ ^ self ].
+	self currentCell clearValues
+	! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:43'!
+clearValue: aString
+
+	| cell |
+	"clears the cell value for the given attribute"
+	self prototype ifNil: [ ^ self ].
+	cell _ self currentCell.
+
+	cell ifNotNil: [ cell clearValue: aString ].
+		! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:58'!
+currentCell
+
+	"return the cell that this sprite is standing on"
+	self prototype ifNil: [ ^ nil ].
+	^ (self ownerThatIsA: ScratchStageMorph) cellBehind: self! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:02'!
+envAttrNames
+
+	^ (self ownerThatIsA: ScratchStageMorph) cellAttributeNames! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:03'!
+envAttrNamesMenu
+
+	^ (self ownerThatIsA: ScratchStageMorph) cellAttributeNames! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:30'!
+setCell: aString to: aNumber
+
+	| stage |
+
+	self prototype ifNil: [ ^ self ].
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNotNil: [ stage setCellValue: aString for: self to: aNumber ].
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/1/2011 09:45'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/2/2011 15:38'!
 blockSpecs
 
 	| blocks |
@@ -2446,10 +2573,6 @@ blockSpecs
 			('y position'						r	ypos)
 			('direction'						r	heading)
 		'pen'
-			('change cell by %n'			-	changeCellBy: 0)
-			('set cell to %n'					-	setCellTo: 0)
-			('clear cell'						-	clearCell)
-			-		
 	
 			('clear'							-	clearPenTrails)
 			-
@@ -2467,6 +2590,7 @@ blockSpecs
 			('set pen size to %n'				-	penSize: 1)
 			-
 			('stamp'							-	stampCostume)
+			
 	).
 
 	blocks _ blocks, #(
@@ -2494,6 +2618,13 @@ blockSpecs
 			('go to front'					-	comeToFront)
 			('go back %n layers'			-	goBackByLayers: 1)
 		'sensing'
+			('value of %3'					r	cellValue: )
+			('set %3 to %n'					- 	setCell:to: )
+			('change %3 by %n'				-	changeCellValue:by:)
+			('clear %3'						-	clearValue:)
+			('clear cell'						-	clearCell)
+			-			
+
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)
 			('color %C is touching %C?'		b	color:sees:)
