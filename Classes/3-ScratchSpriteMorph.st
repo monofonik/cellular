@@ -2446,10 +2446,12 @@ syncToPrototype
 		block receiver: self. ]! !
 
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:58'!
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/5/2011 11:05'!
 addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
-	| stage x y |
+	^ yLoc.
+
+	"| stage x y |
 	x _ xLoc.
 	y _ yLoc.
 
@@ -2470,7 +2472,7 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 		]
 	].
 
-	^ y! !
+	^ y"! !
 
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:34'!
 cellValue: aString
@@ -2478,11 +2480,10 @@ cellValue: aString
 	self prototype ifNil: [ ^ 0 ].
 	^ self currentCell value:aString! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:40'!
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/5/2011 10:27'!
 changeCellValue: aString by: aNumber
 
 	| cell |
-
 	"set the value of the cell behind this sprite"
 	prototype ifNil: [ ^ self ].
 	cell _ self currentCell.

@@ -2070,6 +2070,31 @@ changeVar: varName by: increment
 	self setVar: varName to: n asNumberNoError + increment asNumberNoError.
 ! !
 
+!ScriptableScratchMorph methodsFor: 'variables' stamp: 'JM 9/5/2011 12:12'!
+deleteEnvironmentAttribute
+	"Ask the user which env var to delete, then remove it."
+
+	| sFrame stage menu choice |
+	sFrame _ self ownerThatIsA: ScratchFrameMorph.
+	sFrame ifNil: [^ self].
+
+	stage _ sFrame workPane.
+	(stage cellAttributes isEmpty)
+		ifTrue: [^ self inform: 'No env attributes.' localized].
+
+	menu _ CustomMenu new.
+	stage cellAttributeNames do: [:v | menu add: v asMacRoman action: (Array with: v with: #global)].
+	"self = stage ifFalse: [
+		stage varNames isEmpty ifFalse: [menu addLine].
+		self varNames do: [:v | menu add: v asMacRoman action: (Array with: v with: #local)]]."
+	choice _ menu startUp.
+	choice ifNil: [^ self].
+
+	stage deleteCellAttribute: choice first.
+
+	sFrame viewerPane categoryChanged: 'sensing'.
+! !
+
 !ScriptableScratchMorph methodsFor: 'variables' stamp: 'jens 5/12/2010 00:46'!
 deleteVariable
 	"Ask the user which user variable to delete, then remove it."
@@ -4006,7 +4031,7 @@ viewBlocksAndScripts
 		self zoomRectFrom: self bounds to: editor bounds].
 ! !
 
-!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'jens 6/8/2010 22:42'!
+!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'JM 9/5/2011 11:03'!
 viewerPageForCategory: aCategoryName
 	"Answer a morph containing blocks for the given category for use in the given ScratchViewer."
 
@@ -4085,32 +4110,6 @@ viewerPageForMotion
 			ifTrue: [
 				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"
 				(blockOrSym = #~) ifTrue: [y _ y + 5]]  "insert a half space"
-			ifFalse: [
-				y _ self createBlock: blockOrSym atPosition: x@y onPage: bin]].
-
-	^ bin
-! !
-
-!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'JM 9/2/2011 11:54'!
-viewerPageForSensing
-	"Answer a morph containing mtion blocks for the given category for use in the given ScratchViewer."
-
-	| bin x y |
-	bin _ ScratchBlockPaletteMorph new.
-	x _ 12.
-	y _ 10.
-	
-	y _ self addEnvironmentBlocksTo: bin x: x y: y.
-
-	(self blocksFor: 'sensing') do: [:blockOrSym |
-		(blockOrSym = #-) | (blockOrSym = #~) |  (blockOrSym = #=)
-			ifTrue: [
-				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"
-				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"
-				(blockOrSym = #=) ifTrue: [
-					y _ y + 7.
-					bin addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
-					y _ y + 20]]  "insert a line"
 			ifFalse: [
 				y _ self createBlock: blockOrSym atPosition: x@y onPage: bin]].
 
@@ -6717,15 +6716,34 @@ undeleteAttribute: aSymbol
 	w setCategoryColor: block color! !
 
 
-!ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 11:52'!
-addEnvironmentBlocksTo: aPane x: x y: y
-
-	self subclassResponsibility! !
-
 !ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 12:19'!
 layer: aNumber
 
 	"Override this in a subclass if it is meaningful" ! !
+
+!ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/5/2011 11:03'!
+viewerPageForSensing	
+
+	"Answer a morph containing mtion blocks for the given category for use in the given ScratchViewer."		
+	| bin x y |	
+	bin _ ScratchBlockPaletteMorph new.	
+	x _ 12.	
+	y _ 10.
+		
+	y _ self addEnvironmentBlocksTo: bin x: x y: y.		
+	(self blocksFor: 'sensing') do: [:blockOrSym |	
+		(blockOrSym = #-) | (blockOrSym = #~) |  (blockOrSym = #=)	
+			ifTrue: [	
+				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"	
+				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"	
+				(blockOrSym = #=) ifTrue: [	
+					y _ y + 7.	
+					bin addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).	
+					y _ y + 20]]  "insert a line"	
+			ifFalse: [	
+				y _ self createBlock: blockOrSym atPosition: x@y onPage: bin]].	
+	
+	^ bin! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 

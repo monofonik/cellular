@@ -1637,10 +1637,10 @@ allCellsDo: aSelector with: anArg with: anotherArg with: lastArg
 	"perform the provided action on all cells"
 	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:28'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:20'!
 cellAttribute: aString
 
-	^ cellAttributes at: aString ifAbsent: [ self halt ].! !
+	^ cellAttributes at: aString! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:40'!
 cellAttributeNames
@@ -1663,13 +1663,12 @@ cellBehind: aSprite
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:07'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 11:22'!
 cellValue: aString for: aSprite
 
 	| cell |
 	
 	cell _ self cellBehind: aSprite.
-
 	cell ifNotNil: [ ^ cell value: aString ].
 	^ 0.! !
 
@@ -1724,12 +1723,12 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hu
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
 	"self allCellsDo: #update: with: cellAttributes."! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:39'!
-deleteAttribute: aString
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:24'!
+deleteCellAttribute: aString
 
+	self allCellsDo: #deleteValue: with: aString.
 	cellAttributes removeKey: aString.
-	self allCellsDo: #deleteValue with: aString.
-	self allCellsDo: #update: with: cellAttributes.
+	self allCellsDo: #update
 	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 11:59'!
@@ -1966,10 +1965,10 @@ broadcastEventNamed: name with: value
 	^ newProcs asArray
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:28'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:20'!
 cellAttribute: aString
 
-	^ cellAttributes at: aString ifAbsent: [ self halt ].! !
+	^ cellAttributes at: aString! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:40'!
 cellAttributeNames
@@ -1992,13 +1991,12 @@ cellBehind: aSprite
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:07'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 11:22'!
 cellValue: aString for: aSprite
 
 	| cell |
 	
 	cell _ self cellBehind: aSprite.
-
 	cell ifNotNil: [ ^ cell value: aString ].
 	^ 0.! !
 
@@ -2175,12 +2173,12 @@ deleteAllClones
 	self allClones do: [:clone | clone delete].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:39'!
-deleteAttribute: aString
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:24'!
+deleteCellAttribute: aString
 
+	self allCellsDo: #deleteValue: with: aString.
 	cellAttributes removeKey: aString.
-	self allCellsDo: #deleteValue with: aString.
-	self allCellsDo: #update: with: cellAttributes.
+	self allCellsDo: #update
 	! !
 
 !ScratchStageMorph methodsFor: 'byob OOP' stamp: 'jens 1/31/2011 00:30'!
