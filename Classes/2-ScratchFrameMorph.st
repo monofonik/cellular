@@ -1,5 +1,5 @@
 Morph subclass: #ScratchFrameMorph
-	instanceVariableNames: 'blockEditors topPane viewerPane scriptsPane stageFrame workPane titlePane libraryPane menuPanel stageButtonsPanel readoutPane logoMorph projectTitleMorph flagButton pauseButton fillScreenFlag paintingInProgress projectDirectory projectName projectInfo author loginName loginPassword watcherPositions shuffledCostumeNames justSaved viewModeButtons viewMode lastViewMode viewModeButtonsPanel toolbarPanel lastWeDoPoll quitFlag '
+	instanceVariableNames: 'blockEditors topPane viewerPane scriptsPane stageFrame workPane titlePane libraryPane menuPanel stageButtonsPanel readoutPane logoMorph projectTitleMorph flagButton pauseButton fillScreenFlag paintingInProgress projectDirectory projectName projectInfo author loginName loginPassword watcherPositions shuffledCostumeNames justSaved viewModeButtons viewMode lastViewMode viewModeButtonsPanel toolbarPanel envToolbarPanel lastWeDoPoll quitFlag '
 	classVariableNames: 'AllowSharing Clipboard DefaultNotes DefaultSprite Fonts FontsXO IsXO ScratchServers ScratchSkin ScratchSkinXO ShareServer ShareServerPath SupportServer SupportServerPath TakeOverScreen UseErrorCatcher Version VersionDate VisibleDrives WorkpaneExtent '
 	poolDictionaries: ''
 	category: 'Scratch-UI-Panes'!
@@ -34,6 +34,38 @@ createBasicPanes
 
 	self createReadoutPane.
 	workPane comeToFront.
+! !
+
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/9/2011 11:47'!
+createEnvToolbar
+	"Create and add the environment toolbar."
+
+	| buttonSpecs bName button |
+	envToolbarPanel _ AlignmentMorph new
+		hResizing: #shrinkWrap;
+		vResizing: #shrinkWrap;
+		color: Color transparent.
+		
+	buttonSpecs _ #(
+		"name			selector"			"tooltip"
+		(paint			paintTool		'Paint')
+		(erase			eraseTool		'Erase')
+	).
+
+	buttonSpecs do: [:spec |
+		bName _ spec at: 1.
+		button _ ToggleButton
+			onForm: (ScratchFrameMorph skinAt: (bName, 'ButtonPressed') asSymbol)
+			offForm: (ScratchFrameMorph skinAt: (bName, 'Button') asSymbol)
+			overForm: (ScratchFrameMorph skinAt: (bName, 'ButtonOver') asSymbol).
+		button
+			target: self;
+			actionSelector: (spec at: 2);
+			isMomentary: true;
+			setProperty: #balloonText toValue: (spec at: 3) localized.
+		envToolbarPanel addMorphBack: button].
+
+	self addMorph: envToolbarPanel.
 ! !
 
 !ScratchFrameMorph methodsFor: 'intialization' stamp: 'ee 1/27/2009 13:21'!
@@ -221,7 +253,7 @@ createViewModeButtonsPanel
 	self addMorph: viewModeButtonsPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'jens 6/10/2010 21:17'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/9/2011 10:33'!
 initialize
 
 	super initialize.
@@ -243,6 +275,7 @@ initialize
 	self createViewModeButtonsPanel.
 	self createStageButtonsPanel.
 	self createToolbar.
+	self createEnvToolbar.
 
 	self extent: 1000@600.
 ! !
@@ -1284,6 +1317,30 @@ uniqueSummaryFileName
 
 ! !
 
+!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 9/9/2011 14:38'!
+updateToolButtons
+	"Update the highlighting of my tool buttons."
+
+	| toolButtons envToolButtons currentTool |
+	Sensor anyButtonPressed ifTrue: [^ self].  "don't update if mouse button pressed"
+
+	toolButtons _ toolbarPanel submorphs select: [:m |
+		(m isKindOf: ToggleButton) and: [m actionSelector endsWith: 'Tool']].
+
+	envToolButtons _ envToolbarPanel submorphs select: [:m |
+		(m isKindOf: ToggleButton) and: [m actionSelector endsWith: 'Tool']].
+
+	currentTool _ (World activeHand toolType ifNil: ['none']) asLowercase.
+
+	toolButtons, envToolButtons do: [:b |
+		(b actionSelector asLowercase = currentTool)
+			ifTrue: [b on.]
+			ifFalse: [b off]].
+
+	
+
+! !
+
 !ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 8/16/2011 09:49'!
 versionControlExport
 	"Outputs all classes that have changed since the project start date to a directory that should be managed by an external revision control system."
@@ -1400,7 +1457,7 @@ extent: aPoint
 	self fixLayout.
 ! !
 
-!ScratchFrameMorph methodsFor: 'geometry' stamp: 'jm 4/22/2009 08:59'!
+!ScratchFrameMorph methodsFor: 'geometry' stamp: 'JM 9/9/2011 10:42'!
 fixLayout
 
 	| stageExtent xyReadout w |
@@ -1475,6 +1532,16 @@ fixLayout
 		ifFalse: [
 			(toolbarPanel owner = self) ifFalse: [
 				self addMorphFront: toolbarPanel]].
+
+	envToolbarPanel
+		left: (stageFrame left - 4 max: toolbarPanel right);
+		top: self top + ((topPane height - toolbarPanel height) // 2) + 3.
+
+	((envToolbarPanel right - 5) > viewModeButtonsPanel left)
+		ifTrue: [envToolbarPanel delete]
+		ifFalse: [
+			(envToolbarPanel owner = self) ifFalse: [
+				self addMorphFront: envToolbarPanel]].
 ! !
 
 !ScratchFrameMorph methodsFor: 'geometry' stamp: 'jm 12/23/2008 13:50'!
@@ -1687,24 +1754,6 @@ stepTime
 	"Every screen update cycle."
 
 	^ 0
-! !
-
-!ScratchFrameMorph methodsFor: 'stepping' stamp: 'jm 4/22/2009 08:36'!
-updateToolButtons
-	"Update the highlighting of my tool buttons."
-
-	| toolButtons currentTool |
-	Sensor anyButtonPressed ifTrue: [^ self].  "don't update if mouse button pressed"
-
-	toolButtons _ toolbarPanel submorphs select: [:m |
-		(m isKindOf: ToggleButton) and: [m actionSelector endsWith: 'Tool']].
-
-	currentTool _ (World activeHand toolType ifNil: ['none']) asLowercase.
-	toolButtons do: [:b |
-		(b actionSelector asLowercase = currentTool)
-			ifTrue: [b on]
-			ifFalse: [b off]].
-
 ! !
 
 
@@ -2651,7 +2700,7 @@ updateLastHistoryEntryIfNeeded
 	projectInfo at: 'history' put: s contents.
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'jens 3/3/2011 08:54'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 9/9/2011 13:31'!
 writeScratchProject
 	"Write this Scratch project to the file named projectFile in the project directory. Called by saveScratchProject."
 
@@ -2709,7 +2758,7 @@ writeScratchProject
 			[	out close.
 				projectDirectory deleteFileNamed: out localName.
 			] ifError: []]. 
-		saveError _ err].
+		saveError _ err asString , ' - Receiver: ' , rcvr asString].
 
 	workPane allMorphsDo: [:m |
 		(m isKindOf: ScriptableScratchMorph) ifTrue: [
@@ -2818,7 +2867,7 @@ scriptsStringForUpload
 	^ s contents
 ! !
 
-!ScratchFrameMorph methodsFor: 'uploading' stamp: 'jens 7/27/2010 13:44'!
+!ScratchFrameMorph methodsFor: 'uploading' stamp: 'JM 9/9/2011 13:13'!
 writeScratchProjectOn: aStream
 	"Write this Scratch project in a serialized form on the given stream."
 
@@ -3030,10 +3079,11 @@ watcherShowingFor: sprite selectorAndArg: selectorAndArg
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'tools (no longer used)' stamp: 'jm 2/13/2009 15:26'!
+!ScratchFrameMorph methodsFor: 'tools (no longer used)' stamp: 'JM 9/9/2011 11:49'!
 copyTool
 
 	| hand cursorForm offset |
+
 	self paintingInProgress ifTrue: [^ self beep].
 	hand _ self world activeHand.
 	hand toolType: 'CopyTool'.
@@ -3292,7 +3342,7 @@ setLanguage: aString
 	justSaved _ tempJustSaved].
 ! !
 
-!ScratchFrameMorph methodsFor: 'private' stamp: 'jens 11/19/2009 21:45'!
+!ScratchFrameMorph methodsFor: 'private' stamp: 'JM 9/9/2011 10:42'!
 updatePanes
 
 	| p |
@@ -3301,6 +3351,9 @@ updatePanes
 
 	toolbarPanel delete.
 	self createToolbar.
+
+	envToolbarPanel delete.
+	self createEnvToolbar.
 
 	viewModeButtonsPanel delete.
 	self createViewModeButtonsPanel.
@@ -4262,10 +4315,11 @@ compressSounds
 	DialogBoxMorph inform: 'Sounds compressed' withDetails: count printString.
 ! !
 
-!ScratchFrameMorph methodsFor: 'tools (no longer used)' stamp: 'jm 2/13/2009 15:26'!
+!ScratchFrameMorph methodsFor: 'tools (no longer used)' stamp: 'JM 9/9/2011 11:49'!
 copyTool
 
 	| hand cursorForm offset |
+
 	self paintingInProgress ifTrue: [^ self beep].
 	hand _ self world activeHand.
 	hand toolType: 'CopyTool'.
@@ -4304,6 +4358,38 @@ createBasicPanes
 
 	self createReadoutPane.
 	workPane comeToFront.
+! !
+
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/9/2011 11:47'!
+createEnvToolbar
+	"Create and add the environment toolbar."
+
+	| buttonSpecs bName button |
+	envToolbarPanel _ AlignmentMorph new
+		hResizing: #shrinkWrap;
+		vResizing: #shrinkWrap;
+		color: Color transparent.
+		
+	buttonSpecs _ #(
+		"name			selector"			"tooltip"
+		(paint			paintTool		'Paint')
+		(erase			eraseTool		'Erase')
+	).
+
+	buttonSpecs do: [:spec |
+		bName _ spec at: 1.
+		button _ ToggleButton
+			onForm: (ScratchFrameMorph skinAt: (bName, 'ButtonPressed') asSymbol)
+			offForm: (ScratchFrameMorph skinAt: (bName, 'Button') asSymbol)
+			overForm: (ScratchFrameMorph skinAt: (bName, 'ButtonOver') asSymbol).
+		button
+			target: self;
+			actionSelector: (spec at: 2);
+			isMomentary: true;
+			setProperty: #balloonText toValue: (spec at: 3) localized.
+		envToolbarPanel addMorphBack: button].
+
+	self addMorph: envToolbarPanel.
 ! !
 
 !ScratchFrameMorph methodsFor: 'intialization' stamp: 'ee 1/27/2009 13:21'!
@@ -4812,6 +4898,23 @@ enterQuarterModeIfSmallScreen
 	viewMode = #normal ifTrue: [self enterQuarterMode].
 ! !
 
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 14:48'!
+eraseTool
+
+	| hand cursorForm offset |
+	self paintingInProgress ifTrue: [^ self beep].
+	hand _ self world activeHand.
+	hand toolType: 'EraseTool'.
+
+	cursorForm _ ScratchFrameMorph skinAt: #eraseCursor.
+	offset _ 8@8.
+
+	ScratchFrameMorph isXO ifTrue: [
+		cursorForm _ cursorForm magnifyBy: 1.5.
+		offset _ (offset * 1.5) rounded].
+
+	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
+
 !ScratchFrameMorph methodsFor: 'view mode' stamp: 'jens 8/13/2009 23:48'!
 exitPresentationMode
 	"Exit presentation mode."
@@ -4965,7 +5068,7 @@ Note: this is a compatibility force method for BYOB - jens"
 	^ proj
 ! !
 
-!ScratchFrameMorph methodsFor: '-- all --' stamp: 'JM 8/16/2011 10:05'!
+!ScratchFrameMorph methodsFor: '-- all --' stamp: 'JM 9/9/2011 10:13'!
 fileMenu: aMenuTitleMorph
 
 	| menu |
@@ -4984,6 +5087,8 @@ fileMenu: aMenuTitleMorph
 		menu addLine.
 		menu add: 'Export to version control' action: #versionControlExport.
 		menu add: 'Import from version control' action: #versionControlImport.
+		menu addLine.
+		menu add: 'Update interface skin' action: #updateInterfaceSkin.
 			
 		"menu add: 'Write Project Summary' action: #writeSummaryFile."
 		"menu add: 'Write Multiple Project Summaries' action: #writeMultipleSummaries]."
@@ -5068,7 +5173,7 @@ fixByteReversedSounds
 		allSoundBuffers do: [:buf | buf reverseEndiannessStereo: false]].
 ! !
 
-!ScratchFrameMorph methodsFor: 'geometry' stamp: 'jm 4/22/2009 08:59'!
+!ScratchFrameMorph methodsFor: 'geometry' stamp: 'JM 9/9/2011 10:42'!
 fixLayout
 
 	| stageExtent xyReadout w |
@@ -5143,6 +5248,16 @@ fixLayout
 		ifFalse: [
 			(toolbarPanel owner = self) ifFalse: [
 				self addMorphFront: toolbarPanel]].
+
+	envToolbarPanel
+		left: (stageFrame left - 4 max: toolbarPanel right);
+		top: self top + ((topPane height - toolbarPanel height) // 2) + 3.
+
+	((envToolbarPanel right - 5) > viewModeButtonsPanel left)
+		ifTrue: [envToolbarPanel delete]
+		ifFalse: [
+			(envToolbarPanel owner = self) ifFalse: [
+				self addMorphFront: envToolbarPanel]].
 ! !
 
 !ScratchFrameMorph methodsFor: 'private' stamp: 'ee 2/3/2009 13:26'!
@@ -5355,7 +5470,7 @@ importSpriteOrProject: fileNameOrData
 	workPane layoutChanged.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'jens 6/10/2010 21:17'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/9/2011 10:33'!
 initialize
 
 	super initialize.
@@ -5377,6 +5492,7 @@ initialize
 	self createViewModeButtonsPanel.
 	self createStageButtonsPanel.
 	self createToolbar.
+	self createEnvToolbar.
 
 	self extent: 1000@600.
 ! !
@@ -5941,6 +6057,23 @@ paintSpriteMorph
 	self addAndView: m.
 	m editDrawingOldCostumeName: m costume mediaName deleteOnCancel: true.
 ! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 12:25'!
+paintTool
+
+	| hand cursorForm offset |
+	self paintingInProgress ifTrue: [^ self beep].
+	hand _ self world activeHand.
+	hand toolType: 'PaintTool'.
+
+	cursorForm _ ScratchFrameMorph skinAt: #paintCursor.
+	offset _ 8@8.
+
+	ScratchFrameMorph isXO ifTrue: [
+		cursorForm _ cursorForm magnifyBy: 1.5.
+		offset _ (offset * 1.5) rounded].
+
+	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
 
 !ScratchFrameMorph methodsFor: 'accessing' stamp: 'jm 5/2/2005 17:22'!
 paintingInProgress
@@ -7020,7 +7153,7 @@ surpriseSpriteMorph
 	m referencePosition: ((e x negated) to: e x) atRandom @ ((e y negated) to: e y) atRandom.
 ! !
 
-!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 16:36'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/26/2011 16:36'!
 syncClones
 
 	((self workPane submorphs select: [ :sub | sub isKindOf: ScratchSpriteMorph ]) select:[ :sub | sub prototype isNil not ])
@@ -7241,6 +7374,15 @@ updateHistoryProjectName: projName op: operation
 
 ! !
 
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 10:12'!
+updateInterfaceSkin
+
+	"Reads in the latest skin from the ScratchSkin folder and updates the UI appearance."
+
+	self class readSkinFrom: (FileDirectory default directoryNamed: 'ScratchSkin').
+	"self rebuildUIForNewLanguage."
+	ScratchTranslator updateScratchUI.! !
+
 !ScratchFrameMorph methodsFor: 'file read/write' stamp: 'jm 3/28/2007 12:43'!
 updateLastHistoryEntryIfNeeded
 	"If the the last entry in this project's history is an old-sytle entry (i.e. one that does not include the project name and author) update it."
@@ -7272,7 +7414,7 @@ updateMediaCategoryFor: anObject
 		viewerPane categoryChanged: 'Sound'].
 ! !
 
-!ScratchFrameMorph methodsFor: 'private' stamp: 'jens 11/19/2009 21:45'!
+!ScratchFrameMorph methodsFor: 'private' stamp: 'JM 9/9/2011 10:42'!
 updatePanes
 
 	| p |
@@ -7281,6 +7423,9 @@ updatePanes
 
 	toolbarPanel delete.
 	self createToolbar.
+
+	envToolbarPanel delete.
+	self createEnvToolbar.
 
 	viewModeButtonsPanel delete.
 	self createViewModeButtonsPanel.
@@ -7341,21 +7486,27 @@ updateProjectName
 	self fixLayout.
 ! !
 
-!ScratchFrameMorph methodsFor: 'stepping' stamp: 'jm 4/22/2009 08:36'!
+!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 9/9/2011 14:38'!
 updateToolButtons
 	"Update the highlighting of my tool buttons."
 
-	| toolButtons currentTool |
+	| toolButtons envToolButtons currentTool |
 	Sensor anyButtonPressed ifTrue: [^ self].  "don't update if mouse button pressed"
 
 	toolButtons _ toolbarPanel submorphs select: [:m |
 		(m isKindOf: ToggleButton) and: [m actionSelector endsWith: 'Tool']].
 
+	envToolButtons _ envToolbarPanel submorphs select: [:m |
+		(m isKindOf: ToggleButton) and: [m actionSelector endsWith: 'Tool']].
+
 	currentTool _ (World activeHand toolType ifNil: ['none']) asLowercase.
-	toolButtons do: [:b |
+
+	toolButtons, envToolButtons do: [:b |
 		(b actionSelector asLowercase = currentTool)
-			ifTrue: [b on]
+			ifTrue: [b on.]
 			ifFalse: [b off]].
+
+	
 
 ! !
 
@@ -7383,7 +7534,7 @@ versionControlExport
 	
 	dir fileOutClassesChangedSince: date.	! !
 
-!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 14:34'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/23/2011 14:34'!
 versionControlImport
 
 	self class versionControlDirectory fileInContents.! !
@@ -7477,7 +7628,7 @@ writeMultipleSummaries
 			self writeSummaryFile: fn]].
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'jens 3/3/2011 08:54'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 9/9/2011 13:31'!
 writeScratchProject
 	"Write this Scratch project to the file named projectFile in the project directory. Called by saveScratchProject."
 
@@ -7535,7 +7686,7 @@ writeScratchProject
 			[	out close.
 				projectDirectory deleteFileNamed: out localName.
 			] ifError: []]. 
-		saveError _ err].
+		saveError _ err asString , ' - Receiver: ' , rcvr asString].
 
 	workPane allMorphsDo: [:m |
 		(m isKindOf: ScriptableScratchMorph) ifTrue: [
@@ -7563,7 +7714,7 @@ writeScratchProject
 			self inform: 'Save failed' withDetails: saveError].
 ! !
 
-!ScratchFrameMorph methodsFor: 'uploading' stamp: 'jens 7/27/2010 13:44'!
+!ScratchFrameMorph methodsFor: 'uploading' stamp: 'JM 9/9/2011 13:13'!
 writeScratchProjectOn: aStream
 	"Write this Scratch project in a serialized form on the given stream."
 
@@ -7727,13 +7878,56 @@ zoomOutTool
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 16:36'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 14:48'!
+eraseTool
+
+	| hand cursorForm offset |
+	self paintingInProgress ifTrue: [^ self beep].
+	hand _ self world activeHand.
+	hand toolType: 'EraseTool'.
+
+	cursorForm _ ScratchFrameMorph skinAt: #eraseCursor.
+	offset _ 8@8.
+
+	ScratchFrameMorph isXO ifTrue: [
+		cursorForm _ cursorForm magnifyBy: 1.5.
+		offset _ (offset * 1.5) rounded].
+
+	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 12:25'!
+paintTool
+
+	| hand cursorForm offset |
+	self paintingInProgress ifTrue: [^ self beep].
+	hand _ self world activeHand.
+	hand toolType: 'PaintTool'.
+
+	cursorForm _ ScratchFrameMorph skinAt: #paintCursor.
+	offset _ 8@8.
+
+	ScratchFrameMorph isXO ifTrue: [
+		cursorForm _ cursorForm magnifyBy: 1.5.
+		offset _ (offset * 1.5) rounded].
+
+	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/26/2011 16:36'!
 syncClones
 
 	((self workPane submorphs select: [ :sub | sub isKindOf: ScratchSpriteMorph ]) select:[ :sub | sub prototype isNil not ])
 		do: [ :sub | sub syncToPrototype ].! !
 
-!ScratchFrameMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 14:34'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 10:12'!
+updateInterfaceSkin
+
+	"Reads in the latest skin from the ScratchSkin folder and updates the UI appearance."
+
+	self class readSkinFrom: (FileDirectory default directoryNamed: 'ScratchSkin').
+	"self rebuildUIForNewLanguage."
+	ScratchTranslator updateScratchUI.! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/23/2011 14:34'!
 versionControlImport
 
 	self class versionControlDirectory fileInContents.! !

@@ -4179,10 +4179,11 @@ doubleClick: evt
 	self viewBlocksAndScripts.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'event handling' stamp: 'tis 12/10/2006 23:50'!
+!ScriptableScratchMorph methodsFor: 'event handling' stamp: 'JM 9/9/2011 16:28'!
 handleTool: toolName hand: hand
 
 	| scaleFactor |
+
 	toolName = 'CopyTool' ifTrue: [
 		Sensor shiftPressed ifFalse: [hand toolType: nil].
 		(self isKindOf: ScratchStageMorph) ifFalse: [
@@ -6716,6 +6717,27 @@ undeleteAttribute: aSymbol
 	w setCategoryColor: block color! !
 
 
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:45'!
+cellValue: aString
+
+	self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
+change: aString by: aNumber
+
+	self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
+clear: aString
+
+	self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
+setCell: aString to: aNumber
+
+		self subclassResponsibility! !
+
+
 !ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 12:19'!
 layer: aNumber
 
@@ -6796,7 +6818,7 @@ blockSpecDict
 
 ! !
 
-!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 8/26/2011 15:28'!
+!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 9/9/2011 16:48'!
 blockSpecs
 	"Answer a collection of block specifications for the blocks that are common to all objects. Block specificatons (Arrays) are interspersed with category names (Strings). A block specification is an Array of the form: (<block spec string> <block type> <selector> [optional initial argument values]).
 
@@ -6816,6 +6838,10 @@ blockSpecs
 
 	| blocks |
 	blocks _ #(
+		'sensing'
+			('set %3 to %n'					- 	setCell:to: )
+			('change %3 by %n'				-	changeCellValue:by:)
+			('clear %3'						-	clearValue:)
 		'control'
 			('when %m clicked'				S	-)
 			('when %k key pressed'			K	-)

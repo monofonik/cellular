@@ -764,7 +764,7 @@ initialize
 	FirstPointerClassID _ (NameToClassEntry at: #Array) first.
 ! !
 
-!ObjStream class methodsFor: 'class initialization' stamp: 'JM 9/5/2011 12:40'!
+!ObjStream class methodsFor: 'class initialization' stamp: 'JM 9/9/2011 13:06'!
 userClasses
 	"Answer an array of (<class id>, <class name>) records for all version numbered user classes."
 	"The following finds obsolete user classes:"
@@ -845,6 +845,7 @@ userClasses
 		(207		CReporterSlotMorph)
 
 		(220		ScratchCellMorph)
+		(221		ScratchCellAttribute)
 
 		(300		StringFieldMorph)
 		(301		MultiArgReporterBlockMorph)

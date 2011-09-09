@@ -2339,10 +2339,13 @@ penShade
 	^ penShade! !
 
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 13:51'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 16:23'!
 addEnvAttributeBlocksTo: page x: x y: startY
 
 	| y vName stage block varBlocks |
+
+	self halt.
+
 	y _ startY.
 
 	"pick a default variable name"
@@ -2436,12 +2439,14 @@ die
 	"Deletes this sprite, unless it's the prototype"
 	self prototype ifNotNil: [ self deleteSprite ].! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 14:19'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 16:27'!
 syncToPrototype
 
 	"Updates this sprites blocks bin with a full copy of its prototypes"
 
-	self prototype ifNotNil: [ blocksBin _ self prototype blocksBin fullCopy ].
+	self prototype ifNotNil: [ 
+		blocksBin _ self prototype blocksBin fullCopy.
+		].
 	blocksBin submorphs do: [ :block |
 		block receiver: self. ]! !
 
@@ -2542,7 +2547,7 @@ setCell: aString to: aNumber
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/2/2011 15:38'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/9/2011 16:48'!
 blockSpecs
 
 	| blocks |
@@ -2618,13 +2623,7 @@ blockSpecs
 			-
 			('go to front'					-	comeToFront)
 			('go back %n layers'			-	goBackByLayers: 1)
-		'sensing'
-			('value of %3'					r	cellValue: )
-			('set %3 to %n'					- 	setCell:to: )
-			('change %3 by %n'				-	changeCellValue:by:)
-			('clear %3'						-	clearValue:)
-			('clear cell'						-	clearCell)
-			-			
+		'sensing'			
 
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)
@@ -2655,6 +2654,10 @@ blockSpecs
 			=
 			('object %m'						r	getObject:)
 			('attribute %a'						r	get:)
+			=
+		'sensing'
+			('clear cell'						-	clearCell)
+			('value of %3'					r	cellValue: )
 		).
 
 	^ blocks, super blockSpecs

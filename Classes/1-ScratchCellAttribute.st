@@ -74,3 +74,36 @@ name
 spread
 
 	^ spread! !
+
+
+!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:33'!
+fieldsVersion
+
+	^ 1! !
+
+!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:34'!
+initFieldsFrom: anObjStream version: classVersion
+
+	self initFieldsNamed: #(
+		name
+		min
+		max
+		spread 
+		hue
+		default
+	) from: anObjStream.! !
+
+!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:32'!
+storeFieldsOn: anObjStream
+
+	"super storeFieldsOn: anObjStream."
+	self storeFieldsNamed: #(
+		name
+		min
+		max
+		spread 
+		hue
+		default
+	) on: anObjStream.
+
+	! !

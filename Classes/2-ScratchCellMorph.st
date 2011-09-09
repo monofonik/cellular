@@ -7,6 +7,17 @@ Morph subclass: #ScratchCellMorph
 I am a cell that represents an area of the stage environment. Sprites that are at my location can query and update my properties.!
 
 
+!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/9/2011 13:43'!
+initFieldsFrom: anObjStream version: classVersion
+
+	super initFieldsFrom: anObjStream version: classVersion.
+
+	self initFieldsNamed: #(
+		gridLocation
+		values
+		colors
+	) from: anObjStream.! !
+
 !ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/5/2011 10:42'!
 initialize
 
@@ -15,6 +26,16 @@ initialize
 	colors _ Dictionary new.
 	self extent: 10@10.
 	self color: (Color fromString: 'white'). "default cell color with no attributes"
+! !
+
+!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/9/2011 14:12'!
+mouseDown: evt
+
+	evt hand newKeyboardFocus: nil.
+
+	evt hand toolType ifNotNil: [
+		self handleTool: evt hand toolType hand: evt hand.
+	].
 ! !
 
 
@@ -35,11 +56,15 @@ changeValue: aString by: aNumber
 	spread _ (self stage cellAttribute: aString) spread.
 	self changeValue: aString by: aNumber spread: spread.! !
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/5/2011 10:33'!
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 16:56'!
 changeValue: aString by: aNumber spread: aSpread
 
 	" check for a spread amount and update neighbouring cells "
-	| myVal |	
+	| myVal min max |	
+
+	min _ (self stage cellAttribute: aString) min.
+	max _ (self stage cellAttribute: aString) max.
+	
 	myVal _ self value: aString.
 
 	aSpread > 0 ifTrue: [ 
@@ -47,7 +72,7 @@ changeValue: aString by: aNumber spread: aSpread
 		((self ownerThatIsA: ScratchStageMorph) adjacentCellsTo: self) do: [ :cell | cell changeValue: aString by: aNumber / 2 spread: aSpread - 1 ].
 	].
 
-	values at: aString put: myVal + aNumber.
+	values at: aString put: (((myVal + aNumber) min: max) max: min).
 	self update. ! !
 
 !ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 15:57'!
@@ -89,6 +114,22 @@ gridLocation: aPoint
 
 	gridLocation _ aPoint.! !
 
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 15:19'!
+handleTool: toolName hand: hand
+
+	toolName = 'PaintTool' ifTrue: [ ^ self changeValue: 'default' by: 10 ].
+	toolName = 'EraseTool' ifTrue: [ ^ self changeValue: 'default' by: -10 ].
+
+	
+
+
+! !
+
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 12:44'!
+handlesMouseDown: evt
+
+	^ true! !
+
 !ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 15:58'!
 setValue: aString to: aNumber
 
@@ -108,6 +149,16 @@ setValue: aString to: aNumber spread: aSpread
 stage
 
 	^ self ownerThatIsA: ScratchStageMorph! !
+
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 13:05'!
+storeFieldsOn: anObjStream
+
+	super storeFieldsOn: anObjStream.
+	self storeFieldsNamed: #(
+		gridLocation
+		values
+		colors
+	) on: anObjStream.! !
 
 !ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/5/2011 12:08'!
 update

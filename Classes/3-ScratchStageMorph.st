@@ -1221,13 +1221,13 @@ updateTrailsForm
 ! !
 
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'nb 1/7/2008 14:01'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:39'!
 fieldsVersion
 
-	^ 5
+	^ 6
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'jm 7/8/2008 06:13'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:39'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -1262,10 +1262,18 @@ initFieldsFrom: anObjStream version: classVersion
 		sceneStates
 		lists
 	) from: anObjStream.
+	classVersion = 5 ifTrue: [ ^ self ].
+
+	"fields added in version 6"
+	self initFieldsNamed: #(
+		cellAttributes 
+		cells
+	) from: anObjStream.
+
 	lists ifNil: [lists _ Dictionary new].  "work around"
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'jm 5/12/2008 11:58'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:05'!
 storeFieldsOn: anObjStream
 
 	super storeFieldsOn: anObjStream.
@@ -1279,6 +1287,8 @@ storeFieldsOn: anObjStream
 		tempoBPM
 		sceneStates
 		lists
+		cellAttributes
+		cells
 	) on: anObjStream.
 ! !
 
@@ -1663,6 +1673,11 @@ cellBehind: aSprite
 	
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:34'!
+cellValue: aString
+
+	^ 0! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 11:22'!
 cellValue: aString for: aSprite
 
@@ -1671,6 +1686,11 @@ cellValue: aString for: aSprite
 	cell _ self cellBehind: aSprite.
 	cell ifNotNil: [ ^ cell value: aString ].
 	^ 0.! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:50'!
+changeCellValue: aString by: aNumber
+
+	self allCellsDo: #changeValue:by:spread: with: aString with: aNumber with: 0! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:40'!
 changeCellValue: aString for: aSprite by: aNumber
@@ -1731,6 +1751,11 @@ deleteCellAttribute: aString
 	self allCellsDo: #update
 	! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:38'!
+envAttrNamesMenu
+
+	^ self cellAttributeNames! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 11:59'!
 hasAttribute: aString
 
@@ -1762,6 +1787,11 @@ newCellAt: xLoc at: yLoc
 	self addMorphBack: cell.
 	^ cell.
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:40'!
+setCell: aString to: aNumber
+
+	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 14:44'!
 setCellValue: aString for: aSprite to: aNumber
@@ -1991,6 +2021,11 @@ cellBehind: aSprite
 	
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:34'!
+cellValue: aString
+
+	^ 0! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 11:22'!
 cellValue: aString for: aSprite
 
@@ -2006,6 +2041,11 @@ changeBackgroundIndexBy: aNumber
 
 	self changeCostumeIndexBy: aNumber.
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:50'!
+changeCellValue: aString by: aNumber
+
+	self allCellsDo: #changeValue:by:spread: with: aString with: aNumber with: 0! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:40'!
 changeCellValue: aString for: aSprite by: aNumber
@@ -2297,6 +2337,11 @@ drawSubmorphsOn: aCanvas
 
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:38'!
+envAttrNamesMenu
+
+	^ self cellAttributeNames! !
+
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 12/16/2006 12:21'!
 exportFileName: fileName
 
@@ -2315,10 +2360,10 @@ exportFileName: fileName
 	(form asFormOfDepth: 32) writeBMPFileNamed: fName.
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'nb 1/7/2008 14:01'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:39'!
 fieldsVersion
 
-	^ 5
+	^ 6
 ! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 6/3/2004 20:17'!
@@ -2460,7 +2505,7 @@ incrRedraw: damageList
 				f displayOn: Display at: r topLeft rule: Form over]].
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'jm 7/8/2008 06:13'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:39'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -2495,6 +2540,14 @@ initFieldsFrom: anObjStream version: classVersion
 		sceneStates
 		lists
 	) from: anObjStream.
+	classVersion = 5 ifTrue: [ ^ self ].
+
+	"fields added in version 6"
+	self initFieldsNamed: #(
+		cellAttributes 
+		cells
+	) from: anObjStream.
+
 	lists ifNil: [lists _ Dictionary new].  "work around"
 ! !
 
@@ -3021,6 +3074,11 @@ sensorBoard: aSensorBoardMorph
 	sensorBoard _ aSensorBoardMorph.
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:40'!
+setCell: aString to: aNumber
+
+	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 14:44'!
 setCellValue: aString for: aSprite to: aNumber
 
@@ -3358,7 +3416,7 @@ stopAsks
 	ScratchPrompterMorph clearLastAnswer.
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'jm 5/12/2008 11:58'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:05'!
 storeFieldsOn: anObjStream
 
 	super storeFieldsOn: anObjStream.
@@ -3372,6 +3430,8 @@ storeFieldsOn: anObjStream
 		tempoBPM
 		sceneStates
 		lists
+		cellAttributes
+		cells
 	) on: anObjStream.
 ! !
 
@@ -3545,7 +3605,7 @@ userSelectSpriteDefault: defaultSprite butNotAnyOf: excludeArray
 ScratchStageMorph class
 	instanceVariableNames: ''!
 
-!ScratchStageMorph class methodsFor: 'block specs' stamp: 'JM 9/2/2011 15:09'!
+!ScratchStageMorph class methodsFor: 'block specs' stamp: 'JM 9/9/2011 16:49'!
 blockSpecs
 
 	| blocks |
