@@ -1,5 +1,5 @@
 Morph subclass: #ScratchCellMorph
-	instanceVariableNames: 'gridLocation values colors '
+	instanceVariableNames: 'gridLocation values colors changed '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -18,7 +18,7 @@ initFieldsFrom: anObjStream version: classVersion
 		colors
 	) from: anObjStream.! !
 
-!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/5/2011 10:42'!
+!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/12/2011 15:59'!
 initialize
 
 	super initialize.
@@ -26,6 +26,7 @@ initialize
 	colors _ Dictionary new.
 	self extent: 10@10.
 	self color: (Color fromString: 'white'). "default cell color with no attributes"
+	changed _ true
 ! !
 
 !ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/9/2011 14:12'!
@@ -56,24 +57,29 @@ changeValue: aString by: aNumber
 	spread _ (self stage cellAttribute: aString) spread.
 	self changeValue: aString by: aNumber spread: spread.! !
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 16:56'!
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/12/2011 16:17'!
 changeValue: aString by: aNumber spread: aSpread
 
 	" check for a spread amount and update neighbouring cells "
-	| myVal min max |	
+	| min max oldValue newValue |	
 
 	min _ (self stage cellAttribute: aString) min.
 	max _ (self stage cellAttribute: aString) max.
 	
-	myVal _ self value: aString.
+	oldValue _ self value: aString.
 
 	aSpread > 0 ifTrue: [ 
 		"spread the value to adjacent cells, halving each time"
 		((self ownerThatIsA: ScratchStageMorph) adjacentCellsTo: self) do: [ :cell | cell changeValue: aString by: aNumber / 2 spread: aSpread - 1 ].
 	].
 
-	values at: aString put: (((myVal + aNumber) min: max) max: min).
-	self update. ! !
+	newValue _ (((oldValue + aNumber) min: max) max: min).
+	
+	oldValue = newValue ifFalse: [
+		values at: aString put: newValue.
+		self update.
+	].
+	! !
 
 !ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 15:57'!
 clearValue: aString
@@ -160,7 +166,7 @@ storeFieldsOn: anObjStream
 		colors
 	) on: anObjStream.! !
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/5/2011 12:08'!
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/12/2011 16:05'!
 update
 
 	"updates the cell colour using a dictionary of attribute specs"
@@ -192,7 +198,6 @@ update
 
 	"update the color for this cell"
 	self color: col.
-	
 	self changed.! !
 
 !ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/5/2011 10:24'!

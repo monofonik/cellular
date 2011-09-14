@@ -419,6 +419,25 @@ acceptDroppingMorph: aMorph event: evt
 
 ! !
 
+!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 9/12/2011 16:01'!
+drawSubmorphsOn: aCanvas
+	"Clip submorph drawing to my bounds."
+
+	| clipCanvas |
+	clipCanvas _ aCanvas copyClipRect: bounds.
+	submorphs reverseDo:[:m |
+		(clipCanvas isVisible: m fullBounds) ifTrue: [
+			m fullDrawOn: clipCanvas]].
+
+	"draw sprite talk bubbles in front of all morphs:"
+	submorphs reverseDo:[:m |
+		((m isKindOf: ScratchSpriteMorph) and:
+		 [m isHidden not and:
+		 [clipCanvas isVisible: m fullBounds]]) ifTrue: [
+			m drawTalkBubbleOn: clipCanvas]].
+
+! !
+
 !ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'jm 5/25/2004 14:56'!
 rootForGrabOf: aMorph
 	"Allow the given submorph to be extracted."
@@ -489,25 +508,6 @@ xxx"
 
 	"the following scales down entire stage:"
 "	LowResPlugin scale: cachedForm into: aCanvas form at: aCanvas origin + self position."
-! !
-
-!ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 11/30/2007 23:41'!
-drawSubmorphsOn: aCanvas
-	"Clip submorph drawing to my bounds."
-
-	| clipCanvas |
-	clipCanvas _ aCanvas copyClipRect: bounds.
-	submorphs reverseDo:[:m |
-		(clipCanvas isVisible: m fullBounds) ifTrue: [
-			m fullDrawOn: clipCanvas]].
-
-	"draw sprite talk bubbles in front of all morphs:"
-	submorphs reverseDo:[:m |
-		((m isKindOf: ScratchSpriteMorph) and:
-		 [m isHidden not and:
-		 [clipCanvas isVisible: m fullBounds]]) ifTrue: [
-			m drawTalkBubbleOn: clipCanvas]].
-
 ! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 12/16/2006 12:21'!
@@ -2318,7 +2318,7 @@ xxx"
 "	LowResPlugin scale: cachedForm into: aCanvas form at: aCanvas origin + self position."
 ! !
 
-!ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 11/30/2007 23:41'!
+!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 9/12/2011 16:01'!
 drawSubmorphsOn: aCanvas
 	"Clip submorph drawing to my bounds."
 
