@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchStageMorph
-	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells '
+	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells brushSize showGrid '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -8,7 +8,7 @@ I represent the background of the Scratch work pane. Like a sprite, I have a set
 !
 
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 8/31/2011 12:44'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/15/2011 16:51'!
 initialize
 
 	super initialize.
@@ -29,6 +29,7 @@ initialize
 	sprites _ OrderedCollection new.
 	showMotorBlocks _ false.
 	stepLength _ 100.
+	brushSize _ 0.
 	self initialiseCells.
 
 	
@@ -1221,13 +1222,13 @@ updateTrailsForm
 ! !
 
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:39'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:50'!
 fieldsVersion
 
 	^ 6
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:39'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -1273,7 +1274,7 @@ initFieldsFrom: anObjStream version: classVersion
 	lists ifNil: [lists _ Dictionary new].  "work around"
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:05'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
 storeFieldsOn: anObjStream
 
 	super storeFieldsOn: anObjStream.
@@ -1601,6 +1602,31 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	^ y.! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 14:58'!
+adjacentCellTo: aSprite direction: aString
+
+	"returns the adjacent cell to the sprite in the given direction - up, down, left, right, up / left, up / right, down / left, down / right"
+
+	| gridLoc |
+	
+	gridLoc _ (self cellBehind: aSprite) gridLocation.
+	
+	(aString includesSubString: 'left') ifTrue: [ gridLoc _ gridLoc - (1@0) ].
+	(aString includesSubString: 'right') ifTrue: [ gridLoc _ gridLoc + (1@0) ].
+	(aString includesSubString: 'up') ifTrue: [ gridLoc _ gridLoc - (0@1) ].
+	(aString includesSubString: 'down') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
+
+	"Ensure within cell limits"
+	gridLoc _ gridLoc max: 1@1.
+	gridLoc _ gridLoc min: 48@36.
+
+	^ (cells at: gridLoc y) at: gridLoc x
+	
+	
+	
+
+	! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:35'!
 adjacentCellsTo: aSprite
 
@@ -1646,6 +1672,28 @@ allCellsDo: aSelector with: anArg with: anotherArg with: lastArg
 
 	"perform the provided action on all cells"
 	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]]! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:37'!
+brushSize
+
+	^ brushSize! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:37'!
+brushSize: aNumber
+
+	brushSize _ (aNumber min: 4) max: 0! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:13'!
+cellAtGridX: xLoc y: yLoc
+
+	"return the cell at given grid position (or nearest to it)"
+
+	| x y |
+	x _ (xLoc max: 1) min: 48.
+	y _ (yLoc max: 1) min: 36.
+	
+	^ (cells at: y) at: x
+	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:20'!
 cellAttribute: aString
@@ -1761,7 +1809,7 @@ hasAttribute: aString
 
 	^ cellAttributes includes: aString! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 16:52'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 14:42'!
 initialiseCells
 
 	"create the cells"
@@ -1769,13 +1817,13 @@ initialiseCells
 	1 to: 36 do:  [ :y |
 		cells at: y put: (Array new: 48).
 		1 to: 48 do: [ :x |
-			(cells at: y) at: x put: (self newCellAt: x at: y)
+			(cells at: y) at: x put: ((self newCellAt: x at: y) showBorder: self showGrid)
 		]
 	].
 
 	"create the cell attribute list"
 	cellAttributes _ Dictionary new.
-	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 hue: (Color fromString: 'red') hue .! !
+	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 10 hue: (Color fromString: 'red') hue .! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:15'!
 newCellAt: xLoc at: yLoc
@@ -1804,6 +1852,18 @@ setCellValue: aString for: aSprite to: aNumber
 	cell ifNotNil: [ 
 		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
 	]! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:52'!
+showGrid
+
+	^ showGrid ifNil: [ ^ false ]! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:48'!
+showGrid: aBoolean
+
+	showGrid _ aBoolean.
+	self allCellsDo: #showBorder: with: aBoolean.
+! !
 
 
 !ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'jm 11/18/2008 17:43'!
@@ -1845,6 +1905,31 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 	y _ y + 20. "insert a line"
 
 	^ y.! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 14:58'!
+adjacentCellTo: aSprite direction: aString
+
+	"returns the adjacent cell to the sprite in the given direction - up, down, left, right, up / left, up / right, down / left, down / right"
+
+	| gridLoc |
+	
+	gridLoc _ (self cellBehind: aSprite) gridLocation.
+	
+	(aString includesSubString: 'left') ifTrue: [ gridLoc _ gridLoc - (1@0) ].
+	(aString includesSubString: 'right') ifTrue: [ gridLoc _ gridLoc + (1@0) ].
+	(aString includesSubString: 'up') ifTrue: [ gridLoc _ gridLoc - (0@1) ].
+	(aString includesSubString: 'down') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
+
+	"Ensure within cell limits"
+	gridLoc _ gridLoc max: 1@1.
+	gridLoc _ gridLoc min: 48@36.
+
+	^ (cells at: gridLoc y) at: gridLoc x
+	
+	
+	
+
+	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 8/31/2011 16:35'!
 adjacentCellsTo: aSprite
@@ -1994,6 +2079,28 @@ broadcastEventNamed: name with: value
 
 	^ newProcs asArray
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:37'!
+brushSize
+
+	^ brushSize! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:37'!
+brushSize: aNumber
+
+	brushSize _ (aNumber min: 4) max: 0! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:13'!
+cellAtGridX: xLoc y: yLoc
+
+	"return the cell at given grid position (or nearest to it)"
+
+	| x y |
+	x _ (xLoc max: 1) min: 48.
+	y _ (yLoc max: 1) min: 36.
+	
+	^ (cells at: y) at: x
+	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:20'!
 cellAttribute: aString
@@ -2360,7 +2467,7 @@ exportFileName: fileName
 	(form asFormOfDepth: 32) writeBMPFileNamed: fName.
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:39'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:50'!
 fieldsVersion
 
 	^ 6
@@ -2505,7 +2612,7 @@ incrRedraw: damageList
 				f displayOn: Display at: r topLeft rule: Form over]].
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:39'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -2551,7 +2658,7 @@ initFieldsFrom: anObjStream version: classVersion
 	lists ifNil: [lists _ Dictionary new].  "work around"
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 16:52'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 14:42'!
 initialiseCells
 
 	"create the cells"
@@ -2559,15 +2666,15 @@ initialiseCells
 	1 to: 36 do:  [ :y |
 		cells at: y put: (Array new: 48).
 		1 to: 48 do: [ :x |
-			(cells at: y) at: x put: (self newCellAt: x at: y)
+			(cells at: y) at: x put: ((self newCellAt: x at: y) showBorder: self showGrid)
 		]
 	].
 
 	"create the cell attribute list"
 	cellAttributes _ Dictionary new.
-	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 hue: (Color fromString: 'red') hue .! !
+	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 10 hue: (Color fromString: 'red') hue .! !
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 8/31/2011 12:44'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/15/2011 16:51'!
 initialize
 
 	super initialize.
@@ -2588,6 +2695,7 @@ initialize
 	sprites _ OrderedCollection new.
 	showMotorBlocks _ false.
 	stepLength _ 100.
+	brushSize _ 0.
 	self initialiseCells.
 
 	
@@ -3130,6 +3238,18 @@ showBackground: costumeNameOrIndex
 	self lookLike: costumeNameOrIndex.
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:52'!
+showGrid
+
+	^ showGrid ifNil: [ ^ false ]! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:48'!
+showGrid: aBoolean
+
+	showGrid _ aBoolean.
+	self allCellsDo: #showBorder: with: aBoolean.
+! !
+
 !ScratchStageMorph methodsFor: 'accessing' stamp: 'jm 2/13/2009 14:49'!
 showMotorBlocks
 
@@ -3416,7 +3536,7 @@ stopAsks
 	ScratchPrompterMorph clearLastAnswer.
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:05'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
 storeFieldsOn: anObjStream
 
 	super storeFieldsOn: anObjStream.
@@ -3653,3 +3773,4 @@ blockSpecs
 
 	^ blocks, super blockSpecs
 ! !
+

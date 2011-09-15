@@ -4,13 +4,13 @@ Object subclass: #ScratchCellAttribute
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
 
-!ScratchCellAttribute methodsFor: 'initialization' stamp: 'JM 9/1/2011 14:04'!
+!ScratchCellAttribute methodsFor: 'initialization' stamp: 'JM 9/15/2011 14:26'!
 initialize
 
 	name _ ''.
 	min _ 0.
 	max _ 100.
-	spread _ 2.
+	spread = 0.
 	hue _ (Color fromString: 'white') hue! !
 
 
@@ -39,10 +39,10 @@ name: aString
 
 	name _ aString.! !
 
-!ScratchCellAttribute methodsFor: 'setters' stamp: 'JM 9/1/2011 10:42'!
+!ScratchCellAttribute methodsFor: 'setters' stamp: 'JM 9/15/2011 14:45'!
 spread: aNumber
 
-	spread _ (aNumber max: 0) min: 3.! !
+	spread _ (aNumber max: 0) min: 4.! !
 
 
 !ScratchCellAttribute methodsFor: 'getters' stamp: 'JM 9/1/2011 11:53'!
@@ -76,32 +76,34 @@ spread
 	^ spread! !
 
 
-!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:33'!
+!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/15/2011 14:24'!
 fieldsVersion
 
 	^ 1! !
 
-!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:34'!
+!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/15/2011 14:26'!
 initFieldsFrom: anObjStream version: classVersion
 
 	self initFieldsNamed: #(
 		name
 		min
-		max
-		spread 
+		max 
+		spread
 		hue
 		default
-	) from: anObjStream.! !
+	) from: anObjStream.
 
-!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/9/2011 13:32'!
+	self fieldsVersion = 1 ifTrue: [ ^ self ].! !
+
+!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/15/2011 14:27'!
 storeFieldsOn: anObjStream
 
 	"super storeFieldsOn: anObjStream."
 	self storeFieldsNamed: #(
 		name
 		min
-		max
-		spread 
+		max 
+		spread
 		hue
 		default
 	) on: anObjStream.

@@ -7199,6 +7199,12 @@ resetTimer
 	TimerStartMSecs _ Time millisecondClockValue.
 ! !
 
+!ScriptableScratchMorph class methodsFor: 'other' stamp: 'JM 9/14/2011 15:40'!
+scratchOrigin
+
+	^ ScratchOrigin
+! !
+
 !ScriptableScratchMorph class methodsFor: 'other' stamp: 'jm 10/21/2005 11:21'!
 scratchOrigin: aPoint
 	"Set the origin for the Scratch coordinate system."

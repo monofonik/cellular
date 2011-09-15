@@ -616,6 +616,28 @@ forward: distance
 	self ypos: self ypos 
 ! !
 
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 9/14/2011 16:25'!
+forwardCell: aNumber
+
+	"moves the sprite a given number of cells in the closest discrete direction to the sprites current heading"
+	| stage directions dirIndex |
+
+	self prototype ifNil: [ ^ self ].
+
+	directions _ Array withAll: #('right' 'down / right' 'down' 'down / left' 'left' 'left / up' 'up' 'up / right' ).
+
+	"get a reference to the stage"
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ self ].
+
+	"determine which discrete direction to move in"
+	dirIndex _ (rotationDegrees / 45) rounded \\ 8 + 1.
+
+	aNumber timesRepeat: [ | cell |
+		cell _ stage adjacentCellTo: self direction: (directions at: dirIndex).
+		self gotoX: cell referencePosition x y: cell referencePosition y
+		]! !
+
 !ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 glideSecs: duration toX: endX y: endY elapsed: elapsed from: startPoint
 	"Interpolate my position from my current postion to the given x and y over the given duration. If startPoint is nil, just answer my current position; this sets the starting point for the interpolation."
@@ -653,6 +675,17 @@ glideSecs: duration toX: endX y: endY elapsed: elapsed from: startPoint
 		self releaseSubsprites]
 
 "! !
+
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 9/14/2011 16:14'!
+gotoCellX: xPos y: yPos
+
+	| stage cell |
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ self ].
+	cell _ stage cellAtGridX: xPos y: yPos.
+
+	self gotoX: cell referencePosition x y: cell referencePosition y! !
 
 !ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 gotoSpriteOrMouse: anObject
@@ -2479,6 +2512,11 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	^ y"! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/14/2011 12:20'!
+cellDirectionNamesMenu
+
+	^ #('up' 'down' 'left' 'right' 'up / left' 'up / right' 'down / left' 'down / right')! !
+
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:34'!
 cellValue: aString
 
@@ -2531,6 +2569,22 @@ envAttrNamesMenu
 
 	^ (self ownerThatIsA: ScratchStageMorph) cellAttributeNames! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/14/2011 13:34'!
+face: aString
+
+	"face in one of 8 directions, for cell motion"
+
+	aString = 'up' ifTrue: [ ^ self heading: 0 ].
+	aString = 'down' ifTrue: [ ^ self heading: 180 ].
+	aString = 'left' ifTrue: [ ^ self heading: 270 ].
+	aString = 'right' ifTrue: [ ^ self heading: 90 ].
+	aString = 'up / left' ifTrue: [ ^ self heading: 315 ].
+	aString = 'up / right' ifTrue: [ ^ self heading: 45 ].
+	aString = 'down / left' ifTrue: [ ^ self heading: 225 ].
+	aString = 'down / right' ifTrue: [ ^ self heading: 135 ].
+
+	! !
+
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:30'!
 setCell: aString to: aNumber
 
@@ -2547,7 +2601,7 @@ setCell: aString to: aNumber
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/9/2011 16:48'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/14/2011 16:05'!
 blockSpecs
 
 	| blocks |
@@ -2556,8 +2610,10 @@ blockSpecs
 			('breed'							-	breed)
 			('die'							-	die)
 			-
-		'motion'
+		'motion'		
 			('move %n steps'				-	forward:)
+			('move %n cells'					-	forwardCell: 1) 	
+			-
 			('turn %n degrees'				-	turnRight: 15)	"icon shows turn direction"
 			('turn %n degrees'				-	turnLeft: 15)	"icon shows turn direction"
 			-
@@ -2565,6 +2621,7 @@ blockSpecs
 			('point towards %m'				-	pointTowards:)
 			-
 			('go to x:%n y:%n'				-	gotoX:y: 0 0)
+			('go to cell x:%n y:%n'			-	gotoCellX:y: 1 1)
 			('go to %m'						-	gotoSpriteOrMouse:)
 			('glide %n secs to x:%n y:%n'	t	glideSecs:toX:y:elapsed:from: 1 50 50)
 			-
