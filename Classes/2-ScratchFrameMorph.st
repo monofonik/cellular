@@ -1,5 +1,5 @@
 Morph subclass: #ScratchFrameMorph
-	instanceVariableNames: 'blockEditors topPane viewerPane scriptsPane stageFrame workPane titlePane libraryPane menuPanel stageButtonsPanel readoutPane logoMorph projectTitleMorph flagButton pauseButton fillScreenFlag paintingInProgress projectDirectory projectName projectInfo author loginName loginPassword watcherPositions shuffledCostumeNames justSaved viewModeButtons viewMode lastViewMode viewModeButtonsPanel toolbarPanel envToolbarPanel brushPanel lastWeDoPoll quitFlag '
+	instanceVariableNames: 'blockEditors topPane viewerPane scriptsPane stageFrame workPane titlePane libraryPane menuPanel stageButtonsPanel readoutPane logoMorph projectTitleMorph flagButton pauseButton fillScreenFlag paintingInProgress projectDirectory projectName projectInfo author loginName loginPassword watcherPositions shuffledCostumeNames justSaved viewModeButtons viewMode lastViewMode viewModeButtonsPanel toolbarPanel envToolbarPanel brushPanel envAttrMenu brushSize selectedAttribute lastWeDoPoll quitFlag '
 	classVariableNames: 'AllowSharing Clipboard DefaultNotes DefaultSprite Fonts FontsXO IsXO ScratchServers ScratchSkin ScratchSkinXO ShareServer ShareServerPath SupportServer SupportServerPath TakeOverScreen UseErrorCatcher Version VersionDate VisibleDrives WorkpaneExtent '
 	poolDictionaries: ''
 	category: 'Scratch-UI-Panes'!
@@ -36,11 +36,13 @@ createBasicPanes
 	workPane comeToFront.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/15/2011 16:38'!
-createBrushPanel
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:07'!
+createBrushSizeToolbar
 	"Create and add the environment toolbar."
 
 	| buttonSpecs bName button |
+	
+	"Now the brush size buttons"
 	brushPanel _ AlignmentMorph new
 		hResizing: #shrinkWrap;
 		vResizing: #shrinkWrap;
@@ -71,36 +73,18 @@ createBrushPanel
 	self addMorph: brushPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/9/2011 11:47'!
-createEnvToolbar
-	"Create and add the environment toolbar."
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:18'!
+createCellAttrToolbar
 
-	| buttonSpecs bName button |
-	envToolbarPanel _ AlignmentMorph new
-		hResizing: #shrinkWrap;
-		vResizing: #shrinkWrap;
-		color: Color transparent.
-		
-	buttonSpecs _ #(
-		"name			selector"			"tooltip"
-		(paint			paintTool		'Paint')
-		(erase			eraseTool		'Erase')
-	).
+	"And add the menu for cell attribute selection"
 
-	buttonSpecs do: [:spec |
-		bName _ spec at: 1.
-		button _ ToggleButton
-			onForm: (ScratchFrameMorph skinAt: (bName, 'ButtonPressed') asSymbol)
-			offForm: (ScratchFrameMorph skinAt: (bName, 'Button') asSymbol)
-			overForm: (ScratchFrameMorph skinAt: (bName, 'ButtonOver') asSymbol).
-		button
-			target: self;
-			actionSelector: (spec at: 2);
-			isMomentary: true;
-			setProperty: #balloonText toValue: (spec at: 3) localized.
-		envToolbarPanel addMorphBack: button].
-
-	self addMorph: envToolbarPanel.
+	envAttrMenu _ DropDownSelectionMorph new.
+	envAttrMenu target: self.
+	envAttrMenu getLabelSelector: #selectedAttribute.
+	envAttrMenu getMenuSelector: #envAttrNamesCustomMenu.
+	envAttrMenu menuChoiceSelector: #selectedAttribute:.
+	self addMorph: envAttrMenu.
+	
 ! !
 
 !ScratchFrameMorph methodsFor: 'intialization' stamp: 'ee 1/27/2009 13:21'!
@@ -144,6 +128,38 @@ createMenuPanel
 			menuPanel addMorphBack: (Morph new color: Color transparent; extent: 12@5)]].
 
 	topPane addMorph: menuPanel.
+! !
+
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:08'!
+createPaintToolbar
+	"Create and add the paint toolbar."
+
+	| buttonSpecs bName button |
+	envToolbarPanel _ AlignmentMorph new
+		hResizing: #shrinkWrap;
+		vResizing: #shrinkWrap;
+		color: Color transparent.
+		
+	buttonSpecs _ #(
+		"name			selector"			"tooltip"
+		(paint			paintTool		'Paint')
+		(erase			eraseTool		'Erase')
+	).
+
+	buttonSpecs do: [:spec |
+		bName _ spec at: 1.
+		button _ ToggleButton
+			onForm: (ScratchFrameMorph skinAt: (bName, 'ButtonPressed') asSymbol)
+			offForm: (ScratchFrameMorph skinAt: (bName, 'Button') asSymbol)
+			overForm: (ScratchFrameMorph skinAt: (bName, 'ButtonOver') asSymbol).
+		button
+			target: self;
+			actionSelector: (spec at: 2);
+			isMomentary: true;
+			setProperty: #balloonText toValue: (spec at: 3) localized.
+		envToolbarPanel addMorphBack: button].
+
+	self addMorph: envToolbarPanel.
 ! !
 
 !ScratchFrameMorph methodsFor: 'intialization' stamp: 'ee 1/29/2009 14:21'!
@@ -288,7 +304,7 @@ createViewModeButtonsPanel
 	self addMorph: viewModeButtonsPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/15/2011 16:12'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:56'!
 initialize
 
 	super initialize.
@@ -303,6 +319,8 @@ initialize
 	loginName _ ''.
 	loginPassword _ ''.
 	viewMode _ #normal.
+	brushSize _ 2.
+	selectedAttribute _ 'default'.
 
 	self createBasicPanes.
 	self createLogo.
@@ -310,8 +328,9 @@ initialize
 	self createViewModeButtonsPanel.
 	self createStageButtonsPanel.
 	self createToolbar.
-	self createEnvToolbar.
-	self createBrushPanel.
+	self createPaintToolbar.
+	self createBrushSizeToolbar.
+	self createCellAttrToolbar.
 
 	self extent: 1000@600.
 ! !
@@ -1481,7 +1500,7 @@ extent: aPoint
 	self fixLayout.
 ! !
 
-!ScratchFrameMorph methodsFor: 'geometry' stamp: 'JM 9/15/2011 16:15'!
+!ScratchFrameMorph methodsFor: 'geometry' stamp: 'JM 9/16/2011 13:49'!
 fixLayout
 
 	| stageExtent xyReadout w |
@@ -1559,7 +1578,7 @@ fixLayout
 
 	envToolbarPanel
 		left: (stageFrame left - 4 max: toolbarPanel right);
-		top: self top + ((topPane height - toolbarPanel height) // 2) + 3.
+		top: self top + ((topPane height - envToolbarPanel height) // 2) + 3.
 
 	((envToolbarPanel right - 5) > viewModeButtonsPanel left)
 		ifTrue: [envToolbarPanel delete]
@@ -1569,14 +1588,23 @@ fixLayout
 
 	brushPanel
 		left: (stageFrame left - 4 max: envToolbarPanel right);
-		top: self top + ((topPane height - toolbarPanel height) // 2) + 3.
+		top: self top + ((topPane height - brushPanel height) // 2) + 3.
 
 	((brushPanel right - 5) > viewModeButtonsPanel left)
 		ifTrue: [brushPanel delete]
 		ifFalse: [
 			(brushPanel owner = self) ifFalse: [
 				self addMorphFront: brushPanel]].
-! !
+
+	envAttrMenu
+		left: (stageFrame left - 4 max: brushPanel right + 5);
+		top: self top + ((topPane height - envAttrMenu height) // 2) + 3.
+
+	((envAttrMenu right - 5) > viewModeButtonsPanel left)
+		ifTrue: [envAttrMenu delete]
+		ifFalse: [
+			(envAttrMenu owner = self) ifFalse: [
+				self addMorphFront: envAttrMenu]].! !
 
 !ScratchFrameMorph methodsFor: 'geometry' stamp: 'jm 12/23/2008 13:50'!
 hidePalette: hidePalette
@@ -3376,7 +3404,7 @@ setLanguage: aString
 	justSaved _ tempJustSaved].
 ! !
 
-!ScratchFrameMorph methodsFor: 'private' stamp: 'JM 9/9/2011 10:42'!
+!ScratchFrameMorph methodsFor: 'private' stamp: 'JM 9/16/2011 13:12'!
 updatePanes
 
 	| p |
@@ -3387,7 +3415,13 @@ updatePanes
 	self createToolbar.
 
 	envToolbarPanel delete.
-	self createEnvToolbar.
+	self createPaintToolbar.
+
+	brushPanel delete.
+	self createBrushSizeToolbar.
+	
+	envAttrMenu delete.
+	self createCellAttrToolbar.
 
 	viewModeButtonsPanel delete.
 	self createViewModeButtonsPanel.
@@ -3497,7 +3531,7 @@ newScratchProject
 	justSaved _ true.
 ! !
 
-!ScratchFrameMorph methodsFor: 'buttonActions' stamp: 'JM 9/15/2011 16:55'!
+!ScratchFrameMorph methodsFor: 'buttonActions' stamp: 'JM 9/16/2011 13:53'!
 updateToolButtons
 	"Update the highlighting of my tool buttons."
 
@@ -3521,7 +3555,7 @@ updateToolButtons
 			ifFalse: [b off]].
 
 	brushButtons do: [ :b |
-		(b actionSelector asLowercase endsWith: workPane brushSize asString)
+		(b actionSelector asLowercase endsWith: brushSize asString)
 			ifTrue: [b on]
 			ifFalse: [b off]].! !
 
@@ -4162,30 +4196,35 @@ blockContrastStrong
 blockEditors
 	^blockEditors! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:38'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:53'!
+brushSize
+
+	^ brushSize! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:54'!
 brushSize0
 
-	workPane brushSize: 0! !
+	brushSize _ 0! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:38'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
 brushSize1
 
-	workPane brushSize: 1! !
+	brushSize _ 1! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:38'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
 brushSize2
 
-	workPane brushSize: 2! !
+	brushSize _ 2! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:39'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
 brushSize3
 
-	workPane brushSize: 3! !
+	brushSize _ 3! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:39'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
 brushSize4
 
-	workPane brushSize: 4! !
+	brushSize _ 4! !
 
 !ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'jm 10/17/2007 12:29'!
 canonicalizeImagesQuality: qualityOrNil saveOriginal: saveFlag
@@ -4447,11 +4486,13 @@ createBasicPanes
 	workPane comeToFront.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/15/2011 16:38'!
-createBrushPanel
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:07'!
+createBrushSizeToolbar
 	"Create and add the environment toolbar."
 
 	| buttonSpecs bName button |
+	
+	"Now the brush size buttons"
 	brushPanel _ AlignmentMorph new
 		hResizing: #shrinkWrap;
 		vResizing: #shrinkWrap;
@@ -4482,36 +4523,18 @@ createBrushPanel
 	self addMorph: brushPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/9/2011 11:47'!
-createEnvToolbar
-	"Create and add the environment toolbar."
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:18'!
+createCellAttrToolbar
 
-	| buttonSpecs bName button |
-	envToolbarPanel _ AlignmentMorph new
-		hResizing: #shrinkWrap;
-		vResizing: #shrinkWrap;
-		color: Color transparent.
-		
-	buttonSpecs _ #(
-		"name			selector"			"tooltip"
-		(paint			paintTool		'Paint')
-		(erase			eraseTool		'Erase')
-	).
+	"And add the menu for cell attribute selection"
 
-	buttonSpecs do: [:spec |
-		bName _ spec at: 1.
-		button _ ToggleButton
-			onForm: (ScratchFrameMorph skinAt: (bName, 'ButtonPressed') asSymbol)
-			offForm: (ScratchFrameMorph skinAt: (bName, 'Button') asSymbol)
-			overForm: (ScratchFrameMorph skinAt: (bName, 'ButtonOver') asSymbol).
-		button
-			target: self;
-			actionSelector: (spec at: 2);
-			isMomentary: true;
-			setProperty: #balloonText toValue: (spec at: 3) localized.
-		envToolbarPanel addMorphBack: button].
-
-	self addMorph: envToolbarPanel.
+	envAttrMenu _ DropDownSelectionMorph new.
+	envAttrMenu target: self.
+	envAttrMenu getLabelSelector: #selectedAttribute.
+	envAttrMenu getMenuSelector: #envAttrNamesCustomMenu.
+	envAttrMenu menuChoiceSelector: #selectedAttribute:.
+	self addMorph: envAttrMenu.
+	
 ! !
 
 !ScratchFrameMorph methodsFor: 'intialization' stamp: 'ee 1/27/2009 13:21'!
@@ -4555,6 +4578,38 @@ createMenuPanel
 			menuPanel addMorphBack: (Morph new color: Color transparent; extent: 12@5)]].
 
 	topPane addMorph: menuPanel.
+! !
+
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:08'!
+createPaintToolbar
+	"Create and add the paint toolbar."
+
+	| buttonSpecs bName button |
+	envToolbarPanel _ AlignmentMorph new
+		hResizing: #shrinkWrap;
+		vResizing: #shrinkWrap;
+		color: Color transparent.
+		
+	buttonSpecs _ #(
+		"name			selector"			"tooltip"
+		(paint			paintTool		'Paint')
+		(erase			eraseTool		'Erase')
+	).
+
+	buttonSpecs do: [:spec |
+		bName _ spec at: 1.
+		button _ ToggleButton
+			onForm: (ScratchFrameMorph skinAt: (bName, 'ButtonPressed') asSymbol)
+			offForm: (ScratchFrameMorph skinAt: (bName, 'Button') asSymbol)
+			overForm: (ScratchFrameMorph skinAt: (bName, 'ButtonOver') asSymbol).
+		button
+			target: self;
+			actionSelector: (spec at: 2);
+			isMomentary: true;
+			setProperty: #balloonText toValue: (spec at: 3) localized.
+		envToolbarPanel addMorphBack: button].
+
+	self addMorph: envToolbarPanel.
 ! !
 
 !ScratchFrameMorph methodsFor: 'intialization' stamp: 'ee 1/29/2009 14:21'!
@@ -5027,6 +5082,17 @@ enterQuarterModeIfSmallScreen
 	viewMode = #normal ifTrue: [self enterQuarterMode].
 ! !
 
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 14:24'!
+envAttrNamesCustomMenu
+
+	| menu |
+	menu _ CustomMenu new.
+	
+	(workPane envAttrNamesMenu) do: [ :name |
+		menu add: name action: (name) ].
+
+	^ menu! !
+
 !ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 14:48'!
 eraseTool
 
@@ -5302,7 +5368,7 @@ fixByteReversedSounds
 		allSoundBuffers do: [:buf | buf reverseEndiannessStereo: false]].
 ! !
 
-!ScratchFrameMorph methodsFor: 'geometry' stamp: 'JM 9/15/2011 16:15'!
+!ScratchFrameMorph methodsFor: 'geometry' stamp: 'JM 9/16/2011 13:49'!
 fixLayout
 
 	| stageExtent xyReadout w |
@@ -5380,7 +5446,7 @@ fixLayout
 
 	envToolbarPanel
 		left: (stageFrame left - 4 max: toolbarPanel right);
-		top: self top + ((topPane height - toolbarPanel height) // 2) + 3.
+		top: self top + ((topPane height - envToolbarPanel height) // 2) + 3.
 
 	((envToolbarPanel right - 5) > viewModeButtonsPanel left)
 		ifTrue: [envToolbarPanel delete]
@@ -5390,14 +5456,23 @@ fixLayout
 
 	brushPanel
 		left: (stageFrame left - 4 max: envToolbarPanel right);
-		top: self top + ((topPane height - toolbarPanel height) // 2) + 3.
+		top: self top + ((topPane height - brushPanel height) // 2) + 3.
 
 	((brushPanel right - 5) > viewModeButtonsPanel left)
 		ifTrue: [brushPanel delete]
 		ifFalse: [
 			(brushPanel owner = self) ifFalse: [
 				self addMorphFront: brushPanel]].
-! !
+
+	envAttrMenu
+		left: (stageFrame left - 4 max: brushPanel right + 5);
+		top: self top + ((topPane height - envAttrMenu height) // 2) + 3.
+
+	((envAttrMenu right - 5) > viewModeButtonsPanel left)
+		ifTrue: [envAttrMenu delete]
+		ifFalse: [
+			(envAttrMenu owner = self) ifFalse: [
+				self addMorphFront: envAttrMenu]].! !
 
 !ScratchFrameMorph methodsFor: 'private' stamp: 'ee 2/3/2009 13:26'!
 fixProjectTitleMorphLayout
@@ -5609,7 +5684,7 @@ importSpriteOrProject: fileNameOrData
 	workPane layoutChanged.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/15/2011 16:12'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:56'!
 initialize
 
 	super initialize.
@@ -5624,6 +5699,8 @@ initialize
 	loginName _ ''.
 	loginPassword _ ''.
 	viewMode _ #normal.
+	brushSize _ 2.
+	selectedAttribute _ 'default'.
 
 	self createBasicPanes.
 	self createLogo.
@@ -5631,8 +5708,9 @@ initialize
 	self createViewModeButtonsPanel.
 	self createStageButtonsPanel.
 	self createToolbar.
-	self createEnvToolbar.
-	self createBrushPanel.
+	self createPaintToolbar.
+	self createBrushSizeToolbar.
+	self createCellAttrToolbar.
 
 	self extent: 1000@600.
 ! !
@@ -6884,6 +6962,16 @@ scriptsStringForUpload
 			s cr]].
 	^ s contents
 ! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 14:25'!
+selectedAttribute
+
+	^ selectedAttribute! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:43'!
+selectedAttribute: aString
+
+	selectedAttribute _ aString! !
 
 !ScratchFrameMorph methodsFor: '-- all --' stamp: 'jens 5/3/2010 22:31'!
 setDefaultSprite
@@ -7559,7 +7647,7 @@ updateMediaCategoryFor: anObject
 		viewerPane categoryChanged: 'Sound'].
 ! !
 
-!ScratchFrameMorph methodsFor: 'private' stamp: 'JM 9/9/2011 10:42'!
+!ScratchFrameMorph methodsFor: 'private' stamp: 'JM 9/16/2011 13:12'!
 updatePanes
 
 	| p |
@@ -7570,7 +7658,13 @@ updatePanes
 	self createToolbar.
 
 	envToolbarPanel delete.
-	self createEnvToolbar.
+	self createPaintToolbar.
+
+	brushPanel delete.
+	self createBrushSizeToolbar.
+	
+	envAttrMenu delete.
+	self createCellAttrToolbar.
 
 	viewModeButtonsPanel delete.
 	self createViewModeButtonsPanel.
@@ -7631,7 +7725,7 @@ updateProjectName
 	self fixLayout.
 ! !
 
-!ScratchFrameMorph methodsFor: 'buttonActions' stamp: 'JM 9/15/2011 16:55'!
+!ScratchFrameMorph methodsFor: 'buttonActions' stamp: 'JM 9/16/2011 13:53'!
 updateToolButtons
 	"Update the highlighting of my tool buttons."
 
@@ -7655,7 +7749,7 @@ updateToolButtons
 			ifFalse: [b off]].
 
 	brushButtons do: [ :b |
-		(b actionSelector asLowercase endsWith: workPane brushSize asString)
+		(b actionSelector asLowercase endsWith: brushSize asString)
 			ifTrue: [b on]
 			ifFalse: [b off]].! !
 
@@ -8027,30 +8121,46 @@ zoomOutTool
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:38'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:53'!
+brushSize
+
+	^ brushSize! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:54'!
 brushSize0
 
-	workPane brushSize: 0! !
+	brushSize _ 0! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:38'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
 brushSize1
 
-	workPane brushSize: 1! !
+	brushSize _ 1! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:38'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
 brushSize2
 
-	workPane brushSize: 2! !
+	brushSize _ 2! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:39'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
 brushSize3
 
-	workPane brushSize: 3! !
+	brushSize _ 3! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/15/2011 16:39'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
 brushSize4
 
-	workPane brushSize: 4! !
+	brushSize _ 4! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 14:24'!
+envAttrNamesCustomMenu
+
+	| menu |
+	menu _ CustomMenu new.
+	
+	(workPane envAttrNamesMenu) do: [ :name |
+		menu add: name action: (name) ].
+
+	^ menu! !
 
 !ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 14:48'!
 eraseTool
@@ -8085,6 +8195,16 @@ paintTool
 		offset _ (offset * 1.5) rounded].
 
 	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 14:25'!
+selectedAttribute
+
+	^ selectedAttribute! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:43'!
+selectedAttribute: aString
+
+	selectedAttribute _ aString! !
 
 !ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/26/2011 16:36'!
 syncClones

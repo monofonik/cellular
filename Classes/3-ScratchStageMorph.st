@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchStageMorph
-	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells brushSize showGrid '
+	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells showGrid '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -8,7 +8,7 @@ I represent the background of the Scratch work pane. Like a sprite, I have a set
 !
 
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/15/2011 16:51'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/16/2011 10:56'!
 initialize
 
 	super initialize.
@@ -30,6 +30,7 @@ initialize
 	showMotorBlocks _ false.
 	stepLength _ 100.
 	brushSize _ 0.
+	selectedAttribute _ 'default'.
 	self initialiseCells.
 
 	
@@ -1673,16 +1674,6 @@ allCellsDo: aSelector with: anArg with: anotherArg with: lastArg
 	"perform the provided action on all cells"
 	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:37'!
-brushSize
-
-	^ brushSize! !
-
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:37'!
-brushSize: aNumber
-
-	brushSize _ (aNumber min: 4) max: 0! !
-
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:13'!
 cellAtGridX: xLoc y: yLoc
 
@@ -1695,10 +1686,10 @@ cellAtGridX: xLoc y: yLoc
 	^ (cells at: y) at: x
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:20'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 14:19'!
 cellAttribute: aString
 
-	^ cellAttributes at: aString! !
+	^ cellAttributes at: aString asString ifAbsent: [ ^ nil ].! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:40'!
 cellAttributeNames
@@ -1770,7 +1761,7 @@ clearCells
 	"self allCellsDo: #update: with: cellAttributes."
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:22'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 14:20'!
 createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hue: aHue 
 
 	| attr |
@@ -1785,14 +1776,17 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hu
 		default: aNumber.
 
 	"add it to the dictionary of attributes"
-	cellAttributes at: aString put: attr.
+	cellAttributes at: aString asString put: attr.
 		
 	"update all cells"
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
 	"self allCellsDo: #update: with: cellAttributes."! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:24'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 13:50'!
 deleteCellAttribute: aString
+
+	"delete a cell attribute (but never the default attribute)"
+	aString = 'default' ifTrue: [ ^ self ].
 
 	self allCellsDo: #deleteValue: with: aString.
 	cellAttributes removeKey: aString.
@@ -2080,16 +2074,6 @@ broadcastEventNamed: name with: value
 	^ newProcs asArray
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:37'!
-brushSize
-
-	^ brushSize! !
-
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:37'!
-brushSize: aNumber
-
-	brushSize _ (aNumber min: 4) max: 0! !
-
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:13'!
 cellAtGridX: xLoc y: yLoc
 
@@ -2102,10 +2086,10 @@ cellAtGridX: xLoc y: yLoc
 	^ (cells at: y) at: x
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:20'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 14:19'!
 cellAttribute: aString
 
-	^ cellAttributes at: aString! !
+	^ cellAttributes at: aString asString ifAbsent: [ ^ nil ].! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:40'!
 cellAttributeNames
@@ -2256,7 +2240,7 @@ costumeChanged
 	self changed.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 12:22'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 14:20'!
 createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hue: aHue 
 
 	| attr |
@@ -2271,7 +2255,7 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread hu
 		default: aNumber.
 
 	"add it to the dictionary of attributes"
-	cellAttributes at: aString put: attr.
+	cellAttributes at: aString asString put: attr.
 		
 	"update all cells"
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
@@ -2320,8 +2304,11 @@ deleteAllClones
 	self allClones do: [:clone | clone delete].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 12:24'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 13:50'!
 deleteCellAttribute: aString
+
+	"delete a cell attribute (but never the default attribute)"
+	aString = 'default' ifTrue: [ ^ self ].
 
 	self allCellsDo: #deleteValue: with: aString.
 	cellAttributes removeKey: aString.
@@ -2674,7 +2661,7 @@ initialiseCells
 	cellAttributes _ Dictionary new.
 	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 10 hue: (Color fromString: 'red') hue .! !
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/15/2011 16:51'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/16/2011 10:56'!
 initialize
 
 	super initialize.
@@ -2696,6 +2683,7 @@ initialize
 	showMotorBlocks _ false.
 	stepLength _ 100.
 	brushSize _ 0.
+	selectedAttribute _ 'default'.
 	self initialiseCells.
 
 	
