@@ -129,15 +129,17 @@ extent: aRectangle thumbWidth: w isSprite: s
 	self highlight: false.
 ! !
 
-!LibraryItemMorph methodsFor: 'initialization' stamp: 'jens 1/14/2011 00:47'!
+!LibraryItemMorph methodsFor: 'initialization' stamp: 'JM 9/20/2011 11:59'!
 updateNameAndInfo
 
-	| w y txt |
+	| w y txt scriptCountMorph |
 
-	txt _ ((target objName asUTF8, ' (' asUTF8, 'Scripts' localized, ScratchTranslator colonSuffix, ' ' asUTF8, target scripts size printString asUTF8,')' asUTF8) asUTF8).
+	scriptCountMorph _ nil. "hack to allow saving, sCM must have been edited out elsewhere"
 
-	target prototype ifNotNil: [
-		txt _ (txt, ' kind of: ' asUTF8, target prototype objName asUTF8) asUTF8].
+	txt _ ((target className asUTF8, ' (' asUTF8, 'Scripts' localized, ScratchTranslator colonSuffix, ' ' asUTF8, target scripts size printString asUTF8,')' asUTF8) asUTF8).
+
+	"target prototype ifNotNil: [
+		txt _ (txt, ' kind of: ' asUTF8, target prototype objName asUTF8) asUTF8]."
 
 	self
 		setProperty: #balloonText
@@ -452,6 +454,40 @@ rejectDropEvent: evt
 	evt hand rejectDropMorph: self event: evt.
 ! !
 
+!LibraryItemMorph methodsFor: 'dropping/grabbing' stamp: 'JM 9/20/2011 12:03'!
+rightButtonMenu
+	"Present the right button menu."
+
+	| menu stage |
+	menu _ CustomMenu new.
+	menu add: 'show' action: #makeVisible.
+	menu add: 'export this sprite' action: #exportObject.
+
+	stage _ self target ownerThatIsA: ScratchStageMorph.
+	stage ifNotNil: [
+		(stage scratchServer notNil and: 
+		[stage scratchServer sessionInProgress])
+			ifTrue: [
+				menu add: 'share this sprite' action: #shareObject ]].
+
+	menu addLine.
+	menu add: 'duplicate' action: #duplicateNoAttach.
+	menu add: 'delete' action: #undoableDeleteSprite.
+	(self target isKindOf: ScratchSpriteMorph) ifTrue: [
+		"menu addLine.
+		menu add: 'clone' action: #spawn.
+		menu add: 'parent...' action: #choosePrototype.
+		self target instances size > 0 ifTrue: [
+			menu add: 'children...' action: [self childrenMenu]].
+		self target isNested ifTrue: [
+			menu addLine ].
+		self target hasSubsprites ifTrue: [
+			menu add: 'detach all subsprites' action: #unhingeAll ].
+		self target ownerSprite ifNotNil: [
+			menu add: 'detach from ', self target ownerSprite objName action: #unhinge  ]"].
+	menu localize; invokeOn: self target.
+! !
+
 !LibraryItemMorph methodsFor: 'dropping/grabbing' stamp: 'ee 2/19/2009 11:52'!
 wantsDroppedMorph: aMorph event: evt
 	"Answer true if the given morph is a script, costume, sound or comment."
@@ -538,40 +574,6 @@ updateThumbnail
 ! !
 
 
-!LibraryItemMorph methodsFor: 'right button menu' stamp: 'jens 3/9/2011 00:54'!
-rightButtonMenu
-	"Present the right button menu."
-
-	| menu stage |
-	menu _ CustomMenu new.
-	menu add: 'show' action: #makeVisible.
-	menu add: 'export this sprite' action: #exportObject.
-
-	stage _ self target ownerThatIsA: ScratchStageMorph.
-	stage ifNotNil: [
-		(stage scratchServer notNil and: 
-		[stage scratchServer sessionInProgress])
-			ifTrue: [
-				menu add: 'share this sprite' action: #shareObject ]].
-
-	menu addLine.
-	menu add: 'duplicate' action: #duplicateNoAttach.
-	menu add: 'delete' action: #undoableDeleteSprite.
-	(self target isKindOf: ScratchSpriteMorph) ifTrue: [
-		menu addLine.
-		menu add: 'clone' action: #spawn.
-		menu add: 'parent...' action: #choosePrototype.
-		self target instances size > 0 ifTrue: [
-			menu add: 'children...' action: [self childrenMenu]].
-		self target isNested ifTrue: [
-			menu addLine ].
-		self target hasSubsprites ifTrue: [
-			menu add: 'detach all subsprites' action: #unhingeAll ].
-		self target ownerSprite ifNotNil: [
-			menu add: 'detach from ', self target ownerSprite objName action: #unhinge  ]].
-	menu localize; invokeOn: self target.
-! !
-
 
 !LibraryItemMorph methodsFor: 'private' stamp: 'jens 9/16/2010 23:21'!
 toggleRotationRule
@@ -581,14 +583,14 @@ toggleRotationRule
 	self target toggleRotationRule.
 	self updateRotationToggleMorph! !
 
-!LibraryItemMorph methodsFor: 'private' stamp: 'ee 3/28/2009 19:12'!
+!LibraryItemMorph methodsFor: 'private' stamp: 'JM 9/20/2011 10:39'!
 truncatedLabel
 	"Answer the label string to used as the name morph."
 
 	| ellipses s w n |
 
 	nameMorph contents = target objName ifFalse: [
-		n _ target objName.
+		n _ target className.
 		ellipses _ ScratchTranslator ellipsesSuffix asUTF32.
 		1 to: n size do: [:i |
 			s _ n copyFrom: 1 to: i.
@@ -596,7 +598,7 @@ truncatedLabel
 			w > (self width - 3) ifTrue: [
 				^ (n copyFrom: 1 to: i - 1) asUTF32, ellipses]]].
 
-	^ target objName
+	^ target className
 ! !
 
 

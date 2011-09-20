@@ -26,7 +26,7 @@ initFieldsFrom: anObjStream version: classVersion
 	classVersion = 1 ifTrue: [ ^ self ].
 		! !
 
-!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/16/2011 15:58'!
+!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/20/2011 16:09'!
 initialize
 
 	super initialize.
@@ -35,7 +35,7 @@ initialize
 	values _ Dictionary new.
 	colors _ Dictionary new.
 	self extent: 10@10.
-	self color: (Color fromString: 'white'). "default cell color with no attributes"
+	self color: (Color fromString: 'transparent'). "default cell color with no attributes"
 	changing _ false.
 ! !
 
@@ -117,10 +117,10 @@ clearValue: aString
 	
 	self clearValue: aString spread: spread.! !
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/2/2011 15:47'!
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/20/2011 13:35'!
 clearValue: aString spread: aSpread
 	
-	self changeValue: aString by: (values at: aString) negated spread: aSpread! !
+	self changeValue: aString by: (values at: aString ifAbsent: [ ^ 0 ]) negated spread: aSpread! !
 
 !ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/5/2011 11:21'!
 clearValues
@@ -226,18 +226,18 @@ storeFieldsOn: anObjStream
 		colors
 	) on: anObjStream.! !
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/12/2011 16:05'!
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/20/2011 16:36'!
 update
 
 	"updates the cell colour using a dictionary of attribute specs"
 
 	| attributes keys col |
-	attributes _ self stage cellAttributes.
+	attributes _ self stage cellAttributes reject: [ :att | att hidden ].
 	keys _ attributes keysSortedSafely.
 
 	"If no attributes, just use white"
 	keys size = 0 
-		ifTrue: [ col _ Color fromString: 'white' ]
+		ifTrue: [ col _ Color fromString: 'transparent' ]
 		ifFalse: [
 			| key attr val |
 			key _ keys removeFirst.
@@ -245,14 +245,18 @@ update
 			val _ self value: key.
 
 			"get the initial colour"
-			col _ Color h: attr hue s: (val - attr min) / (attr max - attr min) v: 1.
+			val ~= attr min 
+				ifTrue: [ col _ attr colour alpha: (val - attr min) / (attr max - attr min) ]
+				ifFalse: [ col _ Color fromString: 'transparent' ].
+				
 
 			"mix with any other attribute colors"
 			[ keys size > 0 ] whileTrue: [
 				key _ keys removeFirst.
 				attr _ attributes at: key.
 				val _ self value: key.
-				col _ col mixed: 0.5 with: (Color h: attr hue s: (val - attr min) / (attr max - attr min) v: 1).
+				val ~= attr min ifTrue: [
+					col _ col mixed: 0.5 with: (attr colour alpha: (val - attr min) / (attr max - attr min) )].
 			]
 		].
 

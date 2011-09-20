@@ -770,7 +770,7 @@ tabToNextField: evt
 	evt hand newKeyboardFocus: (fields at: (current \\ fields size) + 1) labelMorph.
 ! !
 
-!CommandBlockMorph methodsFor: 'private' stamp: 'JM 9/14/2011 12:15'!
+!CommandBlockMorph methodsFor: 'private' stamp: 'JM 9/20/2011 14:04'!
 uncoloredArgMorphFor: specString
 	"Answer an argument morph for the given argument specification string."
 
@@ -856,9 +856,10 @@ uncoloredArgMorphFor: specString
 	$1 = code ifTrue: [ ^ SpecialArgMorph new type: #objSlot].
 	$2 = code ifTrue: [ ^ MultiArgMorph type: #objSlot].
 
-	"special args for scratch sim"
+	"special args for cellular"
 	$3 = code ifTrue: [^ ChoiceArgMorph new getOptionsSelector: #envAttrNamesMenu; choice: 'default'].
 	$4 = code ifTrue: [^ ChoiceArgMorph new getOptionsSelector: #cellDirectionNamesMenu; choice: 'up'].
+	$5 = code ifTrue: [^ ChoiceArgMorph new getOptionsSelector: #classNamesMenu].
 
 
 	^ ExpressionArgMorph new numExpression: '10'

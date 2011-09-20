@@ -27,7 +27,7 @@ createStringField
 			borderWidth: 2;
 			color: (Color r: (211/255) g: (214/255) b: (216/255)).! !
 
-!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 16:57'!
+!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 9/20/2011 16:31'!
 getUserResponse
 	"Wait for the user to type in and accept a string, then report that string. Answer the empty string if the user cancels the operation."
 	"Details: This is invoked synchronously from the caller. In order to keep processing inputs and updating the screen while waiting for the user to respond, this method has its own version of the World's event loop."
@@ -50,7 +50,7 @@ getUserResponse
 					maxText contents asNumber.
 					defaultText contents asNumber. 
 					spreadText contents asNumber.
-					colorSelection evaluate hue 
+					colorSelection evaluate 
 					}
 			].! !
 
@@ -132,7 +132,7 @@ min
 
 	^ minText contents asNumber.! !
 
-!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 16:48'!
+!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 9/20/2011 16:30'!
 response
 
 	"returns an array containing the resulting input"
@@ -141,7 +141,7 @@ response
 		maxText contents asNumber,
 		defaultText contents asNumber, 
 		spreadText contents asNumber,
-		color evaluate hue 
+		color evaluate 
 		}! !
 
 !NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 16:39'!

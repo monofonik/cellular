@@ -1,5 +1,5 @@
 Morph subclass: #ScriptableScratchMorph
-	instanceVariableNames: 'objName vars lists blocksBin isClone media costume costumeChangeMSecs filterPack visibility volume tempoBPM sceneStates customBlocks deletedAttributes '
+	instanceVariableNames: 'objName vars lists blocksBin isClone media costume costumeChangeMSecs filterPack visibility volume tempoBPM sceneStates customBlocks deletedAttributes className '
 	classVariableNames: 'BlockColorDict BlockSpecDict DefaultBackgroundForm DefaultSpriteForm DoubleSize Experimental KeepOnStage ListBlockColor MeowSound ObjEncoding OldMeowPrefixReversed PopSound RandomGen Recorder ScratchOrigin TimerStartMSecs '
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -15,11 +15,11 @@ Scriptable morphs:
 !
 
 
-!ScriptableScratchMorph methodsFor: 'initialization' stamp: 'jens 1/25/2010 22:33'!
+!ScriptableScratchMorph methodsFor: 'initialization' stamp: 'JM 9/20/2011 11:03'!
 initialize
 
 	super initialize.
-	temporaryVariables _ VariableFrame new.
+	"temporaryVariables _ VariableFrame new."
 	objName _ self nextInstanceName.
 	vars _ Dictionary new.
 	lists _ Dictionary new.
@@ -32,6 +32,7 @@ initialize
 	volume _ 100.
 	tempoBPM _ 60.
 	sceneStates _ Dictionary new.
+	className _ self nextClassName.
 ! !
 
 
@@ -2370,11 +2371,11 @@ addComment: aScratchCommentMorph
 	blocksBin addMorph: aScratchCommentMorph.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 9/2/2011 12:23'!
+!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 9/20/2011 16:32'!
 addEnvironmentAttribute
 	"Ask the user for the details of a new environment attribute"
 
-	| sFrame results attrName min max default spread hue |
+	| sFrame results attrName min max default spread colour |
 	(sFrame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ self beep].
 
 	results _ NewEnvAttributeDialog ask: 'Attribute name?'.
@@ -2385,7 +2386,7 @@ addEnvironmentAttribute
 	max _ results at: 3.
 	default _ results at: 4.
 	spread _ results at: 5.
-	hue _ results at: 6.
+	colour _ results at: 6.
 
 	attrName size = 0 ifTrue: [^ self].
 	attrName _ attrName asUTF8.
@@ -2394,7 +2395,7 @@ addEnvironmentAttribute
 		DialogBoxMorph warn: 'That attribute name is already in use'.
 		^ self].
 
-	sFrame workPane createAttribute: attrName min: min max: max default: default spread: spread hue: hue.
+	sFrame workPane createAttribute: attrName min: min max: max default: default spread: spread colour: colour.
 	"sFrame viewerPane categoryChanged: 'pen'."
 ! !
 
@@ -4116,6 +4117,30 @@ viewerPageForMotion
 	^ bin
 ! !
 
+!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'JM 9/5/2011 11:03'!
+viewerPageForSensing	
+
+	"Answer a morph containing mtion blocks for the given category for use in the given ScratchViewer."		
+	| bin x y |	
+	bin _ ScratchBlockPaletteMorph new.	
+	x _ 12.	
+	y _ 10.
+		
+	y _ self addEnvironmentBlocksTo: bin x: x y: y.		
+	(self blocksFor: 'sensing') do: [:blockOrSym |	
+		(blockOrSym = #-) | (blockOrSym = #~) |  (blockOrSym = #=)	
+			ifTrue: [	
+				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"	
+				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"	
+				(blockOrSym = #=) ifTrue: [	
+					y _ y + 7.	
+					bin addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).	
+					y _ y + 20]]  "insert a line"	
+			ifFalse: [	
+				y _ self createBlock: blockOrSym atPosition: x@y onPage: bin]].	
+	
+	^ bin! !
+
 !ScriptableScratchMorph methodsFor: 'blocks' stamp: 'jens 12/18/2009 04:45'!
 wholeBlockSpecForSelector: aSymbol
 	"Answer a block specification string (in English) for the give selector or nil if there is no spec that has the given selector."
@@ -4799,7 +4824,7 @@ stepTime
 ! !
 
 
-!ScriptableScratchMorph methodsFor: 'object i/o' stamp: 'jens 3/2/2010 20:24'!
+!ScriptableScratchMorph methodsFor: 'object i/o' stamp: 'JM 9/20/2011 10:25'!
 initFieldsFrom: anObjStream version: classVersion
 
 	| fields |
@@ -4827,9 +4852,14 @@ initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
 	self initFieldsNamed: fields from: anObjStream.
+
+	classVersion < 7 ifTrue: [ ^ self ].
+
+	self initFieldsNamed: #(className) from: anObjStream.
+
 ! !
 
-!ScriptableScratchMorph methodsFor: 'object i/o' stamp: 'jens 11/12/2009 01:07'!
+!ScriptableScratchMorph methodsFor: 'object i/o' stamp: 'JM 9/19/2011 16:43'!
 storeFieldsOn: anObjStream
 
 	| oldBlockBinOwner |
@@ -4848,6 +4878,7 @@ storeFieldsOn: anObjStream
 		isClone
 		media
 		costume
+		className
 	) on: anObjStream.
 
 	oldBlockBinOwner ifNotNil: [oldBlockBinOwner addMorph: blocksBin].
@@ -6717,6 +6748,11 @@ undeleteAttribute: aSymbol
 	w setCategoryColor: block color! !
 
 
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/19/2011 16:25'!
+addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
+
+	self subclassResponsibility! !
+
 !ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:45'!
 cellValue: aString
 
@@ -6727,10 +6763,52 @@ change: aString by: aNumber
 
 	self subclassResponsibility! !
 
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/19/2011 16:49'!
+className
+
+	"returns the class name of this sprite"
+	
+	self prototype ifNotNil: [ ^ self prototype className ].	
+
+	^ className! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 11:03'!
+className: aString
+
+	className _ aString! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 14:04'!
+classNamesMenu
+
+	self subclassResponsibility.! !
+
 !ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
 clear: aString
 
 	self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:15'!
+hideAttribute: aString
+
+	self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 11:03'!
+nextClassName
+
+	| stage lastN digits |
+
+	self = ScratchStageMorph ifTrue: [^ 'Stage' localized].
+
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [^ 'Type' localized asUTF8, 1 printString].
+	lastN _ 0.
+	stage sprites ifNotNil: [
+		stage sprites do: [:m |
+			(m isKindOf: ScratchSpriteMorph) ifTrue: [
+				digits _ m className trailingDigits.
+				((digits size > 0) and: [m className beginsWith: ('Type' localized)])
+					ifTrue: [lastN _ lastN max: digits asNumber]]]].
+
+	^ 'Type' localized asUTF8, (lastN + 1) printString! !
 
 !ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
 setCell: aString to: aNumber
@@ -6742,30 +6820,6 @@ setCell: aString to: aNumber
 layer: aNumber
 
 	"Override this in a subclass if it is meaningful" ! !
-
-!ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/5/2011 11:03'!
-viewerPageForSensing	
-
-	"Answer a morph containing mtion blocks for the given category for use in the given ScratchViewer."		
-	| bin x y |	
-	bin _ ScratchBlockPaletteMorph new.	
-	x _ 12.	
-	y _ 10.
-		
-	y _ self addEnvironmentBlocksTo: bin x: x y: y.		
-	(self blocksFor: 'sensing') do: [:blockOrSym |	
-		(blockOrSym = #-) | (blockOrSym = #~) |  (blockOrSym = #=)	
-			ifTrue: [	
-				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"	
-				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"	
-				(blockOrSym = #=) ifTrue: [	
-					y _ y + 7.	
-					bin addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).	
-					y _ y + 20]]  "insert a line"	
-			ifFalse: [	
-				y _ self createBlock: blockOrSym atPosition: x@y onPage: bin]].	
-	
-	^ bin! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -6818,7 +6872,7 @@ blockSpecDict
 
 ! !
 
-!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 9/9/2011 16:48'!
+!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 9/20/2011 14:08'!
 blockSpecs
 	"Answer a collection of block specifications for the blocks that are common to all objects. Block specificatons (Arrays) are interspersed with category names (Strings). A block specification is an Array of the form: (<block spec string> <block type> <selector> [optional initial argument values]).
 
@@ -6839,8 +6893,12 @@ blockSpecs
 	| blocks |
 	blocks _ #(
 		'sensing'
+			('hide %3'						-	hideAttribute:)
+			('show %3'						-	showAttribute:)
+			-
 			('set %3 to %n'					- 	setCell:to: )
 			('change %3 by %n'				-	changeCellValue:by:)
+			-
 			('clear %3'						-	clearValue:)
 		'control'
 			('when %m clicked'				S	-)
@@ -6854,6 +6912,8 @@ blockSpecs
 			-
 			('broadcast %e'					-	broadcast:)
 			('broadcast %e and wait'			s	doBroadcastAndWait)
+			-
+			('transmit %e to each %5'		-	transmit:to:)
 			('when I receive %e'			E	-)
 			-
 			('forever if %b'					c	doForeverIf)

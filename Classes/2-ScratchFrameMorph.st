@@ -1963,7 +1963,7 @@ updateViewModeButtons
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'other' stamp: 'jens 5/3/2010 02:20'!
+!ScratchFrameMorph methodsFor: 'other' stamp: 'JM 9/20/2011 11:02'!
 addAndView: aSpriteMorph
 	"Add given morph to the work pane and view it."
 
@@ -1974,6 +1974,7 @@ addAndView: aSpriteMorph
 	[pos includes: (p _ (10 * i) asPoint)] whileTrue: [i _ i + 1].
 	workPane addMorphFront: aSpriteMorph.
 	aSpriteMorph objName: aSpriteMorph nextInstanceName.
+	aSpriteMorph className: aSpriteMorph nextClassName.
 	aSpriteMorph referencePosition: p.
 
 	aSpriteMorph installGlobalBlocks.
@@ -4018,7 +4019,7 @@ Please report bugs to http://byobugs.com.
 	dialogBox getUserResponse.
 ! !
 
-!ScratchFrameMorph methodsFor: 'other' stamp: 'jens 5/3/2010 02:20'!
+!ScratchFrameMorph methodsFor: 'other' stamp: 'JM 9/20/2011 11:02'!
 addAndView: aSpriteMorph
 	"Add given morph to the work pane and view it."
 
@@ -4029,6 +4030,7 @@ addAndView: aSpriteMorph
 	[pos includes: (p _ (10 * i) asPoint)] whileTrue: [i _ i + 1].
 	workPane addMorphFront: aSpriteMorph.
 	aSpriteMorph objName: aSpriteMorph nextInstanceName.
+	aSpriteMorph className: aSpriteMorph nextClassName.
 	aSpriteMorph referencePosition: p.
 
 	aSpriteMorph installGlobalBlocks.

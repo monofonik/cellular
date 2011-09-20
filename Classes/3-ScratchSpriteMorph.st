@@ -19,7 +19,7 @@ The leftRight style is useful for side-views of things such as cars, horses, etc
 !
 
 
-!ScratchSpriteMorph methodsFor: 'initialization' stamp: 'JM 8/19/2011 15:04'!
+!ScratchSpriteMorph methodsFor: 'initialization' stamp: 'JM 9/20/2011 11:03'!
 initialize
 
 	super initialize.
@@ -1366,10 +1366,10 @@ rightButtonMenu
 ! !
 
 
-!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'jens 1/14/2011 02:09'!
+!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'JM 9/19/2011 16:45'!
 fieldsVersion
 
-	^ 5
+	^ 7
 ! !
 
 !ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'jens 2/3/2011 23:24'!
@@ -2372,83 +2372,6 @@ penShade
 	^ penShade! !
 
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 16:23'!
-addEnvAttributeBlocksTo: page x: x y: startY
-
-	| y vName stage block varBlocks |
-
-	self halt.
-
-	y _ startY.
-
-	"pick a default variable name"
-	vName _ nil.
-	stage _ self ownerThatIsA: ScratchStageMorph.
-	(stage notNil and: [stage varNames size > 0])
-		ifTrue: [
-			vName _ stage varNames first]
-		ifFalse: [
-			self varNames size = 0
-				ifTrue: [vName = ''  "^ y"]
-				ifFalse: [vName _ self varNames first]].
-
-	vName ifNil: [vName _ ''].
-
-	varBlocks _ OrderedCollection new.
-
-	block _ SetterBlockMorph new
-		initSetterForVar: vName;
-		receiver: self blockReceiver.
-	block expressionArg stringExpression: '0'.
-	varBlocks add: block.
-
-	block _ SetterBlockMorph new
-		initChangerForVar: vName;
-		receiver: self blockReceiver.
-	block expressionArg numExpression: '1'.
-	varBlocks add: block.
-
-	(self blocksFor: 'variables') do: [:b |
-		(b isKindOf: BlockMorph) ifTrue: [
-			b defaultArgs: (Array with: vName)].
-			varBlocks add: b].
-
-	block _ VariableDeclarationBlockMorph new
-		minArgs: 1; 
-		commandSpec: 'script variables' localized; 
-		receiver: self blockReceiver;
-		addItem;
-		isSpecialForm: true;
-		selector: #doDeclareVariables.
-	varBlocks add: block afterIndex: 5.
-
-	varBlocks do: [:blockOrSym |
-		(blockOrSym = #-) | (blockOrSym = #~) | (blockOrSym = #=)
-			ifTrue: [
-				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"
-				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"
-				(blockOrSym = #=) ifTrue: [
-					y _ y + 7.
-					page addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
-					y _ y + 20]]  "insert a line"
-			ifFalse: [
-				blockOrSym color: ((blockOrSym isKindOf: VariableDeclarationBlockMorph)
-									ifTrue: [Color gray]
-									ifFalse: [ self variableBlockColor]).
-				page addMorph: (blockOrSym position: x@y).
-				y _ blockOrSym bottom + 3]].
-"
-
-
-[:b |
-		b color: self variableBlockColor.
-		page addMorph: (b position: x@y).
-		y _ b bottom + 3].
-"
-	^ y
-
-! !
-
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 16:31'!
 cloneCount
 
@@ -2484,33 +2407,10 @@ syncToPrototype
 		block receiver: self. ]! !
 
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/5/2011 11:05'!
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/19/2011 16:24'!
 addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
-	^ yLoc.
-
-	"| stage x y |
-	x _ xLoc.
-	y _ yLoc.
-
-	stage _ self ownerThatIsA: ScratchStageMorph.
-	
-	stage ifNotNil: [
-		
-		stage cellAttributeNames do: [ :name | | reporter |
-
-			reporter _ EnvAttributeBlockMorph new.
-			reporter selector: #envAttr.
-			reporter commandSpec: name.
-			reporter updateLabel.
-			aPane addMorph: ( reporter receiver: self; position: x@y ).
-
-			y _ y + 25.
-			
-		]
-	].
-
-	^ y"! !
+	^ yLoc.! !
 
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/14/2011 12:20'!
 cellDirectionNamesMenu
@@ -2532,6 +2432,15 @@ changeCellValue: aString by: aNumber
 	cell _ self currentCell.
 	cell ifNotNil: [ cell changeValue: aString by: aNumber ].! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 14:06'!
+classNamesMenu
+
+	| stage |
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ #() ].
+
+	^ stage classNamesMenu.! !
+
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:36'!
 clearCell
 
@@ -2541,14 +2450,14 @@ clearCell
 	self currentCell clearValues
 	! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:43'!
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 13:34'!
 clearValue: aString
 
 	| cell |
 	"clears the cell value for the given attribute"
 	self prototype ifNil: [ ^ self ].
-	cell _ self currentCell.
 
+	cell _ self currentCell.
 	cell ifNotNil: [ cell clearValue: aString ].
 		! !
 
@@ -2585,6 +2494,18 @@ face: aString
 
 	! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 13:17'!
+hideAttribute: aString
+
+	"hides the given atttribute"
+
+	| stage |
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ self ].
+
+	stage hideAttribute: aString! !
+
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:30'!
 setCell: aString to: aNumber
 
@@ -2596,12 +2517,24 @@ setCell: aString to: aNumber
 	stage ifNotNil: [ stage setCellValue: aString for: self to: aNumber ].
 	! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 13:17'!
+showAttribute: aString
+
+	"hides the given atttribute"
+
+	| stage |
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ self ].
+
+	stage showAttribute: aString! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/14/2011 16:05'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/19/2011 16:21'!
 blockSpecs
 
 	| blocks |
@@ -2682,6 +2615,9 @@ blockSpecs
 			('go back %n layers'			-	goBackByLayers: 1)
 		'sensing'			
 
+			('clear cell'						-	clearCell)
+			('value of %3'					r	cellValue: )
+			=
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)
 			('color %C is touching %C?'		b	color:sees:)
@@ -2711,11 +2647,9 @@ blockSpecs
 			=
 			('object %m'						r	getObject:)
 			('attribute %a'						r	get:)
-			=
 		'sensing'
-			('clear cell'						-	clearCell)
-			('value of %3'					r	cellValue: )
+
 		).
 
-	^ blocks, super blockSpecs
+	^ super blockSpecs , blocks
 ! !
