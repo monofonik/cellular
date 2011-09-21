@@ -58,7 +58,7 @@ spread: aNumber
 	spread _ (aNumber max: 0) min: 4.! !
 
 
-!ScratchCellAttribute methodsFor: 'getters' stamp: 'JM 9/20/2011 16:24'!
+!ScratchCellAttribute methodsFor: 'getters' stamp: 'JM 9/21/2011 14:25'!
 colour
 
 	^ colour! !
@@ -104,7 +104,7 @@ fieldsVersion
 
 	^ 3! !
 
-!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/20/2011 16:58'!
+!ScratchCellAttribute methodsFor: 'object i/o' stamp: 'JM 9/21/2011 14:02'!
 initFieldsFrom: anObjStream version: classVersion
 
 	self initFieldsNamed: #(
@@ -116,8 +116,8 @@ initFieldsFrom: anObjStream version: classVersion
 		default
 	) from: anObjStream.
 
-	"Use the hue if this is < version 3"
 	colour _ Color h: hue s: 1 v: 1.
+	colour _ colour alpha: 0.5.
 
 	classVersion = 1 ifTrue: [ ^ self ].
 

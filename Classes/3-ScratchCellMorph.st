@@ -226,41 +226,33 @@ storeFieldsOn: anObjStream
 		colors
 	) on: anObjStream.! !
 
-!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/20/2011 16:36'!
+!ScratchCellMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/21/2011 16:18'!
 update
 
 	"updates the cell colour using a dictionary of attribute specs"
 
-	| attributes keys col |
+	| attributes col |
 	attributes _ self stage cellAttributes reject: [ :att | att hidden ].
-	keys _ attributes keysSortedSafely.
 
-	"If no attributes, just use white"
-	keys size = 0 
-		ifTrue: [ col _ Color fromString: 'transparent' ]
-		ifFalse: [
-			| key attr val |
-			key _ keys removeFirst.
-			attr _ attributes at: key.
-			val _ self value: key.
+	col _ Color fromString: 'transparent'.
 
-			"get the initial colour"
-			val ~= attr min 
-				ifTrue: [ col _ attr colour alpha: (val - attr min) / (attr max - attr min) ]
-				ifFalse: [ col _ Color fromString: 'transparent' ].
-				
+	attributes do: [ :attr || val alpha r g b a  |
+		val _ self value: attr name.
+		alpha _ (val - attr min) / (attr max - attr min).
 
-			"mix with any other attribute colors"
-			[ keys size > 0 ] whileTrue: [
-				key _ keys removeFirst.
-				attr _ attributes at: key.
-				val _ self value: key.
-				val ~= attr min ifTrue: [
-					col _ col mixed: 0.5 with: (attr colour alpha: (val - attr min) / (attr max - attr min) )].
+		a _ col alpha + (alpha * ( 1 - col alpha )).
+		(a = 0)
+			ifTrue: [ 
+				r _ 0. g _ 0. b _ 0 
 			]
-		].
+			ifFalse: [
+				r _ ((col red * col alpha) + (attr colour red * alpha * ( 1 - col alpha))) / a. 
+				g _ ((col green * col alpha) + (attr colour green * alpha * ( 1 - col alpha))) / a.
+				b _ ((col blue * col alpha) + (attr colour blue * alpha * ( 1 - col alpha))) / a. 
+			].
+		col _ Color r: r g: g b: b alpha: a.
+	].
 
-	"update the color for this cell"
 	self color: col.
 	self changed.! !
 
