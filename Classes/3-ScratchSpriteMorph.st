@@ -1123,14 +1123,21 @@ setScene: sceneName
 	self heading: (sceneState at: #heading).
 ! !
 
-!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 8/26/2011 15:50'!
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 9/27/2011 14:02'!
 setSizeTo: percent
+	"Set my size to the given percent of the original size. Limit the range to avoid accidentally making me invisibly tiny or really huge. Retain my aspect ratio (i.e., my stretch)."
+
+	self setSizeTo: percent isUser: true.
+! !
+
+!ScratchSpriteMorph methodsFor: 'looks ops' stamp: 'JM 9/27/2011 14:00'!
+setSizeTo: percent isUser: aBoolean
 	"Set my size to the given percent of the original size. Limit the range to avoid accidentally making me invisibly tiny or really huge. Retain my aspect ratio (i.e., my stretch)."
 
 	"self prototype ifNil: [ ^ self ]."
 
 	"Added for system scratch"
-	self prototype ifNotNil: [ ^ self prototype setSizeTo: percent ].
+	( aBoolean & (self prototype ~= nil)) ifTrue: [ ^ self prototype setSizeTo: percent isUser: aBoolean ].
 
 	self undeleteAttribute: #size.
 	self passiveSetSizeTo: percent.
@@ -2301,7 +2308,7 @@ removeLocalBlockDefinitions
 	customBlocks _ customBlocks select: [:def |
 		def isGlobal]! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'jens 2/22/2011 22:26'!
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 9/27/2011 15:13'!
 setRotationStyle: aNumber
 	"Set my rotation style to #normal, #leftRight, or #none. Styles mean:
 		#normal	-- smooth 360 degree rotation
@@ -2311,14 +2318,14 @@ setRotationStyle: aNumber
 	self undeleteAttribute: #rotationStyle.
 	self passiveRotationStyle: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/23/2011 15:52'!
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 9/27/2011 15:17'!
 spawn
 
 	| stage child |
 "
 	(frame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ nil].
 "
-	"If we're a clone, clone the prototype instead"
+	"If we're a clone, clone the prototype instead but place at this position"
 	self prototype ifNotNil: [ ^ prototype spawnAt: self position ].
 
 	stage _ self ownerThatIsA: ScratchStageMorph.
@@ -2337,12 +2344,12 @@ spawn
 	child deleteAttribute: #sounds.
 
 	"new for system scratch"
-	"child undeleteAllAttributes."
+	child deleteAttribute: #rotationStyle.
 	child show.
 
 	^ child	! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 8/23/2011 15:49'!
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 9/26/2011 14:13'!
 spawnAt: aLocation
 
 	self spawn position: aLocation.
@@ -2372,12 +2379,24 @@ penShade
 	^ penShade! !
 
 
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/27/2011 15:11'!
+broadcast: aString for: aNumber
+
+	| stage |
+
+	self prototype ifNil: [ ^ self ].
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ self ].
+
+	stage broadcastEventNamed: aString with: 0 from: self referencePosition for: aNumber! !
+
 !ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 16:31'!
 cloneCount
 
 	^ (self instances size) asString.! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 09:39'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/26/2011 14:09'!
 cloneCount: aNumber
 
 	| num |
@@ -2385,7 +2404,7 @@ cloneCount: aNumber
 	num _ [ aNumber asNumber ] ifError: [ Transcript show: 'Unable to parse number'; cr. ^ self ].
 
 	" Set the number of clones on the stage to the given number "
-	[ (self cloneCount asNumber) < num ] whileTrue: [ self spawn ].
+	[ (self cloneCount asNumber) < num ] whileTrue: [ self spawnSomewhere ].
 	[ (self cloneCount asNumber) > num ] whileTrue: [ (self instances at: 1) deleteSprite. ].
 ! !
 
@@ -2417,11 +2436,14 @@ cellDirectionNamesMenu
 
 	^ #('up' 'down' 'left' 'right' 'up / left' 'up / right' 'down / left' 'down / right')! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:34'!
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/26/2011 10:53'!
 cellValue: aString
 
+	| cell |
 	self prototype ifNil: [ ^ 0 ].
-	^ self currentCell value:aString! !
+	cell _ self currentCell.
+	cell ifNil: [ ^ 0 ].
+	^ cell value:aString! !
 
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/5/2011 10:27'!
 changeCellValue: aString by: aNumber
@@ -2461,11 +2483,17 @@ clearValue: aString
 	cell ifNotNil: [ cell clearValue: aString ].
 		! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/1/2011 09:58'!
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/26/2011 10:52'!
 currentCell
 
 	"return the cell that this sprite is standing on"
+	| stage |
+
 	self prototype ifNil: [ ^ nil ].
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ nil ].
+
 	^ (self ownerThatIsA: ScratchStageMorph) cellBehind: self! !
 
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:02'!
@@ -2529,17 +2557,27 @@ showAttribute: aString
 
 	stage showAttribute: aString! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/26/2011 14:12'!
+spawnSomewhere
+
+	"spawns the sprite at a random location"
+	self spawn referencePosition: ((self randomFrom: -240 to: 240) @ (self randomFrom: -180 to: 180))
+! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/19/2011 16:21'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/26/2011 15:37'!
 blockSpecs
 
 	| blocks |
 	blocks _ #(
 		'control'
+			=
+			('broadcast %e for %n steps'	-	broadcast:for:)
+			-
 			('breed'							-	breed)
 			('die'							-	die)
 			-

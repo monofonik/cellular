@@ -323,7 +323,7 @@ graphicEffectNames
 		'ghost')
 ! !
 
-!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'jens 3/15/2011 00:07'!
+!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'JM 9/27/2011 13:38'!
 lookLike: costumeNameOrIndex
 	"Change to the costume indicated by the given name, index, or boolean. Noop if there is no costume of the given name in my library."
 	"Note: Costumes can have names that look like numbers, but those numbers have nothing to do with the index of the costume. So, we first try interpreting the argument as a name. If that fails, we try interpreting it as a costume index number."
@@ -353,13 +353,13 @@ lookLike: costumeNameOrIndex
 
 	costume _ newCostume.
 	(self isKindOf: ScratchSpriteMorph) ifTrue: [
-		self setSizeTo: self scale ].		"adjust the size if it is really huge or tiny.-jens"
+		self setSizeTo: self scale isUser: false ].		"adjust the size if it is really huge or tiny.-jens"
 	costume resumePlaying.
 	self costumeChanged.
 	self referencePosition: p.
 	World displayWorldSafely.
 !
-]style[(28 1275 86 101)f1b,f1,f1cred;,f1! !
+]style[(28 1275 100 101)f1b,f1,f1cred;,f1! !
 
 !ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'jens 2/8/2011 22:54'!
 nextCostume
@@ -1689,11 +1689,15 @@ broadcast: name
 	self broadcast: name withArgument: 0.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'other ops' stamp: 'jm 5/15/2008 13:49'!
+!ScriptableScratchMorph methodsFor: 'other ops' stamp: 'JM 9/27/2011 15:10'!
 broadcast: name withArgument: arg
 	"Broadcast the given event with the given argument."
 
 	| stage |
+	
+	"added for cellular"
+	self prototype ifNil: [ ^ self ].
+
 	(stage _ self ownerThatIsA: ScratchStageMorph) ifNotNil: [
 		stage broadcastEventNamed: name asString with: arg].
 ! !
@@ -1939,11 +1943,12 @@ propagate
 			ifTrue: [ eachPart perform: sel]
 			ifFalse: [ eachPart perform: sel withArguments: args asArray]]! !
 
-!ScriptableScratchMorph methodsFor: 'byob OOP' stamp: 'jens 2/8/2011 21:26'!
+!ScriptableScratchMorph methodsFor: 'byob OOP' stamp: 'JM 9/27/2011 15:15'!
 propagate: attributeName
 	"private - apply the method calling me to all subsprites"
 
 	| sel args instances |
+
 	instances _ self instances select: [:each |
 		each deletedAttributes includes: attributeName].
 	instances isEmpty ifTrue: [^self].
@@ -4957,7 +4962,7 @@ costumeChanged
 	self keepOnScreen.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'private' stamp: 'JM 8/23/2011 15:47'!
+!ScriptableScratchMorph methodsFor: 'private' stamp: 'JM 9/26/2011 10:45'!
 deleteSprite
 	"Delete the sprite and all watchers that are associated with it."
 
@@ -4982,13 +4987,13 @@ deleteSprite
 		"each prototype: nil]."
 		each delete ].
 
-	frame libraryPane fixLayout.
+	"frame libraryPane fixLayout."
 
 	"delete my thumbnail, and re-focus on the thumbnail right after me or the stage if there are no sprites"
-	i > sprites size ifTrue: [i _ i - 1].
+	"i > sprites size ifTrue: [i _ i - 1].
 	i < 1 
 		ifTrue: [frame view: frame workPane tab: 'Scripts' category: 'motion'] 
-		ifFalse: [frame view: (sprites at: i) tab: 'Scripts' category: 'motion'].	
+		ifFalse: [frame view: (sprites at: i) tab: 'Scripts' category: 'motion']."
 ! !
 
 !ScriptableScratchMorph methodsFor: 'private' stamp: 'jm 3/14/2009 17:22'!
@@ -6233,7 +6238,7 @@ fisheyeEffect: aNumber
 	self undeleteAttribute: #fisheye.
 	self passiveFisheyeEffect: aNumber! !
 
-!ScriptableScratchMorph methodsFor: 'BYOB attributes' stamp: 'jens 2/24/2011 02:49'!
+!ScriptableScratchMorph methodsFor: 'BYOB attributes' stamp: 'JM 9/26/2011 11:39'!
 inheritCostumesNow
 
 	| att idx |
@@ -6250,7 +6255,7 @@ inheritCostumesNow
 			media addLast: item copy]].
 
 	self passiveLookLike: idx.
-	self updateMediaCategory.
+	"self updateMediaCategory." "cellular" 
 
 	self propagateCostumes! !
 
@@ -6517,10 +6522,11 @@ allSprites
 	stage ifNil: [^ ScratchListMorph new].
 	^ ScratchListMorph on: stage sprites! !
 
-!ScriptableScratchMorph methodsFor: 'BYOB object interface' stamp: 'jens 2/23/2011 22:28'!
+!ScriptableScratchMorph methodsFor: 'BYOB object interface' stamp: 'JM 9/26/2011 11:37'!
 deleteAttribute: aSymbol
 
 	| cat sf oi block w |
+
 	self prototype ifNil: [
 		^ self error: 'cannot delete attribute without prototype'].
 
@@ -6544,7 +6550,10 @@ deleteAttribute: aSymbol
 	sf _ self scratchFrame.
 	sf ifNil: [^ self].
 	cat _ (oi at: aSymbol) first.
-	sf viewerPane categoryChanged: cat.
+
+	"commented for cellular"
+
+	"sf viewerPane categoryChanged: cat."
 
 	"update watchers"
 
@@ -6872,7 +6881,7 @@ blockSpecDict
 
 ! !
 
-!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 9/20/2011 14:08'!
+!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 9/26/2011 15:11'!
 blockSpecs
 	"Answer a collection of block specifications for the blocks that are common to all objects. Block specificatons (Arrays) are interspersed with category names (Strings). A block specification is an Array of the form: (<block spec string> <block type> <selector> [optional initial argument values]).
 
@@ -6913,7 +6922,7 @@ blockSpecs
 			('broadcast %e'					-	broadcast:)
 			('broadcast %e and wait'			s	doBroadcastAndWait)
 			-
-			('transmit %e to each %5'		-	transmit:to:)
+			"('transmit %e to each %5'		-	transmit:to:)"
 			('when I receive %e'			E	-)
 			-
 			('forever if %b'					c	doForeverIf)

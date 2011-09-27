@@ -304,7 +304,7 @@ createViewModeButtonsPanel
 	self addMorph: viewModeButtonsPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:56'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/26/2011 15:05'!
 initialize
 
 	super initialize.
@@ -321,6 +321,7 @@ initialize
 	viewMode _ #normal.
 	brushSize _ 2.
 	selectedAttribute _ 'default'.
+
 
 	self createBasicPanes.
 	self createLogo.
@@ -2200,7 +2201,7 @@ readSettingsFile
 	^ dict
 ! !
 
-!ScratchFrameMorph methodsFor: 'startup' stamp: 'jens 8/3/2010 00:16'!
+!ScratchFrameMorph methodsFor: 'startup' stamp: 'JM 9/26/2011 15:06'!
 startup
 
 	| startupFileNames fileName arg presentationMode |
@@ -5686,7 +5687,7 @@ importSpriteOrProject: fileNameOrData
 	workPane layoutChanged.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:56'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/26/2011 15:05'!
 initialize
 
 	super initialize.
@@ -5703,6 +5704,7 @@ initialize
 	viewMode _ #normal.
 	brushSize _ 2.
 	selectedAttribute _ 'default'.
+
 
 	self createBasicPanes.
 	self createLogo.
@@ -7209,7 +7211,7 @@ startHostingScratchSession
 	self showNetworkAddress.
 ! !
 
-!ScratchFrameMorph methodsFor: 'startup' stamp: 'jens 8/3/2010 00:16'!
+!ScratchFrameMorph methodsFor: 'startup' stamp: 'JM 9/26/2011 15:06'!
 startup
 
 	| startupFileNames fileName arg presentationMode |

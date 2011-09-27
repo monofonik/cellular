@@ -26,7 +26,7 @@ initFieldsFrom: anObjStream version: classVersion
 	classVersion = 1 ifTrue: [ ^ self ].
 		! !
 
-!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/20/2011 16:09'!
+!ScratchCellMorph methodsFor: 'initialization' stamp: 'JM 9/26/2011 15:03'!
 initialize
 
 	super initialize.

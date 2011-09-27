@@ -8,7 +8,7 @@ I represent the background of the Scratch work pane. Like a sprite, I have a set
 !
 
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/20/2011 10:58'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/27/2011 11:39'!
 initialize
 
 	super initialize.
@@ -32,6 +32,7 @@ initialize
 	"brushSize _ 0."
 	"selectedAttribute _ 'default'."
 	className _ 'Stage'.
+	showGrid _ true.
 	self initialiseCells.
 
 	
@@ -785,6 +786,28 @@ broadcastEventNamed: name with: value
 
 	"start scripts"
 	objList _ submorphs select: [:m | m isKindOf: ScriptableScratchMorph].
+	objList do: [:obj |
+		newProcs addAll: (obj eventReceived: event)].
+	newProcs addAll: (self eventReceived: event).
+
+	^ newProcs asArray
+! !
+
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 9/26/2011 15:31'!
+broadcastEventNamed: name with: value from: aPoint for: numSteps
+	"Broadcast a ScratchEvent with given name and argument value to all Scratch objects and answer a collection of the newly created processes. This is done by finding all public scripts that respond to this event, and starting new processes for any not already running."
+
+	| event objList newProcs |
+	scratchServer ifNotNil: [scratchServer queueBroadcast: name].
+	event _ ScratchEvent new name: name argument: value.
+	newProcs _ OrderedCollection new.
+
+	"start scripts"
+	objList _ submorphs select: [:m | m isKindOf: ScriptableScratchMorph].
+
+	"select only morphs within range"
+	objList _ objList select: [:m | (m referencePosition dist: aPoint) <= numSteps ].
+
 	objList do: [:obj |
 		newProcs addAll: (obj eventReceived: event)].
 	newProcs addAll: (self eventReceived: event).
@@ -1818,6 +1841,28 @@ broadcastEventNamed: name with: value
 	^ newProcs asArray
 ! !
 
+!ScratchStageMorph methodsFor: 'scratch processes/events' stamp: 'JM 9/26/2011 15:31'!
+broadcastEventNamed: name with: value from: aPoint for: numSteps
+	"Broadcast a ScratchEvent with given name and argument value to all Scratch objects and answer a collection of the newly created processes. This is done by finding all public scripts that respond to this event, and starting new processes for any not already running."
+
+	| event objList newProcs |
+	scratchServer ifNotNil: [scratchServer queueBroadcast: name].
+	event _ ScratchEvent new name: name argument: value.
+	newProcs _ OrderedCollection new.
+
+	"start scripts"
+	objList _ submorphs select: [:m | m isKindOf: ScriptableScratchMorph].
+
+	"select only morphs within range"
+	objList _ objList select: [:m | (m referencePosition dist: aPoint) <= numSteps ].
+
+	objList do: [:obj |
+		newProcs addAll: (obj eventReceived: event)].
+	newProcs addAll: (self eventReceived: event).
+
+	^ newProcs asArray
+! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:13'!
 cellAtGridX: xLoc y: yLoc
 
@@ -2433,7 +2478,7 @@ initialiseCells
 	cellAttributes _ Dictionary new.
 	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 10 colour: (Color fromString: 'red').! !
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/20/2011 10:58'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/27/2011 11:39'!
 initialize
 
 	super initialize.
@@ -2457,6 +2502,7 @@ initialize
 	"brushSize _ 0."
 	"selectedAttribute _ 'default'."
 	className _ 'Stage'.
+	showGrid _ true.
 	self initialiseCells.
 
 	
