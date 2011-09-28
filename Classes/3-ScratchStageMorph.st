@@ -8,7 +8,7 @@ I represent the background of the Scratch work pane. Like a sprite, I have a set
 !
 
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/27/2011 11:39'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/28/2011 10:38'!
 initialize
 
 	super initialize.
@@ -2478,7 +2478,7 @@ initialiseCells
 	cellAttributes _ Dictionary new.
 	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 10 colour: (Color fromString: 'red').! !
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/27/2011 11:39'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/28/2011 10:38'!
 initialize
 
 	super initialize.
