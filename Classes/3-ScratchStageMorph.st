@@ -345,13 +345,14 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 9/29/2011 13:29'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:36'!
 handleTool: toolName hand: hand
+
 
 	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
 
 		| frame attrName attr tenPC toolSpread toolLoc gridLoc cell |
-
+		
 		toolLoc _ hand position translateBy: self position negated.
 
 		frame _ self ownerThatIsA: ScratchFrameMorph.
@@ -390,7 +391,19 @@ handleTool: toolName hand: hand
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 9/29/2011 13:18'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:35'!
+mouseDown: evt
+	"Handle a mouse down event."
+	
+	evt hand newKeyboardFocus: nil.
+	"evt hand toolType ifNotNil: [ self handleTool: evt hand toolType: nil ]."
+
+	evt rightButtonPressed
+		ifTrue: [Sensor waitNoButton. ^ self rightButtonMenu]
+		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
+! !
+
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:36'!
 mouseMove: evt
 
 	evt hand newKeyboardFocus: nil.
@@ -2500,13 +2513,14 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 9/29/2011 13:29'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:36'!
 handleTool: toolName hand: hand
+
 
 	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
 
 		| frame attrName attr tenPC toolSpread toolLoc gridLoc cell |
-
+		
 		toolLoc _ hand position translateBy: self position negated.
 
 		frame _ self ownerThatIsA: ScratchFrameMorph.
@@ -2797,7 +2811,19 @@ midiPortNum: anInteger
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 9/29/2011 13:18'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:35'!
+mouseDown: evt
+	"Handle a mouse down event."
+	
+	evt hand newKeyboardFocus: nil.
+	"evt hand toolType ifNotNil: [ self handleTool: evt hand toolType: nil ]."
+
+	evt rightButtonPressed
+		ifTrue: [Sensor waitNoButton. ^ self rightButtonMenu]
+		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
+! !
+
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:36'!
 mouseMove: evt
 
 	evt hand newKeyboardFocus: nil.
