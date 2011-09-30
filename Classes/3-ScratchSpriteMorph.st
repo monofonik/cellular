@@ -1373,10 +1373,10 @@ rightButtonMenu
 ! !
 
 
-!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'JM 9/19/2011 16:45'!
+!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:38'!
 fieldsVersion
 
-	^ 7
+	^ 8
 ! !
 
 !ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'jens 2/3/2011 23:24'!

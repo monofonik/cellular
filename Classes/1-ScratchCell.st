@@ -4,37 +4,15 @@ Object subclass: #ScratchCell
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
 
-!ScratchCell methodsFor: 'initialization' stamp: 'JM 9/28/2011 10:23'!
-fieldsVersion
-
-	^ 1! !
-
-!ScratchCell methodsFor: 'initialization' stamp: 'JM 9/28/2011 10:23'!
-initFieldsFrom: anObjStream version: classVersion
-
-	super initFieldsFrom: anObjStream version: classVersion.
-
-	self initFieldsNamed: #(
-		gridLocation
-		values
-		colors
-	) from: anObjStream.
-
-	classVersion = 1 ifTrue: [ ^ self ].
-		! !
-
-!ScratchCell methodsFor: 'initialization' stamp: 'JM 9/28/2011 11:18'!
+!ScratchCell methodsFor: 'initialization' stamp: 'JM 9/29/2011 14:45'!
 initialize
 
 	super initialize.
-	"super borderWidth: 0."
-	"super borderColor: (Color fromString: 'veryVeryLightGray')."
 	values _ Dictionary new.
 	colors _ Dictionary new.
-	"self extent: 10@10."
 	color _ (Color fromString: 'transparent'). "default cell color with no attributes"
 	changing _ false.
-	damaged _ false.
+	damaged _ true.
 ! !
 
 !ScratchCell methodsFor: 'initialization' stamp: 'JM 9/28/2011 10:23'!
@@ -224,16 +202,6 @@ stage: aStage
 
 	stage _ aStage! !
 
-!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 9/28/2011 10:23'!
-storeFieldsOn: anObjStream
-
-	super storeFieldsOn: anObjStream.
-	self storeFieldsNamed: #(
-		gridLocation
-		values
-		colors
-	) on: anObjStream.! !
-
 !ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 9/28/2011 11:18'!
 update
 
@@ -275,3 +243,36 @@ value: aString
 color
 
 	^ color! !
+
+
+!ScratchCell methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:43'!
+fieldsVersion
+
+	^ 1! !
+
+!ScratchCell methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:46'!
+initFieldsFrom: anObjStream version: classVersion
+
+	self initFieldsNamed: #(
+		gridLocation 
+		color 
+		values 
+		colors
+	) from: anObjStream.
+
+
+
+
+	! !
+
+!ScratchCell methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:45'!
+storeFieldsOn: anObjStream
+
+	self storeFieldsNamed: #(
+		gridLocation 
+		color 
+		values 
+		colors
+	) on: anObjStream
+
+	! !

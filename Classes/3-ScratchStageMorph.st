@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchStageMorph
-	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells cellsForm showGrid '
+	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells cellsForm gridForm showGrid '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -345,16 +345,59 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'jm 12/19/2008 17:22'!
-mouseDown: evt
-	"Handle a mouse down event."
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 9/29/2011 13:29'!
+handleTool: toolName hand: hand
+
+	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
+
+		| frame attrName attr tenPC toolSpread toolLoc gridLoc cell |
+
+		toolLoc _ hand position translateBy: self position negated.
+
+		frame _ self ownerThatIsA: ScratchFrameMorph.
+		frame ifNil: [ ^ self ].
+	
+		attrName _ frame selectedAttribute.
+
+		attr _ self cellAttribute: attrName.
+		attr ifNil: [ ^ self ].
+
+		tenPC _ attr max - attr min / 40.
+
+		toolSpread _ frame brushSize.
+
+		gridLoc _ (toolLoc / 10 + (1@1)) min: 48@36 max: 1@1.
+
+		cell _ (cells at: gridLoc y) at: gridLoc x.
+
+		toolName = 'PaintTool' ifTrue: [ cell changeValue: attrName by: tenPC spread: toolSpread ].
+		toolName = 'EraseTool' ifTrue: [ cell changeValue: attrName by: tenPC negated spread: toolSpread ].
+
+		^ self updateCellsForm.
+
+	].
+
+	^ super handleTool: toolName hand: hand
+
+	
+
+
+
+
+
+
+
+	
+! !
+
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 9/29/2011 13:18'!
+mouseMove: evt
 
 	evt hand newKeyboardFocus: nil.
-	evt hand toolType ifNotNil: [evt hand toolType: nil].
 
-	evt rightButtonPressed
-		ifTrue: [Sensor waitNoButton. ^ self rightButtonMenu]
-		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
+	evt hand toolType ifNotNil: [
+		self handleTool: evt hand toolType hand: evt hand.
+	].
 ! !
 
 !ScratchStageMorph methodsFor: 'event handling' stamp: 'tis 12/7/2006 16:04'!
@@ -481,7 +524,7 @@ rootForGrabOf: aMorph
 ! !
 
 
-!ScratchStageMorph methodsFor: 'drawing' stamp: 'JM 9/28/2011 14:08'!
+!ScratchStageMorph methodsFor: 'drawing' stamp: 'JM 9/29/2011 11:05'!
 drawOn: aCanvas
 	"Draw myself if my visibility is > 0. If my visibility is 1, draw using the normal 'paint' mode. Otherwise, draw using 'alpha' resulting in a partially transparent rendering."
 
@@ -501,10 +544,12 @@ drawOn: aCanvas
 			ifFalse: [clipC paintImage: f at: p]].
 
 	self updateCellsForm.
-	cellsForm ifNotNil: [ clipC paintImage: cellsForm at: self position].
+	cellsForm ifNotNil: [ clipC translucentImage: cellsForm at: self position].
 
 	self updateTrailsForm.
 	penTrailsForm ifNotNil: [clipC paintImage: penTrailsForm at: self position].
+
+	gridForm ifNotNil: [ clipC paintImage: gridForm at: self position ].
 	! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 1/23/2009 11:14'!
@@ -1276,13 +1321,13 @@ updateTrailsForm
 ! !
 
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/19/2011 16:45'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:37'!
 fieldsVersion
 
-	^ 7
+	^ 8
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 15:12'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -1317,15 +1362,25 @@ initFieldsFrom: anObjStream version: classVersion
 		sceneStates
 		lists
 	) from: anObjStream.
-	classVersion = 5 ifTrue: [ ^ self ].
+	lists ifNil: [lists _ Dictionary new].  "work around"
+	
+	"cell fields added in version 6/7 are not compatible"
+	classVersion <= 7 ifTrue: [ 
+		"ensure we haven't loaded up any old ScratchCellMorphs"
+		self removeAllMorphsIn: (self submorphs select: [ :m | m isKindOf: ScratchCellMorph ]).
+		self initialiseCells.
+		^ self ].
 
-	"fields added in version 6"
 	self initFieldsNamed: #(
 		cellAttributes 
 		cells
 	) from: anObjStream.
 
-	lists ifNil: [lists _ Dictionary new].  "work around"
+	"ensure each cell has a reference to the stage"
+	self allCellsDo: #stage: with: self.
+	
+
+	
 ! !
 
 !ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
@@ -1993,12 +2048,12 @@ clearCellValue: aString for: aSprite
 	cell clearValue: aString spread: attr spread.
 	cell update: cellAttributes.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:53'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:33'!
 clearCells
 
 	"clear all cells values for every attribute"
 	self allCellsDo: #clearValues.
-	"self allCellsDo: #update: with: cellAttributes."
+
 	! !
 
 !ScratchStageMorph methodsFor: 'pen support' stamp: 'jm 2/5/2005 11:31'!
@@ -2068,7 +2123,7 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread co
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
 	"self allCellsDo: #update: with: cellAttributes."! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 14:34'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:03'!
 createOrResizeCellsForm
 	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
 
@@ -2083,8 +2138,53 @@ createOrResizeCellsForm
 			copy: cellsForm boundingBox
 			from: cellsForm
 			to: 0@0
-			rule: Form paintAlpha.
+			rule: Form paint.
 		cellsForm _ newForm]. ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:29'!
+createOrResizeGridForm
+	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
+
+	| newForm |
+	gridForm ifNil: [
+
+		| pen p1 p2 |
+
+		gridForm _ Form extent: self extent depth: 32.
+
+		"add the grid lines"
+		pen _ Pen newOnForm: gridForm.
+		"penSize _ 1."
+		"aMorph penSize ~= 1 ifTrue: [
+			pen roundNib: penSize.
+			pen sourceForm offset: nil]."  "clear form offset"
+		pen color: Color veryLightGray.
+		"offset _ (gridForm extent - penSize) / 2.0."
+		
+		(1 to: 48) do: [ :x |
+			p1 _ (x * 10) @ 0.
+			p2 _ (x * 10) @ 360.
+			pen drawFrom: p1 to: p2.
+		].
+
+		(1 to: 36) do: [ :y |
+			p1 _ 0 @ (y * 10).
+			p2 _ 480 @ (y * 10).
+			pen drawFrom: p1 to: p2.
+		].
+
+		self invalidRect: ( (0@0 rect: gridForm extent) translateBy: self topLeft).
+		
+		^ self].
+
+	gridForm extent = self extent ifFalse: [  "resize trails Form to my current exent"
+		newForm _ Form extent: self extent depth: 32.
+		newForm
+			copy: gridForm boundingBox
+			from: gridForm
+			to: 0@0
+			rule: Form paint.
+		gridForm _ newForm]. ! !
 
 !ScratchStageMorph methodsFor: 'pen support' stamp: 'jm 2/11/2005 21:56'!
 createOrResizeTrailsForm
@@ -2158,7 +2258,7 @@ deleteTerminatedClones
 		isRunning ifFalse: [clone delete]].
 ! !
 
-!ScratchStageMorph methodsFor: 'drawing' stamp: 'JM 9/28/2011 14:08'!
+!ScratchStageMorph methodsFor: 'drawing' stamp: 'JM 9/29/2011 11:05'!
 drawOn: aCanvas
 	"Draw myself if my visibility is > 0. If my visibility is 1, draw using the normal 'paint' mode. Otherwise, draw using 'alpha' resulting in a partially transparent rendering."
 
@@ -2178,10 +2278,12 @@ drawOn: aCanvas
 			ifFalse: [clipC paintImage: f at: p]].
 
 	self updateCellsForm.
-	cellsForm ifNotNil: [ clipC paintImage: cellsForm at: self position].
+	cellsForm ifNotNil: [ clipC translucentImage: cellsForm at: self position].
 
 	self updateTrailsForm.
 	penTrailsForm ifNotNil: [clipC paintImage: penTrailsForm at: self position].
+
+	gridForm ifNotNil: [ clipC paintImage: gridForm at: self position ].
 	! !
 
 !ScratchStageMorph methodsFor: 'pen support' stamp: 'jm 10/6/2007 15:03'!
@@ -2283,10 +2385,10 @@ exportFileName: fileName
 	(form asFormOfDepth: 32) writeBMPFileNamed: fName.
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/19/2011 16:45'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:37'!
 fieldsVersion
 
-	^ 7
+	^ 8
 ! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 6/3/2004 20:17'!
@@ -2398,6 +2500,51 @@ grabSpriteFromScreen
 
 ! !
 
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 9/29/2011 13:29'!
+handleTool: toolName hand: hand
+
+	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
+
+		| frame attrName attr tenPC toolSpread toolLoc gridLoc cell |
+
+		toolLoc _ hand position translateBy: self position negated.
+
+		frame _ self ownerThatIsA: ScratchFrameMorph.
+		frame ifNil: [ ^ self ].
+	
+		attrName _ frame selectedAttribute.
+
+		attr _ self cellAttribute: attrName.
+		attr ifNil: [ ^ self ].
+
+		tenPC _ attr max - attr min / 40.
+
+		toolSpread _ frame brushSize.
+
+		gridLoc _ (toolLoc / 10 + (1@1)) min: 48@36 max: 1@1.
+
+		cell _ (cells at: gridLoc y) at: gridLoc x.
+
+		toolName = 'PaintTool' ifTrue: [ cell changeValue: attrName by: tenPC spread: toolSpread ].
+		toolName = 'EraseTool' ifTrue: [ cell changeValue: attrName by: tenPC negated spread: toolSpread ].
+
+		^ self updateCellsForm.
+
+	].
+
+	^ super handleTool: toolName hand: hand
+
+	
+
+
+
+
+
+
+
+	
+! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 11:59'!
 hasAttribute: aString
 
@@ -2442,7 +2589,7 @@ incrRedraw: damageList
 				f displayOn: Display at: r topLeft rule: Form over]].
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 15:12'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -2477,18 +2624,28 @@ initFieldsFrom: anObjStream version: classVersion
 		sceneStates
 		lists
 	) from: anObjStream.
-	classVersion = 5 ifTrue: [ ^ self ].
+	lists ifNil: [lists _ Dictionary new].  "work around"
+	
+	"cell fields added in version 6/7 are not compatible"
+	classVersion <= 7 ifTrue: [ 
+		"ensure we haven't loaded up any old ScratchCellMorphs"
+		self removeAllMorphsIn: (self submorphs select: [ :m | m isKindOf: ScratchCellMorph ]).
+		self initialiseCells.
+		^ self ].
 
-	"fields added in version 6"
 	self initFieldsNamed: #(
 		cellAttributes 
 		cells
 	) from: anObjStream.
 
-	lists ifNil: [lists _ Dictionary new].  "work around"
+	"ensure each cell has a reference to the stage"
+	self allCellsDo: #stage: with: self.
+	
+
+	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 14:01'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 13:41'!
 initialiseCells
 
 	"create the cells"
@@ -2502,7 +2659,7 @@ initialiseCells
 
 	"create the cell attribute list"
 	cellAttributes _ Dictionary new.
-	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 10 colour: (Color fromString: 'red').
+	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
 !ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/28/2011 13:13'!
@@ -2640,16 +2797,14 @@ midiPortNum: anInteger
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'jm 12/19/2008 17:22'!
-mouseDown: evt
-	"Handle a mouse down event."
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 9/29/2011 13:18'!
+mouseMove: evt
 
 	evt hand newKeyboardFocus: nil.
-	evt hand toolType ifNotNil: [evt hand toolType: nil].
 
-	evt rightButtonPressed
-		ifTrue: [Sensor waitNoButton. ^ self rightButtonMenu]
-		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
+	evt hand toolType ifNotNil: [
+		self handleTool: evt hand toolType hand: evt hand.
+	].
 ! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 10:53'!
@@ -3091,11 +3246,13 @@ showGrid
 
 	^ showGrid ifNil: [ ^ false ]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:48'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 13:39'!
 showGrid: aBoolean
 
 	showGrid _ aBoolean.
-	self allCellsDo: #showBorder: with: aBoolean.
+	showGrid 
+		ifTrue: [ self createOrResizeGridForm ]
+		ifFalse: [ gridForm _ nil . self invalidRect: self bounds ].
 ! !
 
 !ScratchStageMorph methodsFor: 'accessing' stamp: 'jm 2/13/2009 14:49'!
@@ -3490,24 +3647,26 @@ unlockedMorphsAt: aPoint addTo: mList
 	^ mList
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 15:26'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 10:26'!
 updateCellsForm
 
 	"updates the cells form to display the colour associated with each cell"
 	
+	| count |
+	count _ 0.
+
 	self createOrResizeCellsForm.
 
 	((cells inject: #() into: [ :all :row | all _ all , row ]) select: [ :cell | cell damaged ])
 		do: [ :cell | | rect x y |
+			count _ count + 1.
 			x _ cell gridLocation x * 10 - 10.
 			y _ cell gridLocation y * 10 - 10.
 			rect _ Rectangle origin:  x@y corner: (x + 10) @ (y + 10).
 			cellsForm fill: rect rule: Form over fillColor: cell color.
 			self invalidRect: (rect translateBy: self topLeft).
 			cell redrawn.
-			"Transcript show: 'redrew cell ' , x asString , '@' , y asString , ' with color: ' , cell color asString; cr."
 	].
-
 ! !
 
 !ScratchStageMorph methodsFor: 'pen support' stamp: 'jm 11/15/2006 16:57'!
@@ -3747,12 +3906,12 @@ clearCellValue: aString for: aSprite
 	cell clearValue: aString spread: attr spread.
 	cell update: cellAttributes.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 15:53'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:33'!
 clearCells
 
 	"clear all cells values for every attribute"
 	self allCellsDo: #clearValues.
-	"self allCellsDo: #update: with: cellAttributes."
+
 	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:32'!
@@ -3782,7 +3941,7 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread co
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
 	"self allCellsDo: #update: with: cellAttributes."! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 14:34'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:03'!
 createOrResizeCellsForm
 	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
 
@@ -3797,8 +3956,53 @@ createOrResizeCellsForm
 			copy: cellsForm boundingBox
 			from: cellsForm
 			to: 0@0
-			rule: Form paintAlpha.
+			rule: Form paint.
 		cellsForm _ newForm]. ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:29'!
+createOrResizeGridForm
+	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
+
+	| newForm |
+	gridForm ifNil: [
+
+		| pen p1 p2 |
+
+		gridForm _ Form extent: self extent depth: 32.
+
+		"add the grid lines"
+		pen _ Pen newOnForm: gridForm.
+		"penSize _ 1."
+		"aMorph penSize ~= 1 ifTrue: [
+			pen roundNib: penSize.
+			pen sourceForm offset: nil]."  "clear form offset"
+		pen color: Color veryLightGray.
+		"offset _ (gridForm extent - penSize) / 2.0."
+		
+		(1 to: 48) do: [ :x |
+			p1 _ (x * 10) @ 0.
+			p2 _ (x * 10) @ 360.
+			pen drawFrom: p1 to: p2.
+		].
+
+		(1 to: 36) do: [ :y |
+			p1 _ 0 @ (y * 10).
+			p2 _ 480 @ (y * 10).
+			pen drawFrom: p1 to: p2.
+		].
+
+		self invalidRect: ( (0@0 rect: gridForm extent) translateBy: self topLeft).
+		
+		^ self].
+
+	gridForm extent = self extent ifFalse: [  "resize trails Form to my current exent"
+		newForm _ Form extent: self extent depth: 32.
+		newForm
+			copy: gridForm boundingBox
+			from: gridForm
+			to: 0@0
+			rule: Form paint.
+		gridForm _ newForm]. ! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 13:50'!
 deleteCellAttribute: aString
@@ -3835,7 +4039,7 @@ hideAttribute: aString
 
 	self allCellsDo: #update! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 14:01'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 13:41'!
 initialiseCells
 
 	"create the cells"
@@ -3849,7 +4053,7 @@ initialiseCells
 
 	"create the cell attribute list"
 	cellAttributes _ Dictionary new.
-	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 10 colour: (Color fromString: 'red').
+	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 10:53'!
@@ -3899,31 +4103,35 @@ showGrid
 
 	^ showGrid ifNil: [ ^ false ]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:48'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 13:39'!
 showGrid: aBoolean
 
 	showGrid _ aBoolean.
-	self allCellsDo: #showBorder: with: aBoolean.
+	showGrid 
+		ifTrue: [ self createOrResizeGridForm ]
+		ifFalse: [ gridForm _ nil . self invalidRect: self bounds ].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 15:26'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 10:26'!
 updateCellsForm
 
 	"updates the cells form to display the colour associated with each cell"
 	
+	| count |
+	count _ 0.
+
 	self createOrResizeCellsForm.
 
 	((cells inject: #() into: [ :all :row | all _ all , row ]) select: [ :cell | cell damaged ])
 		do: [ :cell | | rect x y |
+			count _ count + 1.
 			x _ cell gridLocation x * 10 - 10.
 			y _ cell gridLocation y * 10 - 10.
 			rect _ Rectangle origin:  x@y corner: (x + 10) @ (y + 10).
 			cellsForm fill: rect rule: Form over fillColor: cell color.
 			self invalidRect: (rect translateBy: self topLeft).
 			cell redrawn.
-			"Transcript show: 'redrew cell ' , x asString , '@' , y asString , ' with color: ' , cell color asString; cr."
 	].
-
 ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!

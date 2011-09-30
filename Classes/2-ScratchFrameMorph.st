@@ -2442,7 +2442,7 @@ current project."
 	self importSpriteOrProject: response.
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'jens 7/27/2010 13:23'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 9/29/2011 13:42'!
 installNewProject: newWorkpane
 	"Called after creating or reading a new project to clear the process scheduler, pick an object to view, clear the library thumbnails, and perform other housekeeping."
 
@@ -2513,6 +2513,9 @@ installNewProject: newWorkpane
 		self showMotorBlocks].
 	(projectInfo includesKey: 'penTrails') ifTrue: [
 		workPane penTrailsForm: (projectInfo at: 'penTrails')].
+
+	"ensure the grid is drawn"
+	workPane showGrid: true.
 
 	(projectInfo at: 'keepOnStage' ifAbsent: [true]) = ScriptableScratchMorph keepOnStage
 		ifFalse: [self toggleKeepSpritesOnStage].
@@ -2585,7 +2588,7 @@ openScratchProject
 		projectDirectory _ ScratchFileChooserDialog getDefaultFolderForType: #project].
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'jens 1/14/2011 02:11'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 9/29/2011 14:52'!
 openScratchProjectNamed: fName
 	"Open a Scratch project with the given name."
 
@@ -2597,13 +2600,13 @@ openScratchProjectNamed: fName
  	f ifNil: ["try a different encoding, fixes a Firefox bug, -Jens"
 		fn _ fName isoLatinToMac asUTF8.
 		f _ FileStream readOnlyFileNamedOrNil: fn.
-		f ifNil: [^ self inform: 'Could not read' withDetails: fName]].
+		f ifNil: [ ^ self inform: 'Could not read' withDetails: fName]].
 
 	[	projData _ f binary contentsOfEntireFile. 
 		newProj _ self extractProjectFrom: projData.
 		projectInfo _ self extractInfoFrom: projData. 
 
-	] ifError: [:err :rcvr | ^ self inform: 'Could not read project; file may be damaged' withDetails: '(', err, ')'].
+	] ifError: [:err :rcvr | self halt. ^ self inform: 'Could not read project; file may be damaged' withDetails: '(', err, ')'].
 
 	dir _ FileDirectory dirPathFor: fn.
 	projectDirectory _ FileDirectory on: dir.
@@ -5738,7 +5741,7 @@ initializeWatcherPositions
 			put: {w. p. w layoutStyle. w sliderRange}].
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'jens 7/27/2010 13:23'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 9/29/2011 13:42'!
 installNewProject: newWorkpane
 	"Called after creating or reading a new project to clear the process scheduler, pick an object to view, clear the library thumbnails, and perform other housekeeping."
 
@@ -5809,6 +5812,9 @@ installNewProject: newWorkpane
 		self showMotorBlocks].
 	(projectInfo includesKey: 'penTrails') ifTrue: [
 		workPane penTrailsForm: (projectInfo at: 'penTrails')].
+
+	"ensure the grid is drawn"
+	workPane showGrid: true.
 
 	(projectInfo at: 'keepOnStage' ifAbsent: [true]) = ScriptableScratchMorph keepOnStage
 		ifFalse: [self toggleKeepSpritesOnStage].
@@ -6241,7 +6247,7 @@ openScratchProject
 		projectDirectory _ ScratchFileChooserDialog getDefaultFolderForType: #project].
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'jens 1/14/2011 02:11'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 9/29/2011 14:52'!
 openScratchProjectNamed: fName
 	"Open a Scratch project with the given name."
 
@@ -6253,13 +6259,13 @@ openScratchProjectNamed: fName
  	f ifNil: ["try a different encoding, fixes a Firefox bug, -Jens"
 		fn _ fName isoLatinToMac asUTF8.
 		f _ FileStream readOnlyFileNamedOrNil: fn.
-		f ifNil: [^ self inform: 'Could not read' withDetails: fName]].
+		f ifNil: [ ^ self inform: 'Could not read' withDetails: fName]].
 
 	[	projData _ f binary contentsOfEntireFile. 
 		newProj _ self extractProjectFrom: projData.
 		projectInfo _ self extractInfoFrom: projData. 
 
-	] ifError: [:err :rcvr | ^ self inform: 'Could not read project; file may be damaged' withDetails: '(', err, ')'].
+	] ifError: [:err :rcvr | self halt. ^ self inform: 'Could not read project; file may be damaged' withDetails: '(', err, ')'].
 
 	dir _ FileDirectory dirPathFor: fn.
 	projectDirectory _ FileDirectory on: dir.
