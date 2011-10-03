@@ -616,7 +616,7 @@ forward: distance
 	self ypos: self ypos 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 9/14/2011 16:25'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 10/3/2011 12:38'!
 forwardCell: aNumber
 
 	"moves the sprite a given number of cells in the closest discrete direction to the sprites current heading"
@@ -635,7 +635,7 @@ forwardCell: aNumber
 
 	aNumber timesRepeat: [ | cell |
 		cell _ stage adjacentCellTo: self direction: (directions at: dirIndex).
-		self gotoX: cell referencePosition x y: cell referencePosition y
+		self gotoX: cell referencePosition x y: cell referencePosition y.
 		]! !
 
 !ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
@@ -714,13 +714,13 @@ gotoSpriteOrMouse: anObject
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 10/3/2011 12:28'!
 gotoX: x y: y
+
 
 	self prototype ifNil: [ ^ self ].
 
-	self xpos: x; ypos: y
-
+	self xpos: x; ypos: y.
 
 "
 	self holdSubsprites.
