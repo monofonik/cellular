@@ -130,7 +130,7 @@ createMenuPanel
 	topPane addMorph: menuPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:08'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/4/2011 15:11'!
 createPaintToolbar
 	"Create and add the paint toolbar."
 
@@ -143,6 +143,7 @@ createPaintToolbar
 	buttonSpecs _ #(
 		"name			selector"			"tooltip"
 		(paint			paintTool		'Paint')
+		(cellQuery		queryTool		'Query')
 		(erase			eraseTool		'Erase')
 	).
 
@@ -4586,7 +4587,7 @@ createMenuPanel
 	topPane addMorph: menuPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/16/2011 13:08'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/4/2011 15:11'!
 createPaintToolbar
 	"Create and add the paint toolbar."
 
@@ -4599,6 +4600,7 @@ createPaintToolbar
 	buttonSpecs _ #(
 		"name			selector"			"tooltip"
 		(paint			paintTool		'Paint')
+		(cellQuery		queryTool		'Query')
 		(erase			eraseTool		'Erase')
 	).
 
@@ -6567,6 +6569,23 @@ purgeBlockEditors
 	blockEditors _ blockEditors reject: [:each | 
 		each isInWorld not]! !
 
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/4/2011 15:31'!
+queryTool
+
+	| hand cursorForm offset |
+	self paintingInProgress ifTrue: [^ self beep].
+	hand _ self world activeHand.
+	hand toolType: 'QueryTool'.
+
+	cursorForm _ ScratchFrameMorph skinAt: #cellQueryCursor.
+	offset _ 8@8.
+
+	ScratchFrameMorph isXO ifTrue: [
+		cursorForm _ cursorForm magnifyBy: 1.5.
+		offset _ (offset * 1.5) rounded].
+
+	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
+
 !ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'jm 3/26/2009 20:48'!
 quitScratch
 	"Quit from Scratch. Ask the user if they want to save, first."
@@ -8198,6 +8217,23 @@ paintTool
 	hand toolType: 'PaintTool'.
 
 	cursorForm _ ScratchFrameMorph skinAt: #paintCursor.
+	offset _ 8@8.
+
+	ScratchFrameMorph isXO ifTrue: [
+		cursorForm _ cursorForm magnifyBy: 1.5.
+		offset _ (offset * 1.5) rounded].
+
+	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
+
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/4/2011 15:31'!
+queryTool
+
+	| hand cursorForm offset |
+	self paintingInProgress ifTrue: [^ self beep].
+	hand _ self world activeHand.
+	hand toolType: 'QueryTool'.
+
+	cursorForm _ ScratchFrameMorph skinAt: #cellQueryCursor.
 	offset _ 8@8.
 
 	ScratchFrameMorph isXO ifTrue: [

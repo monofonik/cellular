@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchStageMorph
-	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells cellsForm gridForm showGrid '
+	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells cellsForm gridForm showGrid cellQueryToolTip '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -345,9 +345,8 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:36'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 10:10'!
 handleTool: toolName hand: hand
-
 
 	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
 
@@ -391,6 +390,11 @@ handleTool: toolName hand: hand
 	
 ! !
 
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 10:09'!
+handlesMouseOver: evt
+
+	^ true! !
+
 !ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:35'!
 mouseDown: evt
 	"Handle a mouse down event."
@@ -402,6 +406,31 @@ mouseDown: evt
 		ifTrue: [Sensor waitNoButton. ^ self rightButtonMenu]
 		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
 ! !
+
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 15:56'!
+mouseEnter: evt
+
+	"Check if the query tool is selected and display a tool tip"
+
+	"Ensure there's no tooltips left behind"
+	(self submorphs select: [ :m | m isKindOf: ScratchCellToolTipMorph ]) 
+		do: [ :m | m delete]. 
+	
+	(evt hand toolType = 'QueryTool') ifTrue: [
+		cellQueryToolTip _ ScratchCellToolTipMorph new.
+		cellQueryToolTip target: self.
+		cellQueryToolTip getSelector: #cellQueryToolTipText.
+		self addMorphFront: (cellQueryToolTip position: evt hand position).
+		cellQueryToolTip startStepping.
+	].! !
+
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 11:20'!
+mouseLeave: evt
+
+	cellQueryToolTip ifNotNil: [ 
+		cellQueryToolTip delete.
+		cellQueryToolTip _ nil.
+	]! !
 
 !ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:36'!
 mouseMove: evt
@@ -1739,7 +1768,7 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	^ y.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 14:58'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 12:05'!
 adjacentCellTo: aSprite direction: aString
 
 	"returns the adjacent cell to the sprite in the given direction - up, down, left, right, up / left, up / right, down / left, down / right"
@@ -1754,8 +1783,7 @@ adjacentCellTo: aSprite direction: aString
 	(aString includesSubString: 'down') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
 
 	"Ensure within cell limits"
-	gridLoc _ gridLoc max: 1@1.
-	gridLoc _ gridLoc min: 48@36.
+	gridLoc _ gridLoc min: 48@36 max: 1@1.
 
 	^ (cells at: gridLoc y) at: gridLoc x
 	
@@ -1975,6 +2003,39 @@ cellBehind: aSprite
 
 	^ (cells at: y) at: x.
 	
+! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 16:22'!
+cellQueryToolTipText
+
+	"returns the text to display in the cell query tool tip, which depends on the currently selected cell attribute and the position of the cursor."
+
+	| frame text cell cellText |
+
+	frame _ self ownerThatIsA: ScratchFrameMorph.
+	frame ifNil: [ ^ '' ].
+	
+	text _ Text new.
+	cell _ self cellUnderCursor.
+
+	cellAttributes do: [ :attr |
+		text _ text , '  ' asText.
+		text _ text , ((cell value: attr name) stringForReadout asText addAttribute: (TextColor color: attr colour)).
+	].
+
+	cellText _ ('Cell ' , cell gridLocation x asString, '/' , cell gridLocation y asString) asText.
+	^ cellText , text 
+	
+! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 12:11'!
+cellUnderCursor
+
+	"returns the cell underneath the cursor"
+	| gridLoc |
+
+	gridLoc _ ((Sensor cursorPoint translateBy: self position negated) / 10 + (1@1)) min: 48@36 max: 1@1.
+	^ (cells at: gridLoc y) at: gridLoc x.
 ! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 11:22'!
@@ -2513,9 +2574,8 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:36'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 10:10'!
 handleTool: toolName hand: hand
-
 
 	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
 
@@ -2558,6 +2618,11 @@ handleTool: toolName hand: hand
 
 	
 ! !
+
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 10:09'!
+handlesMouseOver: evt
+
+	^ true! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 11:59'!
 hasAttribute: aString
@@ -2822,6 +2887,31 @@ mouseDown: evt
 		ifTrue: [Sensor waitNoButton. ^ self rightButtonMenu]
 		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
 ! !
+
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 15:56'!
+mouseEnter: evt
+
+	"Check if the query tool is selected and display a tool tip"
+
+	"Ensure there's no tooltips left behind"
+	(self submorphs select: [ :m | m isKindOf: ScratchCellToolTipMorph ]) 
+		do: [ :m | m delete]. 
+	
+	(evt hand toolType = 'QueryTool') ifTrue: [
+		cellQueryToolTip _ ScratchCellToolTipMorph new.
+		cellQueryToolTip target: self.
+		cellQueryToolTip getSelector: #cellQueryToolTipText.
+		self addMorphFront: (cellQueryToolTip position: evt hand position).
+		cellQueryToolTip startStepping.
+	].! !
+
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 11:20'!
+mouseLeave: evt
+
+	cellQueryToolTip ifNotNil: [ 
+		cellQueryToolTip delete.
+		cellQueryToolTip _ nil.
+	]! !
 
 !ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/1/2011 09:36'!
 mouseMove: evt
@@ -3774,7 +3864,7 @@ userSelectSpriteDefault: defaultSprite butNotAnyOf: excludeArray
 ! !
 
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 14:58'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 12:05'!
 adjacentCellTo: aSprite direction: aString
 
 	"returns the adjacent cell to the sprite in the given direction - up, down, left, right, up / left, up / right, down / left, down / right"
@@ -3789,8 +3879,7 @@ adjacentCellTo: aSprite direction: aString
 	(aString includesSubString: 'down') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
 
 	"Ensure within cell limits"
-	gridLoc _ gridLoc max: 1@1.
-	gridLoc _ gridLoc min: 48@36.
+	gridLoc _ gridLoc min: 48@36 max: 1@1.
 
 	^ (cells at: gridLoc y) at: gridLoc x
 	
@@ -3885,6 +3974,39 @@ cellBehind: aSprite
 
 	^ (cells at: y) at: x.
 	
+! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 16:22'!
+cellQueryToolTipText
+
+	"returns the text to display in the cell query tool tip, which depends on the currently selected cell attribute and the position of the cursor."
+
+	| frame text cell cellText |
+
+	frame _ self ownerThatIsA: ScratchFrameMorph.
+	frame ifNil: [ ^ '' ].
+	
+	text _ Text new.
+	cell _ self cellUnderCursor.
+
+	cellAttributes do: [ :attr |
+		text _ text , '  ' asText.
+		text _ text , ((cell value: attr name) stringForReadout asText addAttribute: (TextColor color: attr colour)).
+	].
+
+	cellText _ ('Cell ' , cell gridLocation x asString, '/' , cell gridLocation y asString) asText.
+	^ cellText , text 
+	
+! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 12:11'!
+cellUnderCursor
+
+	"returns the cell underneath the cursor"
+	| gridLoc |
+
+	gridLoc _ ((Sensor cursorPoint translateBy: self position negated) / 10 + (1@1)) min: 48@36 max: 1@1.
+	^ (cells at: gridLoc y) at: gridLoc x.
 ! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 11:22'!
