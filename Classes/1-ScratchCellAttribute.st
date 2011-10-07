@@ -147,3 +147,9 @@ storeFieldsOn: anObjStream
 	) on: anObjStream.
 
 	! !
+
+
+!ScratchCellAttribute methodsFor: 'as yet unclassified' stamp: 'JM 10/7/2011 16:58'!
+toggleHidden
+
+	self hidden: hidden not.! !

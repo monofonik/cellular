@@ -1723,12 +1723,17 @@ computeFunction: functionName of: aNumber
 	^ 0
 ! !
 
-!ScriptableScratchMorph methodsFor: 'other ops' stamp: 'jm 4/27/2007 13:14'!
+!ScriptableScratchMorph methodsFor: 'other ops' stamp: 'JM 10/7/2011 13:15'!
 eventReceived: event
 	"Start all non-running stacks with an EventHat matching the given events and answer a collection of the new processes. If a process is already running for a given stack, don't start a new one."
 
 	| targetScripts newProcs |
+
 	targetScripts _ #().
+
+	"for cellular, never start a process for a prototype"
+	(self prototype = nil) & (self isKindOf: ScratchSpriteMorph)  ifTrue: [ ^ targetScripts ].
+
 	event name = 'Scratch-KeyPressedEvent'
 		ifTrue: [
 			targetScripts _ self scripts select: [:s |
@@ -2468,9 +2473,12 @@ scratchFrame
 
 ! !
 
-!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'jm 8/10/2007 10:14'!
+!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 10/7/2011 11:53'!
 scripts
 	"Answer my scripts, a collection of HatBlockMorphs."
+
+	"added for cellular"
+	"(self prototype) ifNotNil: [ ^ self prototype scripts ]."
 
 	(blocksBin isKindOf: Morph) ifFalse: [^ blocksBin].
 	^ blocksBin submorphs select: [:m | m isKindOf: HatBlockMorph]

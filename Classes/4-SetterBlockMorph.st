@@ -22,14 +22,6 @@ initChangerForVar: varName
 	self variable: var.
 ! !
 
-!SetterBlockMorph methodsFor: 'initialization' stamp: 'JM 9/2/2011 14:05'!
-initSetterForEnvAttribute
-
-	self commandSpec: (ScratchTranslator translationFor: 'set %3 to %n').
-	argPermutation _ CommandBlockMorph argPermutationForSpec: 'set %3 to %n' withTranslation: commandSpec.
-	self selector: #setCell:to:.
-! !
-
 !SetterBlockMorph methodsFor: 'initialization' stamp: 'jens 2/28/2011 02:06'!
 initSetterForVar: varName
 
@@ -70,12 +62,11 @@ helpScreenName
 		ifFalse: [^ 'variableChangeBy']
 ! !
 
-!SetterBlockMorph methodsFor: 'accessing' stamp: 'JM 8/15/2011 22:20'!
+!SetterBlockMorph methodsFor: 'accessing' stamp: 'JM 10/7/2011 12:31'!
 receiver: anObject
 	"Set my receiver object and, if possible, my block color."
 
 	receiver _ anObject.
-	super receiver: anObject.
 
 "
 	(receiver respondsTo: #variableBlockColor)

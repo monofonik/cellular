@@ -1249,7 +1249,7 @@ shareMenu: aMenuTitleMorph
 
 ! !
 
-!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 8/15/2011 22:28'!
+!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 10/7/2011 11:34'!
 shoutGo
 	"Broadcasts the start event to all objects and processes."
 
@@ -3878,13 +3878,13 @@ showPause
 		overForm: (ScratchFrameMorph skinAt: 'pauseButtonGrayPressed' asSymbol)
 ! !
 
-!ScratchFrameMorph methodsFor: 'byob' stamp: 'jens 5/19/2010 03:39'!
+!ScratchFrameMorph methodsFor: 'byob' stamp: 'JM 10/7/2011 14:42'!
 showPlay
 
-	pauseButton
+	"pauseButton
 		onForm: (ScratchFrameMorph skinAt: 'playButtonGrayPressed' asSymbol)
 		offForm: (ScratchFrameMorph skinAt: 'playButtonGray'asSymbol)
-		overForm: (ScratchFrameMorph skinAt: 'playButtonGrayPressed' asSymbol)
+		overForm: (ScratchFrameMorph skinAt: 'playButtonGrayPressed' asSymbol)"
 ! !
 
 !ScratchFrameMorph methodsFor: 'byob' stamp: 'jens 4/21/2010 00:37'!
@@ -6288,7 +6288,7 @@ paintSpriteMorph
 	m editDrawingOldCostumeName: m costume mediaName deleteOnCancel: true.
 ! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 12:25'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/6/2011 12:02'!
 paintTool
 
 	| hand cursorForm offset |
@@ -6297,7 +6297,7 @@ paintTool
 	hand toolType: 'PaintTool'.
 
 	cursorForm _ ScratchFrameMorph skinAt: #paintCursor.
-	offset _ 8@8.
+	offset _ 4@17.
 
 	ScratchFrameMorph isXO ifTrue: [
 		cursorForm _ cursorForm magnifyBy: 1.5.
@@ -6569,7 +6569,7 @@ purgeBlockEditors
 	blockEditors _ blockEditors reject: [:each | 
 		each isInWorld not]! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/4/2011 15:31'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/6/2011 12:27'!
 queryTool
 
 	| hand cursorForm offset |
@@ -6578,7 +6578,7 @@ queryTool
 	hand toolType: 'QueryTool'.
 
 	cursorForm _ ScratchFrameMorph skinAt: #cellQueryCursor.
-	offset _ 8@8.
+	offset _ 0@0.
 
 	ScratchFrameMorph isXO ifTrue: [
 		cursorForm _ cursorForm magnifyBy: 1.5.
@@ -7126,7 +7126,7 @@ shareSprite
 	scriptsPane target shareObject.
 ! !
 
-!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 8/15/2011 22:28'!
+!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 10/7/2011 11:34'!
 shoutGo
 	"Broadcasts the start event to all objects and processes."
 
@@ -7172,13 +7172,13 @@ showPause
 		overForm: (ScratchFrameMorph skinAt: 'pauseButtonGrayPressed' asSymbol)
 ! !
 
-!ScratchFrameMorph methodsFor: 'byob' stamp: 'jens 5/19/2010 03:39'!
+!ScratchFrameMorph methodsFor: 'byob' stamp: 'JM 10/7/2011 14:42'!
 showPlay
 
-	pauseButton
+	"pauseButton
 		onForm: (ScratchFrameMorph skinAt: 'playButtonGrayPressed' asSymbol)
 		offForm: (ScratchFrameMorph skinAt: 'playButtonGray'asSymbol)
-		overForm: (ScratchFrameMorph skinAt: 'playButtonGrayPressed' asSymbol)
+		overForm: (ScratchFrameMorph skinAt: 'playButtonGrayPressed' asSymbol)"
 ! !
 
 !ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'jm 10/31/2006 20:59'!
@@ -8208,7 +8208,7 @@ eraseTool
 
 	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 12:25'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/6/2011 12:02'!
 paintTool
 
 	| hand cursorForm offset |
@@ -8217,7 +8217,7 @@ paintTool
 	hand toolType: 'PaintTool'.
 
 	cursorForm _ ScratchFrameMorph skinAt: #paintCursor.
-	offset _ 8@8.
+	offset _ 4@17.
 
 	ScratchFrameMorph isXO ifTrue: [
 		cursorForm _ cursorForm magnifyBy: 1.5.
@@ -8225,7 +8225,7 @@ paintTool
 
 	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/4/2011 15:31'!
+!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/6/2011 12:27'!
 queryTool
 
 	| hand cursorForm offset |
@@ -8234,7 +8234,7 @@ queryTool
 	hand toolType: 'QueryTool'.
 
 	cursorForm _ ScratchFrameMorph skinAt: #cellQueryCursor.
-	offset _ 8@8.
+	offset _ 0@0.
 
 	ScratchFrameMorph isXO ifTrue: [
 		cursorForm _ cursorForm magnifyBy: 1.5.

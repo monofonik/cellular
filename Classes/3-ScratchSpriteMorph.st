@@ -2414,16 +2414,19 @@ die
 	"Deletes this sprite, unless it's the prototype"
 	self prototype ifNotNil: [ self deleteSprite ].! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/9/2011 16:27'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 10/7/2011 12:36'!
 syncToPrototype
 
 	"Updates this sprites blocks bin with a full copy of its prototypes"
 
 	self prototype ifNotNil: [ 
+		"self prototype: self prototype."
 		blocksBin _ self prototype blocksBin fullCopy.
 		].
 	blocksBin submorphs do: [ :block |
-		block receiver: self. ]! !
+		block receiver: self.
+		Transcript show: block asString; cr.
+	 ]! !
 
 
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/19/2011 16:24'!
@@ -2444,6 +2447,19 @@ cellValue: aString
 	cell _ self currentCell.
 	cell ifNil: [ ^ 0 ].
 	^ cell value:aString! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 10/7/2011 12:40'!
+cellValue: aString x: x y: y 
+
+	| stage |
+	"clears the cell value for the given attribute"
+	self prototype ifNil: [ ^ 0 ].
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ 0 ].
+
+	^ stage cellValue: aString x: x y: y
+		! !
 
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/5/2011 10:27'!
 changeCellValue: aString by: aNumber
@@ -2481,6 +2497,19 @@ clearValue: aString
 
 	cell _ self currentCell.
 	cell ifNotNil: [ cell clearValue: aString ].
+		! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 10/7/2011 12:40'!
+clearValue: aString x: x y: y 
+
+	| stage |
+	"clears the cell value for the given attribute"
+	self prototype ifNil: [ ^ 0 ].
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ 0 ].
+
+	^ stage cellValue: aString x: x y: y
 		! !
 
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/26/2011 10:52'!
@@ -2564,12 +2593,36 @@ spawnSomewhere
 	self spawn referencePosition: ((self randomFrom: -240 to: 240) @ (self randomFrom: -180 to: 180))
 ! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 10/6/2011 15:29'!
+xposCell
+
+	| stage |
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ 0 ].
+
+	^ (stage cellBehind: self) gridLocation x.
+
+	! !
+
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 10/6/2011 15:30'!
+yposCell
+
+	| stage |
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ 0 ].
+
+	^ (stage cellBehind: self) gridLocation y.
+
+	! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 9/26/2011 15:37'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 10/6/2011 15:32'!
 blockSpecs
 
 	| blocks |
@@ -2605,6 +2658,9 @@ blockSpecs
 			-
 			('x position'						r	xpos)
 			('y position'						r	ypos)
+			('cell position x'					r	xposCell)
+			('cell position y'					r	yposCell)
+			-
 			('direction'						r	heading)
 		'pen'
 	
@@ -2655,6 +2711,7 @@ blockSpecs
 
 			('clear cell'						-	clearCell)
 			('value of %3'					r	cellValue: )
+			('value of %3 at x: %n y %n'	r	cellValue:x:y: )
 			=
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)
@@ -2685,7 +2742,6 @@ blockSpecs
 			=
 			('object %m'						r	getObject:)
 			('attribute %a'						r	get:)
-		'sensing'
 
 		).
 

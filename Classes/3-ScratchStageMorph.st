@@ -407,7 +407,7 @@ mouseDown: evt
 		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 15:56'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/6/2011 12:30'!
 mouseEnter: evt
 
 	"Check if the query tool is selected and display a tool tip"
@@ -550,6 +550,33 @@ drawSubmorphsOn: aCanvas
 		 [clipCanvas isVisible: m fullBounds]]) ifTrue: [
 			m drawTalkBubbleOn: clipCanvas]].
 
+! !
+
+!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 10/7/2011 17:29'!
+rightButtonMenu
+	"Present the right button menu."
+
+	| frame menu |
+
+	frame _ self ownerThatIsA: ScratchFrameMorph.
+	frame ifNil: [ ^ self ].
+
+	menu _ MenuMorph new.
+	
+	"add the cell attributes"
+	cellAttributes do: [ :attr |
+		menu addIcon: (frame checkBoxLabelled: attr name marked: attr hidden not width: 20)
+			tooltip:	'show / hide ' , attr name
+			target: self
+			selector: #toggleAttribute:
+			argumentList: {attr name}
+	].
+
+	menu add: 'grab screen region for new sprite' action: #grabSpriteFromScreen.
+	menu addLine.
+	menu add: 'save picture of stage...' action: #stageShot.
+	"menu localize; invokeOn: self."
+	menu popUpNearHand.
 ! !
 
 !ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'jm 5/25/2004 14:56'!
@@ -1445,18 +1472,6 @@ storeFieldsOn: anObjStream
 ! !
 
 
-!ScratchStageMorph methodsFor: 'menus' stamp: 'jm 10/25/2007 19:25'!
-rightButtonMenu
-	"Present the right button menu."
-
-	| menu |
-	menu _ CustomMenu new.
-	menu add: 'grab screen region for new sprite' action: #grabSpriteFromScreen.
-	menu addLine.
-	menu add: 'save picture of stage...' action: #stageShot.
-	menu localize; invokeOn: self.
-! !
-
 
 !ScratchStageMorph methodsFor: 'media' stamp: 'jm 6/22/2009 14:15'!
 savePhoto: aForm
@@ -2005,7 +2020,7 @@ cellBehind: aSprite
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 16:22'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/6/2011 11:26'!
 cellQueryToolTipText
 
 	"returns the text to display in the cell query tool tip, which depends on the currently selected cell attribute and the position of the cursor."
@@ -2023,7 +2038,7 @@ cellQueryToolTipText
 		text _ text , ((cell value: attr name) stringForReadout asText addAttribute: (TextColor color: attr colour)).
 	].
 
-	cellText _ ('Cell ' , cell gridLocation x asString, '/' , cell gridLocation y asString) asText.
+	cellText _ ('x=' , cell gridLocation x asString, ' y=' , cell gridLocation y asString, String cr) asText.
 	^ cellText , text 
 	
 ! !
@@ -2046,6 +2061,12 @@ cellValue: aString for: aSprite
 	cell _ self cellBehind: aSprite.
 	cell ifNotNil: [ ^ cell value: aString ].
 	^ 0.! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 12:39'!
+cellValue: aString x: x y: y
+
+
+	^ (self cellAtGridX: x y: y) value: aString! !
 
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 10/6/2006 22:22'!
 changeBackgroundIndexBy: aNumber
@@ -2629,7 +2650,7 @@ hasAttribute: aString
 
 	^ cellAttributes includes: aString! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:18'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:33'!
 hideAttribute: aString
 
 	"hides the given atttribute"
@@ -2641,7 +2662,8 @@ hideAttribute: aString
 
 	attr hidden: true.
 
-	self allCellsDo: #update! !
+	self allCellsDo: #update.
+	self changed! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 11/8/2006 18:09'!
 incrRedraw: damageList
@@ -2888,7 +2910,7 @@ mouseDown: evt
 		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 15:56'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/6/2011 12:30'!
 mouseEnter: evt
 
 	"Check if the query tool is selected and display a tool tip"
@@ -3201,16 +3223,31 @@ resumeAllProcesses
 		each resumeProcess]
 ! !
 
-!ScratchStageMorph methodsFor: 'menus' stamp: 'jm 10/25/2007 19:25'!
+!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 10/7/2011 17:29'!
 rightButtonMenu
 	"Present the right button menu."
 
-	| menu |
-	menu _ CustomMenu new.
+	| frame menu |
+
+	frame _ self ownerThatIsA: ScratchFrameMorph.
+	frame ifNil: [ ^ self ].
+
+	menu _ MenuMorph new.
+	
+	"add the cell attributes"
+	cellAttributes do: [ :attr |
+		menu addIcon: (frame checkBoxLabelled: attr name marked: attr hidden not width: 20)
+			tooltip:	'show / hide ' , attr name
+			target: self
+			selector: #toggleAttribute:
+			argumentList: {attr name}
+	].
+
 	menu add: 'grab screen region for new sprite' action: #grabSpriteFromScreen.
 	menu addLine.
 	menu add: 'save picture of stage...' action: #stageShot.
-	menu localize; invokeOn: self.
+	"menu localize; invokeOn: self."
+	menu popUpNearHand.
 ! !
 
 !ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'jm 5/25/2004 14:56'!
@@ -3337,7 +3374,7 @@ setZoomTo: percent
 	self changed.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:18'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:33'!
 showAttribute: aString
 
 	"hides the given atttribute"
@@ -3348,7 +3385,8 @@ showAttribute: aString
 	attr ifNil: [ ^ self ].
 
 	attr hidden: false.
-	self allCellsDo: #update! !
+	self allCellsDo: #update.
+	self changed.! !
 
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 12/11/2006 11:42'!
 showBackground: costumeNameOrIndex
@@ -3689,6 +3727,16 @@ thumbnailForm
 	^ self stageShotSized: (160@120)
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:32'!
+toggleAttribute: aString
+
+	| attr |
+	attr _ cellAttributes at: aString ifAbsent: [ ^ nil ].
+	attr ifNil: [ ^ self ].
+
+	attr hidden ifTrue: [ self showAttribute: attr name ]
+		ifFalse: [ self hideAttribute: attr name ].! !
+
 !ScratchStageMorph methodsFor: 'byob' stamp: 'jens 5/18/2010 01:13'!
 togglePause
 
@@ -3976,7 +4024,7 @@ cellBehind: aSprite
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 16:22'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/6/2011 11:26'!
 cellQueryToolTipText
 
 	"returns the text to display in the cell query tool tip, which depends on the currently selected cell attribute and the position of the cursor."
@@ -3994,7 +4042,7 @@ cellQueryToolTipText
 		text _ text , ((cell value: attr name) stringForReadout asText addAttribute: (TextColor color: attr colour)).
 	].
 
-	cellText _ ('Cell ' , cell gridLocation x asString, '/' , cell gridLocation y asString) asText.
+	cellText _ ('x=' , cell gridLocation x asString, ' y=' , cell gridLocation y asString, String cr) asText.
 	^ cellText , text 
 	
 ! !
@@ -4017,6 +4065,12 @@ cellValue: aString for: aSprite
 	cell _ self cellBehind: aSprite.
 	cell ifNotNil: [ ^ cell value: aString ].
 	^ 0.! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 12:39'!
+cellValue: aString x: x y: y
+
+
+	^ (self cellAtGridX: x y: y) value: aString! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:50'!
 changeCellValue: aString by: aNumber
@@ -4173,7 +4227,7 @@ hasAttribute: aString
 
 	^ cellAttributes includes: aString! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:18'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:33'!
 hideAttribute: aString
 
 	"hides the given atttribute"
@@ -4185,7 +4239,8 @@ hideAttribute: aString
 
 	attr hidden: true.
 
-	self allCellsDo: #update! !
+	self allCellsDo: #update.
+	self changed! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 13:41'!
 initialiseCells
@@ -4233,7 +4288,7 @@ setCellValue: aString for: aSprite to: aNumber
 		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
 	]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:18'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:33'!
 showAttribute: aString
 
 	"hides the given atttribute"
@@ -4244,7 +4299,8 @@ showAttribute: aString
 	attr ifNil: [ ^ self ].
 
 	attr hidden: false.
-	self allCellsDo: #update! !
+	self allCellsDo: #update.
+	self changed.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/15/2011 16:52'!
 showGrid
@@ -4259,6 +4315,16 @@ showGrid: aBoolean
 		ifTrue: [ self createOrResizeGridForm ]
 		ifFalse: [ gridForm _ nil . self invalidRect: self bounds ].
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:32'!
+toggleAttribute: aString
+
+	| attr |
+	attr _ cellAttributes at: aString ifAbsent: [ ^ nil ].
+	attr ifNil: [ ^ self ].
+
+	attr hidden ifTrue: [ self showAttribute: attr name ]
+		ifFalse: [ self hideAttribute: attr name ].! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 10:26'!
 updateCellsForm

@@ -53,17 +53,17 @@ changeValue: aString by: aNumber
 	spread _ (stage cellAttribute: aString) spread.
 	self changeValue: aString by: aNumber spread: spread.! !
 
-!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 9/28/2011 10:51'!
+!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 10/6/2011 15:01'!
 changeValue: aString by: aNumber spread: aSpread
 
 	" check for a spread amount and update neighbouring cells "
 	| cellAttr min max oldValue newValue |	
 
-	changing ifTrue: [ ^ self ].
-	changing _ true.
-
 	cellAttr _ stage cellAttribute: aString.
 	cellAttr ifNil: [ ^ self ].
+
+	changing ifTrue: [ ^ self ].
+	changing _ true.
 
 	min _ cellAttr min.
 	max _ cellAttr max.
@@ -78,7 +78,9 @@ changeValue: aString by: aNumber spread: aSpread
 	newValue _ (((oldValue + aNumber) min: max) max: min).
 	
 	oldValue = newValue ifFalse: [
-		values at: aString put: newValue.
+		oldValue < newValue 
+			ifTrue: [ values at: aString put: newValue ceiling ]
+			ifFalse: [ values at: aString put: newValue floor ].
 		self update.
 	].
 
@@ -113,11 +115,11 @@ damaged
 
 	^ damaged! !
 
-!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 9/28/2011 10:23'!
+!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 10/6/2011 14:56'!
 deleteValue: aString
 
-	values removeKey: aString ifAbsent: [ ].
-	colors removeKey: aString ifAbsent: [ ]! !
+	values removeKey: aString ifAbsent: [ ^ self ].
+	colors removeKey: aString ifAbsent: [ ^ self ]! !
 
 !ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 9/28/2011 10:23'!
 gridLocation
