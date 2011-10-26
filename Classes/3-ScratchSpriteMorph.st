@@ -2414,7 +2414,7 @@ die
 	"Deletes this sprite, unless it's the prototype"
 	self prototype ifNotNil: [ self deleteSprite ].! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 10/7/2011 12:36'!
+!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 10/26/2011 11:38'!
 syncToPrototype
 
 	"Updates this sprites blocks bin with a full copy of its prototypes"
@@ -2424,8 +2424,7 @@ syncToPrototype
 		blocksBin _ self prototype blocksBin fullCopy.
 		].
 	blocksBin submorphs do: [ :block |
-		block receiver: self.
-		Transcript show: block asString; cr.
+		block setReceiversForClone: self.
 	 ]! !
 
 

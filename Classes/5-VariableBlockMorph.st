@@ -40,7 +40,7 @@ isReporter
 	^ true
 ! !
 
-!VariableBlockMorph methodsFor: 'accessing' stamp: 'JM 8/15/2011 22:20'!
+!VariableBlockMorph methodsFor: 'accessing' stamp: 'JM 10/26/2011 11:41'!
 receiver: anObject
 	"Set my receiver object and, if possible, my block color."
 
@@ -49,9 +49,7 @@ receiver: anObject
 	alias _ nil.
 
 	(receiver respondsTo: #variableBlockColor)
-		ifTrue: [self color: receiver variableBlockColor].
-
-	super receiver: anObject.! !
+		ifTrue: [self color: receiver variableBlockColor].! !
 
 !VariableBlockMorph methodsFor: 'accessing' stamp: 'jens 9/22/2010 02:19'!
 rename
@@ -92,6 +90,13 @@ variable
 
 	^ commandSpec
 ! !
+
+
+!VariableBlockMorph methodsFor: 'Cellular' stamp: 'JM 10/26/2011 11:56'!
+setReceiversForClone: aSprite
+
+	"overridden to ignore command when we're special form"
+	isSpecialForm ifFalse: [ ^ super setReceiversForClone: aSprite ].! !
 
 
 !VariableBlockMorph methodsFor: 'evaluation' stamp: 'jens 3/27/2011 23:41'!

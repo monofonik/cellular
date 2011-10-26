@@ -908,12 +908,10 @@ justDroppedInto: newOwner event: evt
 			targetBlock attachBlock: self].
 ! !
 
-!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'JM 8/16/2011 09:26'!
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'JM 10/26/2011 11:40'!
 receiver: anObject
-	"Set my receiver. Does nothing here, but overridden in blocks that have a receiver." 
-
-	(self submorphs select: [ :sub | sub isKindOf: BlockMorph ]) 
-		do:	[ :block | block receiver: anObject ].! !
+	"Set my receiver. Does nothing here, but overridden in blocks that have a receiver."
+! !
 
 !BlockMorph methodsFor: 'dropping/grabbing' stamp: 'jm 8/3/2003 10:02'!
 rejectDropEvent: evt
@@ -1593,6 +1591,17 @@ fastDuplicate
 
 	World activeHand attachMorph: self fastCopy.
 ! !
+
+
+!BlockMorph methodsFor: 'Cellular' stamp: 'JM 10/26/2011 11:39'!
+setReceiversForClone: aSprite
+
+	"used by cellular after cloning the blocksbin of the prototype. ensures that all command blocks have their receiver set to the correct sprite."
+
+	self receiver: aSprite.
+
+	(self submorphs select: [ :sub | sub isKindOf: BlockMorph ]) do: [ :each |
+		each setReceiversForClone: aSprite ].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 

@@ -168,14 +168,6 @@ receiver
 	^ receiver
 ! !
 
-!CommandBlockMorph methodsFor: 'accessing' stamp: 'JM 8/15/2011 22:20'!
-receiver: anObject
-	"Set my receiver object."
-
-	receiver _ anObject.
-	super receiver: anObject.
-! !
-
 !CommandBlockMorph methodsFor: 'accessing' stamp: 'jm 7/2/2003 11:47'!
 selector
 
@@ -737,6 +729,13 @@ printCodeOn: aStream indent: indent
 	hasFinalSpace ifTrue: [aStream skip: -1].
 	aStream cr.
 	self nextBlock ifNotNil: [self nextBlock printCodeOn: aStream indent: indent].
+! !
+
+!CommandBlockMorph methodsFor: 'private' stamp: 'JM 10/26/2011 11:41'!
+receiver: anObject
+	"Set my receiver object."
+
+	receiver _ anObject.
 ! !
 
 !CommandBlockMorph methodsFor: 'private' stamp: 'jens 1/20/2010 12:04'!

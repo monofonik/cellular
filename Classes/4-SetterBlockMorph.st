@@ -62,11 +62,15 @@ helpScreenName
 		ifFalse: [^ 'variableChangeBy']
 ! !
 
-!SetterBlockMorph methodsFor: 'accessing' stamp: 'JM 10/7/2011 12:31'!
+!SetterBlockMorph methodsFor: 'accessing' stamp: 'JM 10/17/2011 16:41'!
 receiver: anObject
 	"Set my receiver object and, if possible, my block color."
 
-	receiver _ anObject.
+	"receiver _ anObject."
+	super receiver: anObject.
+
+	"ignore the command, but pass it on to my submorphs"
+
 
 "
 	(receiver respondsTo: #variableBlockColor)
