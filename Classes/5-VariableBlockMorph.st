@@ -92,13 +92,6 @@ variable
 ! !
 
 
-!VariableBlockMorph methodsFor: 'Cellular' stamp: 'JM 10/26/2011 11:56'!
-setReceiversForClone: aSprite
-
-	"overridden to ignore command when we're special form"
-	isSpecialForm ifFalse: [ ^ super setReceiversForClone: aSprite ].! !
-
-
 !VariableBlockMorph methodsFor: 'evaluation' stamp: 'jens 3/27/2011 23:41'!
 evaluateWithArgs: args
 	"Overridden to read my variable value."
@@ -437,3 +430,10 @@ updateFragment
 	labelFragment
 		isInput: true;
 		label: self variable! !
+
+
+!VariableBlockMorph methodsFor: 'Cellular' stamp: 'JM 10/26/2011 11:56'!
+setReceiversForClone: aSprite
+
+	"overridden to ignore command when we're special form"
+	isSpecialForm ifFalse: [ ^ super setReceiversForClone: aSprite ].! !

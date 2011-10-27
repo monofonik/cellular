@@ -177,11 +177,11 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 16:34'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/27/2011 13:34'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
-	| buttonSpecs bName button speedSlider |
+	| buttonSpecs bName button speedSlider cellSizeSlider |
 	"create panel"
 	stageButtonsPanel _ AlignmentMorph new
 		color: Color transparent;
@@ -196,12 +196,22 @@ createStageButtonsPanel
 		addMorphBack: projectTitleMorph;
 		addMorphBack: (AlignmentMorph newSpacer: Color transparent).
 
+	"slider to set the cell size"
+	cellSizeSlider _ SimpleSliderMorph new.
+	cellSizeSlider width: 100;
+		height: 20;
+		target: self;
+		actionSelector: #cellSize:;
+		minVal: 1;
+		maxVal: 8.
+	stageButtonsPanel addMorphBack: cellSizeSlider.
+
 	"a slider to set the playback speed"
 	speedSlider _ SimpleSliderMorph new.
 	speedSlider width: 100;
 		height: 20;
 		target: self;
-		actionSelector: #stepLength:;
+		actionSelector: #stepLength;
 		minVal: 1;
 		maxVal: 200.
 	stageButtonsPanel addMorphBack: speedSlider.
@@ -4278,6 +4288,12 @@ canonicalizeSoundsBits: bitsPerSample saveOriginal: saveFlag
 	^ count
 ! !
 
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/27/2011 13:31'!
+cellSize: aNumber
+
+	"sets the cell size on the stage"
+	workPane cellSize: aNumber! !
+
 !ScratchFrameMorph methodsFor: 'byob' stamp: 'jens 7/28/2010 21:33'!
 checkBoxLabelled: aString marked: aBool width: anInt
 	"answer a form consisting of a checkbox and a label - used for the EDIT menu in BYOB"
@@ -4634,11 +4650,11 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 8/30/2011 16:34'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/27/2011 13:34'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
-	| buttonSpecs bName button speedSlider |
+	| buttonSpecs bName button speedSlider cellSizeSlider |
 	"create panel"
 	stageButtonsPanel _ AlignmentMorph new
 		color: Color transparent;
@@ -4653,12 +4669,22 @@ createStageButtonsPanel
 		addMorphBack: projectTitleMorph;
 		addMorphBack: (AlignmentMorph newSpacer: Color transparent).
 
+	"slider to set the cell size"
+	cellSizeSlider _ SimpleSliderMorph new.
+	cellSizeSlider width: 100;
+		height: 20;
+		target: self;
+		actionSelector: #cellSize:;
+		minVal: 1;
+		maxVal: 8.
+	stageButtonsPanel addMorphBack: cellSizeSlider.
+
 	"a slider to set the playback speed"
 	speedSlider _ SimpleSliderMorph new.
 	speedSlider width: 100;
 		height: 20;
 		target: self;
-		actionSelector: #stepLength:;
+		actionSelector: #stepLength;
 		minVal: 1;
 		maxVal: 200.
 	stageButtonsPanel addMorphBack: speedSlider.
@@ -8179,6 +8205,12 @@ brushSize3
 brushSize4
 
 	brushSize _ 4! !
+
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/27/2011 13:31'!
+cellSize: aNumber
+
+	"sets the cell size on the stage"
+	workPane cellSize: aNumber! !
 
 !ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 14:24'!
 envAttrNamesCustomMenu

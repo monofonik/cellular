@@ -1369,13 +1369,13 @@ updateTrailsForm
 ! !
 
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:37'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/27/2011 13:22'!
 fieldsVersion
 
-	^ 8
+	^ 9
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 15:12'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/27/2011 13:24'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -1426,12 +1426,18 @@ initFieldsFrom: anObjStream version: classVersion
 
 	"ensure each cell has a reference to the stage"
 	self allCellsDo: #stage: with: self.
+
+	(self fieldsVersion = 8) ifTrue: [ ^ self ].
+
+	self initFieldsNamed: #(
+		cellSize
+	) from: anObjStream.
 	
 
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/27/2011 13:25'!
 storeFieldsOn: anObjStream
 
 	super storeFieldsOn: anObjStream.
@@ -1447,6 +1453,7 @@ storeFieldsOn: anObjStream
 		lists
 		cellAttributes
 		cells
+		cellSize
 	) on: anObjStream.
 ! !
 
@@ -2055,11 +2062,14 @@ cellSize
 
 	^ cellSize! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:50'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 13:35'!
 cellSize: aNumber
 
+	"if we receive a number between 1 & 8, get the corresponsing size from the cell size collection"
+	(aNumber >= 1 & (aNumber <= 8)) ifTrue: [ ^ self cellSize: (self class cellSizes at: aNumber) ].
+	
 	"ensure the cell size is valid"
-	(self class cellSizes contains: aNumber) ifTrue: [ cellSize _ aNumber ].! !
+	(self class cellSizes includes: aNumber) ifTrue: [ cellSize _ aNumber ].! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:29'!
 cellUnderCursor
@@ -2498,10 +2508,10 @@ exportFileName: fileName
 	(form asFormOfDepth: 32) writeBMPFileNamed: fName.
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:37'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/27/2011 13:22'!
 fieldsVersion
 
-	^ 8
+	^ 9
 ! !
 
 !ScratchStageMorph methodsFor: 'drawing' stamp: 'jm 6/3/2004 20:17'!
@@ -2708,7 +2718,7 @@ incrRedraw: damageList
 				f displayOn: Display at: r topLeft rule: Form over]].
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 15:12'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/27/2011 13:24'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -2759,6 +2769,12 @@ initFieldsFrom: anObjStream version: classVersion
 
 	"ensure each cell has a reference to the stage"
 	self allCellsDo: #stage: with: self.
+
+	(self fieldsVersion = 8) ifTrue: [ ^ self ].
+
+	self initFieldsNamed: #(
+		cellSize
+	) from: anObjStream.
 	
 
 	
@@ -3715,7 +3731,7 @@ stopAsks
 	ScratchPrompterMorph clearLastAnswer.
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 9/14/2011 16:51'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/27/2011 13:25'!
 storeFieldsOn: anObjStream
 
 	super storeFieldsOn: anObjStream.
@@ -3731,6 +3747,7 @@ storeFieldsOn: anObjStream
 		lists
 		cellAttributes
 		cells
+		cellSize
 	) on: anObjStream.
 ! !
 
@@ -4125,11 +4142,14 @@ cellSize
 
 	^ cellSize! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:50'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 13:35'!
 cellSize: aNumber
 
+	"if we receive a number between 1 & 8, get the corresponsing size from the cell size collection"
+	(aNumber >= 1 & (aNumber <= 8)) ifTrue: [ ^ self cellSize: (self class cellSizes at: aNumber) ].
+	
 	"ensure the cell size is valid"
-	(self class cellSizes contains: aNumber) ifTrue: [ cellSize _ aNumber ].! !
+	(self class cellSizes includes: aNumber) ifTrue: [ cellSize _ aNumber ].! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:29'!
 cellUnderCursor
