@@ -177,11 +177,11 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/27/2011 13:34'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/27/2011 17:00'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
-	| buttonSpecs bName button speedSlider cellSizeSlider |
+	| buttonSpecs bName button cellSizeSlider |
 	"create panel"
 	stageButtonsPanel _ AlignmentMorph new
 		color: Color transparent;
@@ -200,6 +200,7 @@ createStageButtonsPanel
 	cellSizeSlider _ SimpleSliderMorph new.
 	cellSizeSlider width: 100;
 		height: 20;
+		sliderThickness: 20;
 		target: self;
 		actionSelector: #cellSize:;
 		minVal: 1;
@@ -207,15 +208,15 @@ createStageButtonsPanel
 	stageButtonsPanel addMorphBack: cellSizeSlider.
 
 	"a slider to set the playback speed"
-	speedSlider _ SimpleSliderMorph new.
+"	speedSlider _ SimpleSliderMorph new.
 	speedSlider width: 100;
 		height: 20;
 		target: self;
-		actionSelector: #stepLength;
+		actionSelector: #stepLength:;
 		minVal: 1;
 		maxVal: 200.
 	stageButtonsPanel addMorphBack: speedSlider.
-
+"
 
 	"buttonSpecs defines the toolbar buttons; first is icon name, second is selector"
 	buttonSpecs _ #(
@@ -419,7 +420,7 @@ author: aString
 
 ! !
 
-!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 9/15/2011 11:10'!
+!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 10/27/2011 16:39'!
 editMenu: aMenuTitleMorph
 
 	| menu onstage |
@@ -435,13 +436,13 @@ editMenu: aMenuTitleMorph
 	menu add: 'Undo last drop' action: #undoLastDrop.
 
 	menu addLine.
-"
+
 	menu addIcon: (self checkBoxLabelled: 'Turbo'
 				marked: self isTurbo
 				width: onstage width)
 			toolTip: 'check to squeeze more computational steps into one display cycle'
 			action: #toggleTurboMode.
-"
+
 "
 	menu addIcon: (self checkBoxLabelled: 'Single Stepping'
 				marked: (ScratchProcess blockHighlightMSecs <= 1) not
@@ -4650,11 +4651,11 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/27/2011 13:34'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/27/2011 17:00'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
-	| buttonSpecs bName button speedSlider cellSizeSlider |
+	| buttonSpecs bName button cellSizeSlider |
 	"create panel"
 	stageButtonsPanel _ AlignmentMorph new
 		color: Color transparent;
@@ -4673,6 +4674,7 @@ createStageButtonsPanel
 	cellSizeSlider _ SimpleSliderMorph new.
 	cellSizeSlider width: 100;
 		height: 20;
+		sliderThickness: 20;
 		target: self;
 		actionSelector: #cellSize:;
 		minVal: 1;
@@ -4680,15 +4682,15 @@ createStageButtonsPanel
 	stageButtonsPanel addMorphBack: cellSizeSlider.
 
 	"a slider to set the playback speed"
-	speedSlider _ SimpleSliderMorph new.
+"	speedSlider _ SimpleSliderMorph new.
 	speedSlider width: 100;
 		height: 20;
 		target: self;
-		actionSelector: #stepLength;
+		actionSelector: #stepLength:;
 		minVal: 1;
 		maxVal: 200.
 	stageButtonsPanel addMorphBack: speedSlider.
-
+"
 
 	"buttonSpecs defines the toolbar buttons; first is icon name, second is selector"
 	buttonSpecs _ #(
@@ -4908,7 +4910,7 @@ editBlockDefinition: aCustomBlockDefinition for: aScriptableScratchMorph
 	editor getUserResponse.
 	blockEditors remove: editor ifAbsent: []! !
 
-!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 9/15/2011 11:10'!
+!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 10/27/2011 16:39'!
 editMenu: aMenuTitleMorph
 
 	| menu onstage |
@@ -4924,13 +4926,13 @@ editMenu: aMenuTitleMorph
 	menu add: 'Undo last drop' action: #undoLastDrop.
 
 	menu addLine.
-"
+
 	menu addIcon: (self checkBoxLabelled: 'Turbo'
 				marked: self isTurbo
 				width: onstage width)
 			toolTip: 'check to squeeze more computational steps into one display cycle'
 			action: #toggleTurboMode.
-"
+
 "
 	menu addIcon: (self checkBoxLabelled: 'Single Stepping'
 				marked: (ScratchProcess blockHighlightMSecs <= 1) not

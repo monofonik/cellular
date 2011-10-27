@@ -115,6 +115,11 @@ damaged
 
 	^ damaged! !
 
+!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 10/27/2011 16:32'!
+damaged: aBoolean
+
+	damaged _ aBoolean.! !
+
 !ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 10/6/2011 14:56'!
 deleteValue: aString
 

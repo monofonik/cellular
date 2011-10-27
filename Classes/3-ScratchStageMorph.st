@@ -2062,14 +2062,21 @@ cellSize
 
 	^ cellSize! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 13:35'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:37'!
 cellSize: aNumber
 
 	"if we receive a number between 1 & 8, get the corresponsing size from the cell size collection"
 	(aNumber >= 1 & (aNumber <= 8)) ifTrue: [ ^ self cellSize: (self class cellSizes at: aNumber) ].
 	
 	"ensure the cell size is valid"
-	(self class cellSizes includes: aNumber) ifTrue: [ cellSize _ aNumber ].! !
+	(self class cellSizes includes: aNumber) ifTrue: [ cellSize _ aNumber ].
+
+	self allCellsDo: #damaged: with: true.
+	gridForm _ nil.
+
+	self createOrResizeGridForm.
+	self invalidRect: self bounds.
+! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:29'!
 cellUnderCursor
@@ -2246,7 +2253,7 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread co
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
 	"self allCellsDo: #update: with: cellAttributes."! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:03'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:54'!
 createOrResizeCellsForm
 	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
 
@@ -2264,9 +2271,9 @@ createOrResizeCellsForm
 			rule: Form paint.
 		cellsForm _ newForm]. ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:12'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:58'!
 createOrResizeGridForm
-	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
+	"If necessary, create a new gridForm or resize the existing one to fill my bounds. On return, gridForm will be a Form of the correct size."
 
 	| newForm |
 	gridForm ifNil: [
@@ -2284,13 +2291,13 @@ createOrResizeGridForm
 		pen color: Color veryLightGray.
 		"offset _ (gridForm extent - penSize) / 2.0."
 		
-		(1 to: 48) do: [ :x |
+		(1 to: (self cellDims x)) do: [ :x |
 			p1 _ (x * cellSize) @ 0.
 			p2 _ (x * cellSize) @ 360.
 			pen drawFrom: p1 to: p2.
 		].
 
-		(1 to: 36) do: [ :y |
+		(1 to: (self cellDims y)) do: [ :y |
 			p1 _ 0 @ (y * cellSize).
 			p2 _ 480 @ (y * cellSize).
 			pen drawFrom: p1 to: p2.
@@ -4142,14 +4149,21 @@ cellSize
 
 	^ cellSize! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 13:35'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:37'!
 cellSize: aNumber
 
 	"if we receive a number between 1 & 8, get the corresponsing size from the cell size collection"
 	(aNumber >= 1 & (aNumber <= 8)) ifTrue: [ ^ self cellSize: (self class cellSizes at: aNumber) ].
 	
 	"ensure the cell size is valid"
-	(self class cellSizes includes: aNumber) ifTrue: [ cellSize _ aNumber ].! !
+	(self class cellSizes includes: aNumber) ifTrue: [ cellSize _ aNumber ].
+
+	self allCellsDo: #damaged: with: true.
+	gridForm _ nil.
+
+	self createOrResizeGridForm.
+	self invalidRect: self bounds.
+! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:29'!
 cellUnderCursor
@@ -4247,7 +4261,7 @@ createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread co
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
 	"self allCellsDo: #update: with: cellAttributes."! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:03'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:54'!
 createOrResizeCellsForm
 	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
 
@@ -4265,9 +4279,9 @@ createOrResizeCellsForm
 			rule: Form paint.
 		cellsForm _ newForm]. ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:12'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:58'!
 createOrResizeGridForm
-	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
+	"If necessary, create a new gridForm or resize the existing one to fill my bounds. On return, gridForm will be a Form of the correct size."
 
 	| newForm |
 	gridForm ifNil: [
@@ -4285,13 +4299,13 @@ createOrResizeGridForm
 		pen color: Color veryLightGray.
 		"offset _ (gridForm extent - penSize) / 2.0."
 		
-		(1 to: 48) do: [ :x |
+		(1 to: (self cellDims x)) do: [ :x |
 			p1 _ (x * cellSize) @ 0.
 			p2 _ (x * cellSize) @ 360.
 			pen drawFrom: p1 to: p2.
 		].
 
-		(1 to: 36) do: [ :y |
+		(1 to: (self cellDims y)) do: [ :y |
 			p1 _ 0 @ (y * cellSize).
 			p2 _ 480 @ (y * cellSize).
 			pen drawFrom: p1 to: p2.
