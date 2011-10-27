@@ -616,7 +616,7 @@ forward: distance
 	self ypos: self ypos 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 10/3/2011 12:38'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 10/27/2011 12:23'!
 forwardCell: aNumber
 
 	"moves the sprite a given number of cells in the closest discrete direction to the sprites current heading"
@@ -627,8 +627,7 @@ forwardCell: aNumber
 	directions _ Array withAll: #('right' 'down / right' 'down' 'down / left' 'left' 'left / up' 'up' 'up / right' ).
 
 	"get a reference to the stage"
-	stage _ self ownerThatIsA: ScratchStageMorph.
-	stage ifNil: [ ^ self ].
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ self ].
 
 	"determine which discrete direction to move in"
 	dirIndex _ (rotationDegrees / 45) rounded \\ 8 + 1.

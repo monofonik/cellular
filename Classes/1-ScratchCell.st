@@ -172,11 +172,13 @@ redrawn
 
 	damaged _ false! !
 
-!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 10/3/2011 12:43'!
+!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 10/27/2011 12:33'!
 referencePosition
 
-	| p |
-	p _ ((gridLocation * 10) - (10@10) + (5@5)) - (240@180).
+	| p cSize |
+	cSize _ stage cellSize.
+
+	p _ ((gridLocation * cSize) - (cSize@cSize) + (cSize@cSize / 2)) - (240@180).
 	^ p x @ p y negated! !
 
 !ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 9/28/2011 10:52'!

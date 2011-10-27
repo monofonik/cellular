@@ -4203,32 +4203,32 @@ blockContrastStrong
 blockEditors
 	^blockEditors! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:53'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:53'!
 brushSize
 
 	^ brushSize! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:54'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:54'!
 brushSize0
 
 	brushSize _ 0! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:55'!
 brushSize1
 
 	brushSize _ 1! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:55'!
 brushSize2
 
 	brushSize _ 2! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:55'!
 brushSize3
 
 	brushSize _ 3! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:55'!
 brushSize4
 
 	brushSize _ 4! !
@@ -5090,7 +5090,7 @@ enterQuarterModeIfSmallScreen
 	viewMode = #normal ifTrue: [self enterQuarterMode].
 ! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 14:24'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 14:24'!
 envAttrNamesCustomMenu
 
 	| menu |
@@ -5101,7 +5101,7 @@ envAttrNamesCustomMenu
 
 	^ menu! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 14:48'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/9/2011 14:48'!
 eraseTool
 
 	| hand cursorForm offset |
@@ -6288,7 +6288,7 @@ paintSpriteMorph
 	m editDrawingOldCostumeName: m costume mediaName deleteOnCancel: true.
 ! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/6/2011 12:02'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/6/2011 12:02'!
 paintTool
 
 	| hand cursorForm offset |
@@ -6569,7 +6569,7 @@ purgeBlockEditors
 	blockEditors _ blockEditors reject: [:each | 
 		each isInWorld not]! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/6/2011 12:27'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/6/2011 12:27'!
 queryTool
 
 	| hand cursorForm offset |
@@ -6992,12 +6992,12 @@ scriptsStringForUpload
 	^ s contents
 ! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 14:25'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/27/2011 10:44'!
 selectedAttribute
 
-	^ selectedAttribute! !
+	^ selectedAttribute asMacRoman! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:43'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:43'!
 selectedAttribute: aString
 
 	selectedAttribute _ aString! !
@@ -7410,7 +7410,7 @@ surpriseSpriteMorph
 	m referencePosition: ((e x negated) to: e x) atRandom @ ((e y negated) to: e y) atRandom.
 ! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/26/2011 16:36'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 8/26/2011 16:36'!
 syncClones
 
 	((self workPane submorphs select: [ :sub | sub isKindOf: ScratchSpriteMorph ]) select:[ :sub | sub prototype isNil not ])
@@ -7636,7 +7636,7 @@ updateHistoryProjectName: projName op: operation
 
 ! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 10:12'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/9/2011 10:12'!
 updateInterfaceSkin
 
 	"Reads in the latest skin from the ScratchSkin folder and updates the UI appearance."
@@ -7806,7 +7806,7 @@ versionControlExport
 	
 	dir fileOutClassesChangedSince: date.	! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/23/2011 14:34'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 8/23/2011 14:34'!
 versionControlImport
 
 	self class versionControlDirectory fileInContents.! !
@@ -8150,37 +8150,37 @@ zoomOutTool
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:53'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:53'!
 brushSize
 
 	^ brushSize! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:54'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:54'!
 brushSize0
 
 	brushSize _ 0! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:55'!
 brushSize1
 
 	brushSize _ 1! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:55'!
 brushSize2
 
 	brushSize _ 2! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:55'!
 brushSize3
 
 	brushSize _ 3! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:55'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:55'!
 brushSize4
 
 	brushSize _ 4! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 14:24'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 14:24'!
 envAttrNamesCustomMenu
 
 	| menu |
@@ -8191,7 +8191,7 @@ envAttrNamesCustomMenu
 
 	^ menu! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 14:48'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/9/2011 14:48'!
 eraseTool
 
 	| hand cursorForm offset |
@@ -8208,7 +8208,7 @@ eraseTool
 
 	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/6/2011 12:02'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/6/2011 12:02'!
 paintTool
 
 	| hand cursorForm offset |
@@ -8225,7 +8225,7 @@ paintTool
 
 	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 10/6/2011 12:27'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/6/2011 12:27'!
 queryTool
 
 	| hand cursorForm offset |
@@ -8242,23 +8242,23 @@ queryTool
 
 	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 14:25'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/27/2011 10:44'!
 selectedAttribute
 
-	^ selectedAttribute! !
+	^ selectedAttribute asMacRoman! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/16/2011 13:43'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/16/2011 13:43'!
 selectedAttribute: aString
 
 	selectedAttribute _ aString! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/26/2011 16:36'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 8/26/2011 16:36'!
 syncClones
 
 	((self workPane submorphs select: [ :sub | sub isKindOf: ScratchSpriteMorph ]) select:[ :sub | sub prototype isNil not ])
 		do: [ :sub | sub syncToPrototype ].! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 9/9/2011 10:12'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 9/9/2011 10:12'!
 updateInterfaceSkin
 
 	"Reads in the latest skin from the ScratchSkin folder and updates the UI appearance."
@@ -8267,7 +8267,7 @@ updateInterfaceSkin
 	"self rebuildUIForNewLanguage."
 	ScratchTranslator updateScratchUI.! !
 
-!ScratchFrameMorph methodsFor: 'systemscratch' stamp: 'JM 8/23/2011 14:34'!
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 8/23/2011 14:34'!
 versionControlImport
 
 	self class versionControlDirectory fileInContents.! !

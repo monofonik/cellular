@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchStageMorph
-	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells cellsForm gridForm showGrid cellQueryToolTip '
+	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells cellsForm gridForm showGrid cellQueryToolTip cellSize '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -8,7 +8,7 @@ I represent the background of the Scratch work pane. Like a sprite, I have a set
 !
 
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/28/2011 13:13'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 10/27/2011 12:21'!
 initialize
 
 	super initialize.
@@ -33,6 +33,7 @@ initialize
 	"selectedAttribute _ 'default'."
 	className _ 'Stage'.
 	showGrid _ true.
+	cellSize _ 20.
 	self initialiseCells.
 
 	
@@ -345,7 +346,7 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 10:10'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/27/2011 12:19'!
 handleTool: toolName hand: hand
 
 	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
@@ -366,7 +367,7 @@ handleTool: toolName hand: hand
 
 		toolSpread _ frame brushSize.
 
-		gridLoc _ (toolLoc / 10 + (1@1)) min: 48@36 max: 1@1.
+		gridLoc _ (toolLoc / cellSize + (1@1)) min: (self cellDims) max: 1@1.
 
 		cell _ (cells at: gridLoc y) at: gridLoc x.
 
@@ -407,19 +408,19 @@ mouseDown: evt
 		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/6/2011 12:30'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/26/2011 15:21'!
 mouseEnter: evt
 
 	"Check if the query tool is selected and display a tool tip"
 
 	"Ensure there's no tooltips left behind"
-	(self submorphs select: [ :m | m isKindOf: ScratchCellToolTipMorph ]) 
+	(self submorphs select: [ :m | m isKindOf: ScratchCellInfoMorph ]) 
 		do: [ :m | m delete]. 
 	
 	(evt hand toolType = 'QueryTool') ifTrue: [
-		cellQueryToolTip _ ScratchCellToolTipMorph new.
+		cellQueryToolTip _ ScratchCellInfoMorph new.
 		cellQueryToolTip target: self.
-		cellQueryToolTip getSelector: #cellQueryToolTipText.
+		cellQueryToolTip getSelector: #cellQueryData.
 		self addMorphFront: (cellQueryToolTip position: evt hand position).
 		cellQueryToolTip startStepping.
 	].! !
@@ -508,31 +509,6 @@ acceptDroppingMorph: aMorph event: evt
 
 ! !
 
-!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 9/19/2011 16:26'!
-addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
-
-	| addButton deleteButton x y |
-
-	x _ xLoc.
-	y _ yLoc.
-
-	addButton _ ScratchFrameMorph
-			buttonLabel: 'Make a cell attribute' localized
-			selector: #addEnvironmentAttribute.
-	aPane addMorph: (addButton target: self; position: x@y).
-	y _ y + 25.
-
-	deleteButton _ ScratchFrameMorph
-			buttonLabel: 'Delete a cell attribute' localized
-			selector: #deleteEnvironmentAttribute.
-	aPane addMorph: (deleteButton target: self; position: x@y).
-	y _ y + 25.
-
-	"aPane addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
-	y _ y + 20. "
-
-	^ y.! !
-
 !ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 9/12/2011 16:01'!
 drawSubmorphsOn: aCanvas
 	"Clip submorph drawing to my bounds."
@@ -552,11 +528,14 @@ drawSubmorphsOn: aCanvas
 
 ! !
 
-!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 10/7/2011 17:29'!
+!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 10/26/2011 14:14'!
 rightButtonMenu
 	"Present the right button menu."
 
 	| frame menu |
+
+	"create the widest menu option first"
+	
 
 	frame _ self ownerThatIsA: ScratchFrameMorph.
 	frame ifNil: [ ^ self ].
@@ -565,15 +544,15 @@ rightButtonMenu
 	
 	"add the cell attributes"
 	cellAttributes do: [ :attr |
-		menu addIcon: (frame checkBoxLabelled: attr name marked: attr hidden not width: 20)
+		menu addIcon: (frame checkBoxLabelled: attr name marked: attr hidden not width: 185)
 			tooltip:	'show / hide ' , attr name
 			target: self
 			selector: #toggleAttribute:
 			argumentList: {attr name}
 	].
-
-	menu add: 'grab screen region for new sprite' action: #grabSpriteFromScreen.
 	menu addLine.
+	menu add: 'grab screen region for new sprite' action: #grabSpriteFromScreen.
+	"menu addLine."
 	menu add: 'save picture of stage...' action: #stageShot.
 	"menu localize; invokeOn: self."
 	menu popUpNearHand.
@@ -1758,7 +1737,7 @@ acceptDroppingMorph: aMorph event: evt
 
 ! !
 
-!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 9/19/2011 16:26'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/19/2011 16:26'!
 addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	| addButton deleteButton x y |
@@ -1783,7 +1762,7 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	^ y.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 12:05'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
 adjacentCellTo: aSprite direction: aString
 
 	"returns the adjacent cell to the sprite in the given direction - up, down, left, right, up / left, up / right, down / left, down / right"
@@ -1798,7 +1777,7 @@ adjacentCellTo: aSprite direction: aString
 	(aString includesSubString: 'down') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
 
 	"Ensure within cell limits"
-	gridLoc _ gridLoc min: 48@36 max: 1@1.
+	gridLoc _ gridLoc min: (self cellDims) max: 1@1.
 
 	^ (cells at: gridLoc y) at: gridLoc x
 	
@@ -1807,7 +1786,7 @@ adjacentCellTo: aSprite direction: aString
 
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 11:11'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
 adjacentCellsTo: aCell
 
 	| adjCells x y |
@@ -1820,9 +1799,9 @@ adjacentCellsTo: aCell
 	y _ aCell gridLocation y.
 
 	x > 1 ifTrue: [ adjCells add: ((cells at: y) at: x - 1) ].
-	x < 48 ifTrue: [ adjCells add: ((cells at: y) at: x + 1) ].
+	x < (self cellDims x) ifTrue: [ adjCells add: ((cells at: y) at: x + 1) ].
 	y > 1 ifTrue: [ adjCells add: ((cells at: y - 1) at: x) ].
-	y < 36 ifTrue: [ adjCells add: ((cells at: y + 1) at: x) ].
+	y < (self cellDims y) ifTrue: [ adjCells add: ((cells at: y + 1) at: x) ].
 
 	^ adjCells
 	
@@ -1978,14 +1957,14 @@ broadcastEventNamed: name with: value from: aPoint for: numSteps
 	^ newProcs asArray
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:13'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:10'!
 cellAtGridX: xLoc y: yLoc
 
 	"return the cell at given grid position (or nearest to it)"
 
 	| x y |
-	x _ (xLoc max: 1) min: 48.
-	y _ (yLoc max: 1) min: 36.
+	x _ (xLoc max: 1) min: (self cellDims x).
+	y _ (yLoc max: 1) min: (self cellDims y).
 	
 	^ (cells at: y) at: x
 	! !
@@ -2005,20 +1984,48 @@ cellAttributes
 
 	^ cellAttributes! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 15:21'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:11'!
 cellBehind: aSprite
 
 	| x y |
 	
-	x _ aSprite referencePosition x + 240 / 10 + 1.
-	y _ 360 - (aSprite referencePosition y + 180) / 10 + 1.
+	x _ aSprite referencePosition x + 240 / cellSize + 1.
+	y _ 360 - (aSprite referencePosition y + 180) / cellSize + 1.
 
-	x _ (x max: 1) min: 48.
-	y _ (y max: 1) min: 36.
+	x _ (x max: 1) min: (self cellDims x).
+	y _ (y max: 1) min: (self cellDims y).
 
 	^ (cells at: y) at: x.
 	
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:44'!
+cellDims
+
+	"returns a point indication the number of cells in the x and y axis"
+	^ 480 / cellSize @ (360 / cellSize)! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:11'!
+cellQueryData
+
+	"returns the text to display in the cell query tool tip, which depends on the currently selected cell attribute and the position of the cursor."
+
+	| frame cell info |
+
+	frame _ self ownerThatIsA: ScratchFrameMorph.
+	frame ifNil: [ ^ '' ].
+	
+	"text _ Text new."
+	cell _ self cellUnderCursor.
+
+	"add the x y position as the first element"
+	info _ OrderedCollection with: (Array with: cell gridLocation x asString with: cell gridLocation y asString).
+
+	"add name / value pairs for all attributes"
+	cellAttributes do: [ :attr |
+		info add: (Array with: attr name with: ((cell value: attr name) asString) with: attr colour )].
+
+	^ info! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/6/2011 11:26'!
 cellQueryToolTipText
@@ -2043,13 +2050,24 @@ cellQueryToolTipText
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 12:11'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:45'!
+cellSize
+
+	^ cellSize! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:50'!
+cellSize: aNumber
+
+	"ensure the cell size is valid"
+	(self class cellSizes contains: aNumber) ifTrue: [ cellSize _ aNumber ].! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:29'!
 cellUnderCursor
 
 	"returns the cell underneath the cursor"
 	| gridLoc |
 
-	gridLoc _ ((Sensor cursorPoint translateBy: self position negated) / 10 + (1@1)) min: 48@36 max: 1@1.
+	gridLoc _ ((Sensor cursorPoint translateBy: self position negated) / cellSize + (1@1)) min: self cellDims max: 1@1.
 	^ (cells at: gridLoc y) at: gridLoc x.
 ! !
 
@@ -2197,14 +2215,14 @@ costumeChanged
 	self changed.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 16:32'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 10:30'!
 createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: colour
 
 	| attr |
 
 	"create the attribtue"
 	attr _ ScratchCellAttribute new.
-	attr name: aString;
+	attr name: aString asMacRoman;
 		min: aMin;
 		max: aMax;
 		spread: aSpread;
@@ -2236,7 +2254,7 @@ createOrResizeCellsForm
 			rule: Form paint.
 		cellsForm _ newForm]. ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:29'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:12'!
 createOrResizeGridForm
 	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
 
@@ -2257,14 +2275,14 @@ createOrResizeGridForm
 		"offset _ (gridForm extent - penSize) / 2.0."
 		
 		(1 to: 48) do: [ :x |
-			p1 _ (x * 10) @ 0.
-			p2 _ (x * 10) @ 360.
+			p1 _ (x * cellSize) @ 0.
+			p2 _ (x * cellSize) @ 360.
 			pen drawFrom: p1 to: p2.
 		].
 
 		(1 to: 36) do: [ :y |
-			p1 _ 0 @ (y * 10).
-			p2 _ 480 @ (y * 10).
+			p1 _ 0 @ (y * cellSize).
+			p2 _ 480 @ (y * cellSize).
 			pen drawFrom: p1 to: p2.
 		].
 
@@ -2595,7 +2613,7 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/5/2011 10:10'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/27/2011 12:19'!
 handleTool: toolName hand: hand
 
 	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
@@ -2616,7 +2634,7 @@ handleTool: toolName hand: hand
 
 		toolSpread _ frame brushSize.
 
-		gridLoc _ (toolLoc / 10 + (1@1)) min: 48@36 max: 1@1.
+		gridLoc _ (toolLoc / cellSize + (1@1)) min: (self cellDims) max: 1@1.
 
 		cell _ (cells at: gridLoc y) at: gridLoc x.
 
@@ -2746,10 +2764,10 @@ initFieldsFrom: anObjStream version: classVersion
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 13:41'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:14'!
 initialiseCells
 
-	"create the cells"
+	"create all cells assuming minimum size"
 	cells _ Array new: 36.
 	1 to: 36 do:  [ :y |
 		cells at: y put: (Array new: 48).
@@ -2763,7 +2781,7 @@ initialiseCells
 	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 9/28/2011 13:13'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 10/27/2011 12:21'!
 initialize
 
 	super initialize.
@@ -2788,6 +2806,7 @@ initialize
 	"selectedAttribute _ 'default'."
 	className _ 'Stage'.
 	showGrid _ true.
+	cellSize _ 20.
 	self initialiseCells.
 
 	
@@ -2910,19 +2929,19 @@ mouseDown: evt
 		ifFalse:	[evt hand waitForClicksOrDrag: self event: evt].
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/6/2011 12:30'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/26/2011 15:21'!
 mouseEnter: evt
 
 	"Check if the query tool is selected and display a tool tip"
 
 	"Ensure there's no tooltips left behind"
-	(self submorphs select: [ :m | m isKindOf: ScratchCellToolTipMorph ]) 
+	(self submorphs select: [ :m | m isKindOf: ScratchCellInfoMorph ]) 
 		do: [ :m | m delete]. 
 	
 	(evt hand toolType = 'QueryTool') ifTrue: [
-		cellQueryToolTip _ ScratchCellToolTipMorph new.
+		cellQueryToolTip _ ScratchCellInfoMorph new.
 		cellQueryToolTip target: self.
-		cellQueryToolTip getSelector: #cellQueryToolTipText.
+		cellQueryToolTip getSelector: #cellQueryData.
 		self addMorphFront: (cellQueryToolTip position: evt hand position).
 		cellQueryToolTip startStepping.
 	].! !
@@ -2945,14 +2964,12 @@ mouseMove: evt
 	].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 10:53'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
 newCellAt: xLoc at: yLoc
 
 	| cell |
 	cell _ ScratchCell new.
 	cell gridLocation: xLoc @ yLoc.
-	"cell position: ((xLoc - 1) * 10) @ ((yLoc - 1) * 10)."
-	"self addMorphBack: cell."
 	cell stage: self.
 	^ cell.
 ! !
@@ -3223,11 +3240,14 @@ resumeAllProcesses
 		each resumeProcess]
 ! !
 
-!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 10/7/2011 17:29'!
+!ScratchStageMorph methodsFor: 'dropping/grabbing' stamp: 'JM 10/26/2011 14:14'!
 rightButtonMenu
 	"Present the right button menu."
 
 	| frame menu |
+
+	"create the widest menu option first"
+	
 
 	frame _ self ownerThatIsA: ScratchFrameMorph.
 	frame ifNil: [ ^ self ].
@@ -3236,15 +3256,15 @@ rightButtonMenu
 	
 	"add the cell attributes"
 	cellAttributes do: [ :attr |
-		menu addIcon: (frame checkBoxLabelled: attr name marked: attr hidden not width: 20)
+		menu addIcon: (frame checkBoxLabelled: attr name marked: attr hidden not width: 185)
 			tooltip:	'show / hide ' , attr name
 			target: self
 			selector: #toggleAttribute:
 			argumentList: {attr name}
 	].
-
-	menu add: 'grab screen region for new sprite' action: #grabSpriteFromScreen.
 	menu addLine.
+	menu add: 'grab screen region for new sprite' action: #grabSpriteFromScreen.
+	"menu addLine."
 	menu add: 'save picture of stage...' action: #stageShot.
 	"menu localize; invokeOn: self."
 	menu popUpNearHand.
@@ -3811,7 +3831,7 @@ unlockedMorphsAt: aPoint addTo: mList
 	^ mList
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 10:26'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
 updateCellsForm
 
 	"updates the cells form to display the colour associated with each cell"
@@ -3824,9 +3844,9 @@ updateCellsForm
 	((cells inject: #() into: [ :all :row | all _ all , row ]) select: [ :cell | cell damaged ])
 		do: [ :cell | | rect x y |
 			count _ count + 1.
-			x _ cell gridLocation x * 10 - 10.
-			y _ cell gridLocation y * 10 - 10.
-			rect _ Rectangle origin:  x@y corner: (x + 10) @ (y + 10).
+			x _ cell gridLocation x * cellSize - cellSize.
+			y _ cell gridLocation y * cellSize - cellSize.
+			rect _ Rectangle origin:  x@y corner: (x + cellSize) @ (y + cellSize).
 			cellsForm fill: rect rule: Form over fillColor: cell color.
 			self invalidRect: (rect translateBy: self topLeft).
 			cell redrawn.
@@ -3912,7 +3932,32 @@ userSelectSpriteDefault: defaultSprite butNotAnyOf: excludeArray
 ! !
 
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 12:05'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/19/2011 16:26'!
+addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
+
+	| addButton deleteButton x y |
+
+	x _ xLoc.
+	y _ yLoc.
+
+	addButton _ ScratchFrameMorph
+			buttonLabel: 'Make a cell attribute' localized
+			selector: #addEnvironmentAttribute.
+	aPane addMorph: (addButton target: self; position: x@y).
+	y _ y + 25.
+
+	deleteButton _ ScratchFrameMorph
+			buttonLabel: 'Delete a cell attribute' localized
+			selector: #deleteEnvironmentAttribute.
+	aPane addMorph: (deleteButton target: self; position: x@y).
+	y _ y + 25.
+
+	"aPane addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
+	y _ y + 20. "
+
+	^ y.! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
 adjacentCellTo: aSprite direction: aString
 
 	"returns the adjacent cell to the sprite in the given direction - up, down, left, right, up / left, up / right, down / left, down / right"
@@ -3927,7 +3972,7 @@ adjacentCellTo: aSprite direction: aString
 	(aString includesSubString: 'down') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
 
 	"Ensure within cell limits"
-	gridLoc _ gridLoc min: 48@36 max: 1@1.
+	gridLoc _ gridLoc min: (self cellDims) max: 1@1.
 
 	^ (cells at: gridLoc y) at: gridLoc x
 	
@@ -3936,7 +3981,7 @@ adjacentCellTo: aSprite direction: aString
 
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 11:11'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
 adjacentCellsTo: aCell
 
 	| adjCells x y |
@@ -3949,9 +3994,9 @@ adjacentCellsTo: aCell
 	y _ aCell gridLocation y.
 
 	x > 1 ifTrue: [ adjCells add: ((cells at: y) at: x - 1) ].
-	x < 48 ifTrue: [ adjCells add: ((cells at: y) at: x + 1) ].
+	x < (self cellDims x) ifTrue: [ adjCells add: ((cells at: y) at: x + 1) ].
 	y > 1 ifTrue: [ adjCells add: ((cells at: y - 1) at: x) ].
-	y < 36 ifTrue: [ adjCells add: ((cells at: y + 1) at: x) ].
+	y < (self cellDims y) ifTrue: [ adjCells add: ((cells at: y + 1) at: x) ].
 
 	^ adjCells
 	
@@ -3982,14 +4027,14 @@ allCellsDo: aSelector with: anArg with: anotherArg with: lastArg
 	"perform the provided action on all cells"
 	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/14/2011 16:13'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:10'!
 cellAtGridX: xLoc y: yLoc
 
 	"return the cell at given grid position (or nearest to it)"
 
 	| x y |
-	x _ (xLoc max: 1) min: 48.
-	y _ (yLoc max: 1) min: 36.
+	x _ (xLoc max: 1) min: (self cellDims x).
+	y _ (yLoc max: 1) min: (self cellDims y).
 	
 	^ (cells at: y) at: x
 	! !
@@ -4009,20 +4054,48 @@ cellAttributes
 
 	^ cellAttributes! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 15:21'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:11'!
 cellBehind: aSprite
 
 	| x y |
 	
-	x _ aSprite referencePosition x + 240 / 10 + 1.
-	y _ 360 - (aSprite referencePosition y + 180) / 10 + 1.
+	x _ aSprite referencePosition x + 240 / cellSize + 1.
+	y _ 360 - (aSprite referencePosition y + 180) / cellSize + 1.
 
-	x _ (x max: 1) min: 48.
-	y _ (y max: 1) min: 36.
+	x _ (x max: 1) min: (self cellDims x).
+	y _ (y max: 1) min: (self cellDims y).
 
 	^ (cells at: y) at: x.
 	
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:44'!
+cellDims
+
+	"returns a point indication the number of cells in the x and y axis"
+	^ 480 / cellSize @ (360 / cellSize)! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:11'!
+cellQueryData
+
+	"returns the text to display in the cell query tool tip, which depends on the currently selected cell attribute and the position of the cursor."
+
+	| frame cell info |
+
+	frame _ self ownerThatIsA: ScratchFrameMorph.
+	frame ifNil: [ ^ '' ].
+	
+	"text _ Text new."
+	cell _ self cellUnderCursor.
+
+	"add the x y position as the first element"
+	info _ OrderedCollection with: (Array with: cell gridLocation x asString with: cell gridLocation y asString).
+
+	"add name / value pairs for all attributes"
+	cellAttributes do: [ :attr |
+		info add: (Array with: attr name with: ((cell value: attr name) asString) with: attr colour )].
+
+	^ info! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/6/2011 11:26'!
 cellQueryToolTipText
@@ -4047,13 +4120,24 @@ cellQueryToolTipText
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/5/2011 12:11'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:45'!
+cellSize
+
+	^ cellSize! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:50'!
+cellSize: aNumber
+
+	"ensure the cell size is valid"
+	(self class cellSizes contains: aNumber) ifTrue: [ cellSize _ aNumber ].! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:29'!
 cellUnderCursor
 
 	"returns the cell underneath the cursor"
 	| gridLoc |
 
-	gridLoc _ ((Sensor cursorPoint translateBy: self position negated) / 10 + (1@1)) min: 48@36 max: 1@1.
+	gridLoc _ ((Sensor cursorPoint translateBy: self position negated) / cellSize + (1@1)) min: self cellDims max: 1@1.
 	^ (cells at: gridLoc y) at: gridLoc x.
 ! !
 
@@ -4122,14 +4206,14 @@ clearValue: aString
 	"clears the value of the given attribute for allcells"
 	self allCellsDo: #clearValue:spread: with: aString with: 0! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 16:32'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 10:30'!
 createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: colour
 
 	| attr |
 
 	"create the attribtue"
 	attr _ ScratchCellAttribute new.
-	attr name: aString;
+	attr name: aString asMacRoman;
 		min: aMin;
 		max: aMax;
 		spread: aSpread;
@@ -4161,7 +4245,7 @@ createOrResizeCellsForm
 			rule: Form paint.
 		cellsForm _ newForm]. ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:29'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:12'!
 createOrResizeGridForm
 	"If necessary, create a new cellsForm or resize the existing one to fill my bounds. On return, cellsForm will be a Form of the correct size."
 
@@ -4182,14 +4266,14 @@ createOrResizeGridForm
 		"offset _ (gridForm extent - penSize) / 2.0."
 		
 		(1 to: 48) do: [ :x |
-			p1 _ (x * 10) @ 0.
-			p2 _ (x * 10) @ 360.
+			p1 _ (x * cellSize) @ 0.
+			p2 _ (x * cellSize) @ 360.
 			pen drawFrom: p1 to: p2.
 		].
 
 		(1 to: 36) do: [ :y |
-			p1 _ 0 @ (y * 10).
-			p2 _ 480 @ (y * 10).
+			p1 _ 0 @ (y * cellSize).
+			p2 _ 480 @ (y * cellSize).
 			pen drawFrom: p1 to: p2.
 		].
 
@@ -4242,10 +4326,10 @@ hideAttribute: aString
 	self allCellsDo: #update.
 	self changed! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 13:41'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:14'!
 initialiseCells
 
-	"create the cells"
+	"create all cells assuming minimum size"
 	cells _ Array new: 36.
 	1 to: 36 do:  [ :y |
 		cells at: y put: (Array new: 48).
@@ -4259,14 +4343,12 @@ initialiseCells
 	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/28/2011 10:53'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
 newCellAt: xLoc at: yLoc
 
 	| cell |
 	cell _ ScratchCell new.
 	cell gridLocation: xLoc @ yLoc.
-	"cell position: ((xLoc - 1) * 10) @ ((yLoc - 1) * 10)."
-	"self addMorphBack: cell."
 	cell stage: self.
 	^ cell.
 ! !
@@ -4326,7 +4408,7 @@ toggleAttribute: aString
 	attr hidden ifTrue: [ self showAttribute: attr name ]
 		ifFalse: [ self hideAttribute: attr name ].! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 10:26'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
 updateCellsForm
 
 	"updates the cells form to display the colour associated with each cell"
@@ -4339,9 +4421,9 @@ updateCellsForm
 	((cells inject: #() into: [ :all :row | all _ all , row ]) select: [ :cell | cell damaged ])
 		do: [ :cell | | rect x y |
 			count _ count + 1.
-			x _ cell gridLocation x * 10 - 10.
-			y _ cell gridLocation y * 10 - 10.
-			rect _ Rectangle origin:  x@y corner: (x + 10) @ (y + 10).
+			x _ cell gridLocation x * cellSize - cellSize.
+			y _ cell gridLocation y * cellSize - cellSize.
+			rect _ Rectangle origin:  x@y corner: (x + cellSize) @ (y + cellSize).
 			cellsForm fill: rect rule: Form over fillColor: cell color.
 			self invalidRect: (rect translateBy: self topLeft).
 			cell redrawn.
@@ -4401,3 +4483,9 @@ blockSpecs
 
 	^ super blockSpecs , blocks
 ! !
+
+
+!ScratchStageMorph class methodsFor: 'Cellular' stamp: 'JM 10/27/2011 11:49'!
+cellSizes
+
+	^ OrderedCollection withAll: #(10 12 15 20 24 30 40 60)! !

@@ -132,11 +132,11 @@ min
 
 	^ minText contents asNumber.! !
 
-!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 9/20/2011 16:30'!
+!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 10/27/2011 10:42'!
 response
 
 	"returns an array containing the resulting input"
-	^ { 	typeinMorph contents asUTF8,
+	^ { 	typeinMorph contents,
 		minText contents asNumber,
 		maxText contents asNumber,
 		defaultText contents asNumber, 

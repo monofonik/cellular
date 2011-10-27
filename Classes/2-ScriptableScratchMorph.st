@@ -2381,7 +2381,7 @@ addComment: aScratchCommentMorph
 	blocksBin addMorph: aScratchCommentMorph.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 9/20/2011 16:32'!
+!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 10/27/2011 10:51'!
 addEnvironmentAttribute
 	"Ask the user for the details of a new environment attribute"
 
@@ -2389,7 +2389,7 @@ addEnvironmentAttribute
 	(sFrame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ self beep].
 
 	results _ NewEnvAttributeDialog ask: 'Attribute name?'.
-	results = #cancelled ifTrue: [^ self].
+	results = '' ifTrue: [^ self].
 
 	attrName _ results at: 1.
 	min _ results at: 2.
