@@ -9,4 +9,4 @@ if [[ "${arg}" != "dev" && \
       `basename "${arg}"` == `basename "${arg}" .ypr` && \
       `basename "${arg}"` == `basename "${arg}" .sb` ]]; then \
    arg="${arg}.ypr" ; fi
-BYOB.app/Contents/MacOS/BYOB BYOB.image "${arg}" dev "${arg}" 2> /dev/null &
+Cellular.app/Contents/MacOS/Cellular Cellular.image "${arg}" dev "${arg}" 2> /dev/null &
