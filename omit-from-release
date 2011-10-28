@@ -1,0 +1,15 @@
+.bzr*
+*.~?~
+Artwork
+ScratchSkin
+Classes
+ScratchSkin
+Media
+Projects
+copyforrelease.sh
+omit-from-release
+Installers
+compile.sh
+Elements090224.pdf
+GoboApplication
+
