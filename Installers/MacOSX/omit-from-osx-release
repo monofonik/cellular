@@ -2,6 +2,3 @@
 *.bat
 *.dll
 *.vbs
-verbose_enchanting.linux.sh
-FrontEnd/SqueakV2.sources
-FrontEnd/Plugins

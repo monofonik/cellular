@@ -1,6 +1,8 @@
 .bzr*
 *.~?~
 Artwork
+BaseCellular.image
+BaseCellular.changes
 ScratchSkin
 Classes
 ScratchSkin
