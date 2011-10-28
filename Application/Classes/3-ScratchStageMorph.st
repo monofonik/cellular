@@ -8,7 +8,7 @@ I represent the background of the Scratch work pane. Like a sprite, I have a set
 !
 
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 10/27/2011 12:21'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 10/28/2011 09:21'!
 initialize
 
 	super initialize.
@@ -1375,7 +1375,7 @@ fieldsVersion
 	^ 9
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/27/2011 13:24'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/28/2011 09:44'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -1427,7 +1427,7 @@ initFieldsFrom: anObjStream version: classVersion
 	"ensure each cell has a reference to the stage"
 	self allCellsDo: #stage: with: self.
 
-	(self fieldsVersion = 8) ifTrue: [ ^ self ].
+	(classVersion <= 8) ifTrue: [ cellSize _ 10. ^ self ].
 
 	self initFieldsNamed: #(
 		cellSize
@@ -2057,16 +2057,16 @@ cellQueryToolTipText
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:45'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 08:59'!
 cellSize
 
 	^ cellSize! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:37'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 09:25'!
 cellSize: aNumber
 
 	"if we receive a number between 1 & 8, get the corresponsing size from the cell size collection"
-	(aNumber >= 1 & (aNumber <= 8)) ifTrue: [ ^ self cellSize: (self class cellSizes at: aNumber) ].
+	(aNumber >= 1 & (aNumber <= 8)) ifTrue: [ ^ self cellSize: (self class cellSizes at: aNumber rounded) ].
 	
 	"ensure the cell size is valid"
 	(self class cellSizes includes: aNumber) ifTrue: [ cellSize _ aNumber ].
@@ -2077,6 +2077,13 @@ cellSize: aNumber
 	self createOrResizeGridForm.
 	self invalidRect: self bounds.
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 09:19'!
+cellSizeIndex
+
+	"returns the index of the current cell size within the available sizes"
+
+	^ self class cellSizes indexOf: cellSize ifAbsent: [ ^ 1 ].! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:29'!
 cellUnderCursor
@@ -2725,7 +2732,7 @@ incrRedraw: damageList
 				f displayOn: Display at: r topLeft rule: Form over]].
 ! !
 
-!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/27/2011 13:24'!
+!ScratchStageMorph methodsFor: 'object i/o' stamp: 'JM 10/28/2011 09:44'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -2777,7 +2784,7 @@ initFieldsFrom: anObjStream version: classVersion
 	"ensure each cell has a reference to the stage"
 	self allCellsDo: #stage: with: self.
 
-	(self fieldsVersion = 8) ifTrue: [ ^ self ].
+	(classVersion <= 8) ifTrue: [ cellSize _ 10. ^ self ].
 
 	self initFieldsNamed: #(
 		cellSize
@@ -2804,7 +2811,7 @@ initialiseCells
 	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
-!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 10/27/2011 12:21'!
+!ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 10/28/2011 09:21'!
 initialize
 
 	super initialize.
@@ -3855,7 +3862,7 @@ unlockedMorphsAt: aPoint addTo: mList
 	^ mList
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 09:44'!
 updateCellsForm
 
 	"updates the cells form to display the colour associated with each cell"
@@ -4144,16 +4151,16 @@ cellQueryToolTipText
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 11:45'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 08:59'!
 cellSize
 
 	^ cellSize! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:37'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 09:25'!
 cellSize: aNumber
 
 	"if we receive a number between 1 & 8, get the corresponsing size from the cell size collection"
-	(aNumber >= 1 & (aNumber <= 8)) ifTrue: [ ^ self cellSize: (self class cellSizes at: aNumber) ].
+	(aNumber >= 1 & (aNumber <= 8)) ifTrue: [ ^ self cellSize: (self class cellSizes at: aNumber rounded) ].
 	
 	"ensure the cell size is valid"
 	(self class cellSizes includes: aNumber) ifTrue: [ cellSize _ aNumber ].
@@ -4164,6 +4171,13 @@ cellSize: aNumber
 	self createOrResizeGridForm.
 	self invalidRect: self bounds.
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 09:19'!
+cellSizeIndex
+
+	"returns the index of the current cell size within the available sizes"
+
+	^ self class cellSizes indexOf: cellSize ifAbsent: [ ^ 1 ].! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:29'!
 cellUnderCursor
@@ -4442,7 +4456,7 @@ toggleAttribute: aString
 	attr hidden ifTrue: [ self showAttribute: attr name ]
 		ifFalse: [ self hideAttribute: attr name ].! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 09:44'!
 updateCellsForm
 
 	"updates the cells form to display the colour associated with each cell"

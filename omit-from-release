@@ -1,22 +1,16 @@
 .bzr*
 *.~?~
-Application/BaseCellular.image
-Application/BaseCellular.changes
-Application/ScratchSkin
-Application/Classes
-Application/ScratchSkin
-Application/Media
-Application/Projects
+BaseCellular.image
+BaseCellular.changes
+ScratchSkin
+Classes
+ScratchSkin
+Media
 copyforrelease.sh
 omit-from-release
 Installers
 compile.sh
-Application/Elements090224.pdf
-Application/GoboApplication
-Application/BYOB\ Development.sh
-Application/GoboApplications.icns
-Application/tools.ypr
-Application/ToolSprite.ysp
+Cellular\ Development.sh
 
 
 

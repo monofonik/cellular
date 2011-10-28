@@ -12,6 +12,6 @@ fi
 DIR=$1
 shift
 
-echo rsync -a ./ "$DIR" --exclude-from=.bzrignore --exclude-from=omit-from-release "$@"
-rsync -a ./ "$DIR" --exclude-from=.bzrignore --exclude-from=omit-from-release $@
-cp ./Cellular.image "$DIR/Cellular.image"
+echo rsync -a ./Application/ "$DIR" --exclude-from=.bzrignore --exclude-from=omit-from-release "$@"
+rsync -a ./Application/ "$DIR" --exclude-from=.bzrignore --exclude-from=omit-from-release $@
+cp Application/Cellular.image "$DIR/Cellular.image"
