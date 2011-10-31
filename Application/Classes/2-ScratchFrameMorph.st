@@ -177,7 +177,7 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/27/2011 17:00'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/28/2011 09:27'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
@@ -205,6 +205,8 @@ createStageButtonsPanel
 		actionSelector: #cellSize:;
 		minVal: 1;
 		maxVal: 8.
+		"adjustToValue: workPane cellSizeIndex."
+		
 	stageButtonsPanel addMorphBack: cellSizeSlider.
 
 	"a slider to set the playback speed"
@@ -2454,7 +2456,7 @@ current project."
 	self importSpriteOrProject: response.
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 9/29/2011 13:42'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 10/28/2011 09:41'!
 installNewProject: newWorkpane
 	"Called after creating or reading a new project to clear the process scheduler, pick an object to view, clear the library thumbnails, and perform other housekeeping."
 
@@ -2539,7 +2541,11 @@ installNewProject: newWorkpane
 	self world ifNotNil: [self world startSteppingSubmorphsOf: self].
 	ScriptableScratchMorph scratchOrigin: workPane center.
 	justSaved _ true.
-! !
+
+	"ensure the slider is set to the default position"
+	stageButtonsPanel submorphs do: [ :sub |  
+		(sub isKindOf: SimpleSliderMorph) ifTrue: [ sub setScaledValue: workPane cellSizeIndex ].
+	]! !
 
 !ScratchFrameMorph methodsFor: 'file read/write' stamp: 'jens 5/3/2010 22:01'!
 nameFromFileName: fileName
@@ -4289,6 +4295,12 @@ canonicalizeSoundsBits: bitsPerSample saveOriginal: saveFlag
 	^ count
 ! !
 
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/28/2011 09:08'!
+cellSize
+
+	"attempt to fetch the current cell size setting"
+! !
+
 !ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/27/2011 13:31'!
 cellSize: aNumber
 
@@ -4651,7 +4663,7 @@ createReadoutPane
 	self addMorph: (readoutPane isSticky: true).
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/27/2011 17:00'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 10/28/2011 09:27'!
 createStageButtonsPanel
 	"Create and add a panel containing the project title, green flag, and stop buttons."
 
@@ -4679,6 +4691,8 @@ createStageButtonsPanel
 		actionSelector: #cellSize:;
 		minVal: 1;
 		maxVal: 8.
+		"adjustToValue: workPane cellSizeIndex."
+		
 	stageButtonsPanel addMorphBack: cellSizeSlider.
 
 	"a slider to set the playback speed"
@@ -5771,7 +5785,7 @@ initializeWatcherPositions
 			put: {w. p. w layoutStyle. w sliderRange}].
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 9/29/2011 13:42'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 10/28/2011 09:41'!
 installNewProject: newWorkpane
 	"Called after creating or reading a new project to clear the process scheduler, pick an object to view, clear the library thumbnails, and perform other housekeeping."
 
@@ -5856,7 +5870,11 @@ installNewProject: newWorkpane
 	self world ifNotNil: [self world startSteppingSubmorphsOf: self].
 	ScriptableScratchMorph scratchOrigin: workPane center.
 	justSaved _ true.
-! !
+
+	"ensure the slider is set to the default position"
+	stageButtonsPanel submorphs do: [ :sub |  
+		(sub isKindOf: SimpleSliderMorph) ifTrue: [ sub setScaledValue: workPane cellSizeIndex ].
+	]! !
 
 !ScratchFrameMorph methodsFor: 'byob' stamp: 'jens 5/26/2010 21:06'!
 isDevelopmentMode
@@ -8207,6 +8225,12 @@ brushSize3
 brushSize4
 
 	brushSize _ 4! !
+
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/28/2011 09:08'!
+cellSize
+
+	"attempt to fetch the current cell size setting"
+! !
 
 !ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/27/2011 13:31'!
 cellSize: aNumber
