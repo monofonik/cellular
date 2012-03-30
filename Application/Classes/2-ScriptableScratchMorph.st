@@ -1068,6 +1068,16 @@ mouseY
 	^ (Sensor cursorPoint y - ScratchOrigin y) negated
 ! !
 
+!ScriptableScratchMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 10:59'!
+numCellsX
+
+	self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 10:59'!
+numCellsY
+
+	self subclassResponsibility! !
+
 !ScriptableScratchMorph methodsFor: 'sensing ops' stamp: 'jens 3/23/2010 00:02'!
 promptForInput: questionString
 
@@ -1723,7 +1733,7 @@ computeFunction: functionName of: aNumber
 	^ 0
 ! !
 
-!ScriptableScratchMorph methodsFor: 'other ops' stamp: 'JM 10/7/2011 13:15'!
+!ScriptableScratchMorph methodsFor: 'other ops' stamp: 'JM 3/30/2012 13:57'!
 eventReceived: event
 	"Start all non-running stacks with an EventHat matching the given events and answer a collection of the new processes. If a process is already running for a given stack, don't start a new one."
 
@@ -6775,8 +6785,20 @@ cellValue: aString
 
 	self subclassResponsibility! !
 
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:38'!
+cellValue: aString x: aX y: aY
+
+	self subclassResponsibility
+
+	! !
+
 !ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
 change: aString by: aNumber
+
+	self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:41'!
+changeCellValue: aString x: aX y: aY by: aNumber
 
 	self subclassResponsibility! !
 
@@ -6831,6 +6853,11 @@ nextClassName
 setCell: aString to: aNumber
 
 		self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:41'!
+setCellValue: aString x: aX y: aY to: aNumber
+
+	self subclassResponsibility! !
 
 
 !ScriptableScratchMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/30/2011 12:19'!
@@ -6889,7 +6916,7 @@ blockSpecDict
 
 ! !
 
-!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 9/26/2011 15:11'!
+!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 3/7/2012 11:47'!
 blockSpecs
 	"Answer a collection of block specifications for the blocks that are common to all objects. Block specificatons (Arrays) are interspersed with category names (Strings). A block specification is an Array of the form: (<block spec string> <block type> <selector> [optional initial argument values]).
 
@@ -6910,13 +6937,21 @@ blockSpecs
 	| blocks |
 	blocks _ #(
 		'sensing'
+			('x cells'						r	numCellsX)
+			('y cells'						r	numCellsY)
+			-
 			('hide %3'						-	hideAttribute:)
 			('show %3'						-	showAttribute:)
+			-
+			('value of %3 at x: %n y %n'	r	cellValue:x:y: )
+			('set %3 at x: %n y: %n to %n'	-	setCellValue:x:y:to:)
+			('change %3 at: %n y: %n by %n'	-	changeCellValue:x:y:by:)
 			-
 			('set %3 to %n'					- 	setCell:to: )
 			('change %3 by %n'				-	changeCellValue:by:)
 			-
 			('clear %3'						-	clearValue:)
+			-
 		'control'
 			('when %m clicked'				S	-)
 			('when %k key pressed'			K	-)

@@ -1227,6 +1227,20 @@ hideQuestion
 	"Hide my question prompt."
 ! !
 
+!ScratchSpriteMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:03'!
+numCellsX
+
+	| stage |
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ 0 ] ifNotNil: [ ^ stage numCellsX ].! !
+
+!ScratchSpriteMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:03'!
+numCellsY
+
+	| stage |
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ 0 ] ifNotNil: [ ^ stage numCellsY ].! !
+
 !ScratchSpriteMorph methodsFor: 'sensing ops' stamp: 'JM 8/19/2011 15:03'!
 showQuestion: aString
 	"Show the given question prompt."
@@ -1643,12 +1657,17 @@ allSubsprites
 		all addAll: sub allSubsprites ].
 	^ all! !
 
-!ScratchSpriteMorph methodsFor: 'nesting' stamp: 'JM 8/26/2011 16:02'!
+!ScratchSpriteMorph methodsFor: 'nesting' stamp: 'JM 3/30/2012 13:52'!
 breed
 
+	| offspring |
+
 	"Spawns  new sprite from this one, unless we're the prototype"
-	self prototype ifNotNil: [ self spawn ].
-	(self ownerThatIsA: ScratchStageMorph) broadcastEventNamed: 'Scratch-StartClicked' with: 0.! !
+	self prototype ifNil: [ ^ self ].
+
+	offspring _ self spawn.
+	"(self ownerThatIsA: ScratchStageMorph) broadcastEventNamed: 'Scratch-StartClicked' with: 0."
+	offspring eventReceived: (ScratchEvent new name:'Scratch-StartClicked' argument: 0).! !
 
 !ScratchSpriteMorph methodsFor: 'nesting' stamp: 'jens 8/10/2009 15:39'!
 cacheRefPos
@@ -2348,10 +2367,10 @@ spawn
 
 	^ child	! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 9/26/2011 14:13'!
+!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 3/30/2012 13:56'!
 spawnAt: aLocation
 
-	self spawn position: aLocation.
+	^ self spawn position: aLocation.
 ! !
 
 
@@ -2469,6 +2488,15 @@ changeCellValue: aString by: aNumber
 	cell _ self currentCell.
 	cell ifNotNil: [ cell changeValue: aString by: aNumber ].! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 3/7/2012 11:51'!
+changeCellValue: aString x: aX y: aY by: aNumber
+
+	| stage |
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ self ].
+
+	stage changeCellValue: aString x: aX y: aY by: aNumber! !
+
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 14:06'!
 classNamesMenu
 
@@ -2573,6 +2601,15 @@ setCell: aString to: aNumber
 	stage ifNotNil: [ stage setCellValue: aString for: self to: aNumber ].
 	! !
 
+!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 3/7/2012 11:51'!
+setCellValue: aString x: aX y: aY to: aNumber
+
+	| stage |
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ self ].
+
+	stage setCellValue: aString x: aX y: aY to: aNumber! !
+
 !ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 13:17'!
 showAttribute: aString
 
@@ -2621,7 +2658,7 @@ yposCell
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 10/6/2011 15:32'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 3/7/2012 11:34'!
 blockSpecs
 
 	| blocks |
@@ -2709,8 +2746,8 @@ blockSpecs
 		'sensing'			
 
 			('clear cell'						-	clearCell)
+			-
 			('value of %3'					r	cellValue: )
-			('value of %3 at x: %n y %n'	r	cellValue:x:y: )
 			=
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)

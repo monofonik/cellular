@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchStageMorph
-	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells cellsForm gridForm showGrid cellQueryToolTip cellSize '
+	instanceVariableNames: 'zoom hPan vPan penTrailsForm lastPenPositions runningBlocks inProcessStep sensorBoard midiPortNum midiPort notePlayerDict obsoleteSavedState sprites scratchServer isQuarterSize cachedForm showMotorBlocks feedbackMorph stepLength cellAttributes cells cellsForm gridForm showGrid cellQueryToolTip cellSize pauseCellUpdates '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -299,6 +299,16 @@ getAttribute: attr
 	'volume' localized = a ifTrue: [^ self volume].
 	^ 0
 ! !
+
+!ScratchStageMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:01'!
+numCellsX
+
+	^ self cellDims x! !
+
+!ScratchStageMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:01'!
+numCellsY
+
+	^ self cellDims y! !
 
 
 !ScratchStageMorph methodsFor: 'sound ops' stamp: 'jens 2/4/2011 02:37'!
@@ -2133,6 +2143,17 @@ changeCellValue: aString for: aSprite by: aNumber
 	cell changeValue: aString by: aNumber spread: attr spread.
 	cell update: cellAttributes.! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:45'!
+changeCellValue: aString x: aX y: aY by: aNumber
+
+	"change the cell value behind a sprite by the given amount"
+	| cell attr |
+	cell _ self cellAtGridX: aX y: aY.
+	attr _ cellAttributes at: aString.
+
+	cell changeValue: aString by: aNumber spread: attr spread.
+	cell update: cellAttributes.! !
+
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 6/2/2004 18:58'!
 changeHPanBy: amount
 	"Change my horizontal pan by the given amount."
@@ -3055,6 +3076,16 @@ notePlayerFor: aScratchObject
 	^ newPlayer
 ! !
 
+!ScratchStageMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:01'!
+numCellsX
+
+	^ self cellDims x! !
+
+!ScratchStageMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:01'!
+numCellsY
+
+	^ self cellDims y! !
+
 !ScratchStageMorph methodsFor: 'accessing' stamp: 'jm 10/25/2007 19:21'!
 objName
 
@@ -3138,6 +3169,11 @@ pauseAllProcesses
 	runningBlocks do: [:each |
 		each pauseProcess]
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/27/2012 11:07'!
+pauseCellUpdates
+
+	pauseCellUpdates _ true! !
 
 !ScratchStageMorph methodsFor: 'pen support' stamp: 'jm 6/2/2009 18:50'!
 penTrailsForm
@@ -3386,6 +3422,18 @@ setCellValue: aString for: aSprite to: aNumber
 	"change the cell value behind a sprite by the given amount"
 	| cell attr |
 	cell _ self cellBehind: aSprite.
+	attr _ cellAttributes at: aString.
+
+	cell ifNotNil: [ 
+		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
+	]! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:44'!
+setCellValue: aString x: aX y: aY to: aNumber
+
+	"change the cell value behind a sprite by the given amount"
+	| cell attr |
+	cell _ self cellAtGridX: aX y: aY.
 	attr _ cellAttributes at: aString.
 
 	cell ifNotNil: [ 
@@ -3862,19 +3910,21 @@ unlockedMorphsAt: aPoint addTo: mList
 	^ mList
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 09:44'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/27/2012 11:08'!
+unpauseCellUpdates
+
+	pauseCellUpdates _ false.
+	self updateCellsForm.! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/27/2012 11:20'!
 updateCellsForm
 
 	"updates the cells form to display the colour associated with each cell"
-	
-	| count |
-	count _ 0.
 
 	self createOrResizeCellsForm.
 
 	((cells inject: #() into: [ :all :row | all _ all , row ]) select: [ :cell | cell damaged ])
 		do: [ :cell | | rect x y |
-			count _ count + 1.
 			x _ cell gridLocation x * cellSize - cellSize.
 			y _ cell gridLocation y * cellSize - cellSize.
 			rect _ Rectangle origin:  x@y corner: (x + cellSize) @ (y + cellSize).
@@ -4220,6 +4270,17 @@ changeCellValue: aString for: aSprite by: aNumber
 	cell changeValue: aString by: aNumber spread: attr spread.
 	cell update: cellAttributes.! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:45'!
+changeCellValue: aString x: aX y: aY by: aNumber
+
+	"change the cell value behind a sprite by the given amount"
+	| cell attr |
+	cell _ self cellAtGridX: aX y: aY.
+	attr _ cellAttributes at: aString.
+
+	cell changeValue: aString by: aNumber spread: attr spread.
+	cell update: cellAttributes.! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 14:13'!
 classNamesMenu
 
@@ -4401,6 +4462,11 @@ newCellAt: xLoc at: yLoc
 	^ cell.
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/27/2012 11:07'!
+pauseCellUpdates
+
+	pauseCellUpdates _ true! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:40'!
 setCell: aString to: aNumber
 
@@ -4412,6 +4478,18 @@ setCellValue: aString for: aSprite to: aNumber
 	"change the cell value behind a sprite by the given amount"
 	| cell attr |
 	cell _ self cellBehind: aSprite.
+	attr _ cellAttributes at: aString.
+
+	cell ifNotNil: [ 
+		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
+	]! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:44'!
+setCellValue: aString x: aX y: aY to: aNumber
+
+	"change the cell value behind a sprite by the given amount"
+	| cell attr |
+	cell _ self cellAtGridX: aX y: aY.
 	attr _ cellAttributes at: aString.
 
 	cell ifNotNil: [ 
@@ -4456,19 +4534,21 @@ toggleAttribute: aString
 	attr hidden ifTrue: [ self showAttribute: attr name ]
 		ifFalse: [ self hideAttribute: attr name ].! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/28/2011 09:44'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/27/2012 11:08'!
+unpauseCellUpdates
+
+	pauseCellUpdates _ false.
+	self updateCellsForm.! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/27/2012 11:20'!
 updateCellsForm
 
 	"updates the cells form to display the colour associated with each cell"
-	
-	| count |
-	count _ 0.
 
 	self createOrResizeCellsForm.
 
 	((cells inject: #() into: [ :all :row | all _ all , row ]) select: [ :cell | cell damaged ])
 		do: [ :cell | | rect x y |
-			count _ count + 1.
 			x _ cell gridLocation x * cellSize - cellSize.
 			y _ cell gridLocation y * cellSize - cellSize.
 			rect _ Rectangle origin:  x@y corner: (x + cellSize) @ (y + cellSize).
