@@ -7371,4 +7371,11 @@ keepOnStage: aBool
 	KeepOnStage _ aBool! !
 
 
+!ScriptableScratchMorph class methodsFor: 'cellular' stamp: 'JM 4/5/2012 16:08'!
+maxAgents
+
+	"The maximum number of agents allowed to exist for each type"
+	^ 100! !
+
+
 ScriptableScratchMorph initialize!

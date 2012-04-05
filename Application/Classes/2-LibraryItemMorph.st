@@ -644,8 +644,3 @@ stageMenu
 	menu localize; invokeOn: library.
 ! !
 
-
-!LibraryItemMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/17/2011 11:33'!
-getCloneCount
-
-	^ target getCloneCount.! !

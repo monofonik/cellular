@@ -1,5 +1,5 @@
 DividedImageFrameMorph subclass: #ScratchScriptEditorMorph
-	instanceVariableNames: 'thumbnailMorph nameMorph pageViewerMorph rotationButtons lockButton readoutMorphs penReadout currentCategory tabPaneMorph deleteButton '
+	instanceVariableNames: 'thumbnailMorph nameMorph pageViewerMorph rotationButtons lockButton readoutMorphs penReadout currentCategory tabPaneMorph deleteButton maxAgentsLabelMorph maxAgentsMorph '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-UI-Panes'!
@@ -50,7 +50,7 @@ createTabPane
 	self addMorph: tabPaneMorph.
 ! !
 
-!ScratchScriptEditorMorph methodsFor: 'initialization' stamp: 'ee 11/4/2008 12:24'!
+!ScratchScriptEditorMorph methodsFor: 'initialization' stamp: 'JM 4/5/2012 16:05'!
 initialize
 
 	super initialize.

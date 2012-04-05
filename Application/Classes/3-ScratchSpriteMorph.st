@@ -1,5 +1,5 @@
 ScriptableScratchMorph subclass: #ScratchSpriteMorph
-	instanceVariableNames: 'scalePoint rotationDegrees rotationStyle rotatedForm offsetWhenRotated draggable penDown penSize penColor penHue penShade subsprites ownerSprite offset virtualScale rotateWithOwner refPos prototype '
+	instanceVariableNames: 'scalePoint rotationDegrees rotationStyle rotatedForm offsetWhenRotated draggable penDown penSize penColor penHue penShade subsprites ownerSprite offset virtualScale rotateWithOwner refPos prototype maxClones '
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
@@ -1386,13 +1386,13 @@ rightButtonMenu
 ! !
 
 
-!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'JM 9/29/2011 14:38'!
+!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'JM 4/5/2012 14:31'!
 fieldsVersion
 
-	^ 8
+	^ 9
 ! !
 
-!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'jens 2/3/2011 23:24'!
+!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'JM 4/5/2012 14:33'!
 initFieldsFrom: anObjStream version: classVersion
 
 	super initFieldsFrom: anObjStream version: classVersion.
@@ -1444,9 +1444,15 @@ initFieldsFrom: anObjStream version: classVersion
 		prototype
 		deletedAttributes
 	) from: anObjStream.
+
+	classVersion < 9 ifTrue: [^ self].
+	"fields addded in version 9"
+	self initFieldsNamed: #(
+		maxClones
+	) from: anObjStream.
 ! !
 
-!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'jens 2/3/2011 23:24'!
+!ScratchSpriteMorph methodsFor: 'object i/o' stamp: 'JM 4/5/2012 14:33'!
 storeFieldsOn: anObjStream
 
 	| oldP |
@@ -1474,6 +1480,7 @@ storeFieldsOn: anObjStream
 		refPos
 		prototype
 		deletedAttributes
+		maxClones
 	) on: anObjStream.
 
 	self position: oldP.  "restore position"
@@ -1924,6 +1931,42 @@ slideBackToFormerSituation: evt
 
 ! !
 
+!ScratchSpriteMorph methodsFor: 'nesting' stamp: 'JM 4/5/2012 16:36'!
+spawn
+
+	| stage child |
+"
+	(frame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ nil].
+"
+	"If we're a clone, clone the prototype instead but place at this position"
+	self prototype ifNotNil: [ ^ prototype spawnAt: self position ].
+
+	"Check that this wont exceed the max number of agents"
+	Transcript show: self cloneCount; cr.
+	Transcript show: self class maxAgents; cr.
+	(self cloneCount asNumber >= self class maxAgents) ifTrue: [ ^ self ].
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [^ self].
+	child _ self fullCopy.
+	child blocksBin allMorphsDo: [:m |
+		(m isKindOf: BlockMorph) ifTrue: [m stop]].
+	child unhinge; unhingeAll; initializeNodes.
+	child prototype: self.
+	child initializeVarsAndLists.
+	child removeLocalBlockDefinitions.
+	"frame workPane" stage addMorphFront: child.
+	stage sprites addLast: child.
+	child deleteAttributes: self deletedAttributes.
+	child deleteAttribute: #costumes.
+	child deleteAttribute: #sounds.
+
+	"new for system scratch"
+	child deleteAttribute: #rotationStyle.
+	child show.
+
+	^ child	! !
+
 !ScratchSpriteMorph methodsFor: 'nesting' stamp: 'jens 8/6/2009 07:38'!
 spread
 	"private - apply the method calling me to all subsprites"
@@ -2336,37 +2379,6 @@ setRotationStyle: aNumber
 	self undeleteAttribute: #rotationStyle.
 	self passiveRotationStyle: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 9/27/2011 15:17'!
-spawn
-
-	| stage child |
-"
-	(frame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [^ nil].
-"
-	"If we're a clone, clone the prototype instead but place at this position"
-	self prototype ifNotNil: [ ^ prototype spawnAt: self position ].
-
-	stage _ self ownerThatIsA: ScratchStageMorph.
-	stage ifNil: [^ self].
-	child _ self fullCopy.
-	child blocksBin allMorphsDo: [:m |
-		(m isKindOf: BlockMorph) ifTrue: [m stop]].
-	child unhinge; unhingeAll; initializeNodes.
-	child prototype: self.
-	child initializeVarsAndLists.
-	child removeLocalBlockDefinitions.
-	"frame workPane" stage addMorphFront: child.
-	stage sprites addLast: child.
-	child deleteAttributes: self deletedAttributes.
-	child deleteAttribute: #costumes.
-	child deleteAttribute: #sounds.
-
-	"new for system scratch"
-	child deleteAttribute: #rotationStyle.
-	child show.
-
-	^ child	! !
-
 !ScratchSpriteMorph methodsFor: 'byob OOP' stamp: 'JM 3/30/2012 13:56'!
 spawnAt: aLocation
 
@@ -2397,7 +2409,12 @@ penShade
 	^ penShade! !
 
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/27/2011 15:11'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/19/2011 16:24'!
+addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
+
+	^ yLoc.! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/27/2011 15:11'!
 broadcast: aString for: aNumber
 
 	| stage |
@@ -2409,55 +2426,12 @@ broadcast: aString for: aNumber
 
 	stage broadcastEventNamed: aString with: 0 from: self referencePosition for: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/23/2011 16:31'!
-cloneCount
-
-	^ (self instances size) asString.! !
-
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 9/26/2011 14:09'!
-cloneCount: aNumber
-
-	| num |
-
-	num _ [ aNumber asNumber ] ifError: [ Transcript show: 'Unable to parse number'; cr. ^ self ].
-
-	" Set the number of clones on the stage to the given number "
-	[ (self cloneCount asNumber) < num ] whileTrue: [ self spawnSomewhere ].
-	[ (self cloneCount asNumber) > num ] whileTrue: [ (self instances at: 1) deleteSprite. ].
-! !
-
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 8/26/2011 15:45'!
-die
-
-	"Deletes this sprite, unless it's the prototype"
-	self prototype ifNotNil: [ self deleteSprite ].! !
-
-!ScratchSpriteMorph methodsFor: 'as yet unclassified' stamp: 'JM 10/28/2011 15:34'!
-syncToPrototype
-
-	"Updates this sprites blocks bin with a full copy of its prototypes"
-
-	self prototype ifNotNil: [ 
-		"self prototype: self prototype."
-		blocksBin _ self prototype blocksBin fullCopy.
-		].
-	(blocksBin submorphs select: [ :block | block isKindOf: BlockMorph ])
-		do: [ :block |
-			block setReceiversForClone: self.
-		]! !
-
-
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/19/2011 16:24'!
-addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
-
-	^ yLoc.! !
-
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/14/2011 12:20'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/14/2011 12:20'!
 cellDirectionNamesMenu
 
 	^ #('up' 'down' 'left' 'right' 'up / left' 'up / right' 'down / left' 'down / right')! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/26/2011 10:53'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/26/2011 10:53'!
 cellValue: aString
 
 	| cell |
@@ -2466,7 +2440,7 @@ cellValue: aString
 	cell ifNil: [ ^ 0 ].
 	^ cell value:aString! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 10/7/2011 12:40'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 10/7/2011 12:40'!
 cellValue: aString x: x y: y 
 
 	| stage |
@@ -2479,7 +2453,7 @@ cellValue: aString x: x y: y
 	^ stage cellValue: aString x: x y: y
 		! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/5/2011 10:27'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/5/2011 10:27'!
 changeCellValue: aString by: aNumber
 
 	| cell |
@@ -2488,7 +2462,7 @@ changeCellValue: aString by: aNumber
 	cell _ self currentCell.
 	cell ifNotNil: [ cell changeValue: aString by: aNumber ].! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 3/7/2012 11:51'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 3/7/2012 11:51'!
 changeCellValue: aString x: aX y: aY by: aNumber
 
 	| stage |
@@ -2497,7 +2471,7 @@ changeCellValue: aString x: aX y: aY by: aNumber
 
 	stage changeCellValue: aString x: aX y: aY by: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 14:06'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 14:06'!
 classNamesMenu
 
 	| stage |
@@ -2506,7 +2480,7 @@ classNamesMenu
 
 	^ stage classNamesMenu.! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 15:36'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/2/2011 15:36'!
 clearCell
 
 	"clears the value of the current cell"
@@ -2515,7 +2489,7 @@ clearCell
 	self currentCell clearValues
 	! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 13:34'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 13:34'!
 clearValue: aString
 
 	| cell |
@@ -2526,7 +2500,7 @@ clearValue: aString
 	cell ifNotNil: [ cell clearValue: aString ].
 		! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 10/7/2011 12:40'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 10/7/2011 12:40'!
 clearValue: aString x: x y: y 
 
 	| stage |
@@ -2539,7 +2513,28 @@ clearValue: aString x: x y: y
 	^ stage cellValue: aString x: x y: y
 		! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/26/2011 10:52'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 4/5/2012 16:37'!
+cloneCount
+
+	prototype ifNotNil: [ ^ prototype cloneCount ].
+	^ self instances size asString.! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 4/5/2012 16:37'!
+cloneCount: aNumber
+
+	| num |
+
+	prototype ifNotNil: [ ^ prototype cloneCount: aNumber ].
+
+	num _ [ aNumber asNumber ] ifError: [ Transcript show: 'Unable to parse number'; cr. ^ self ].
+	num _ num min: ScratchSpriteMorph maxAgents.
+
+	" Set the number of clones on the stage to the given number "
+	[ (self cloneCount asNumber) < num ] whileTrue: [ self spawnSomewhere ].
+	[ (self cloneCount asNumber) > num ] whileTrue: [ (self instances at: 1) deleteSprite. ].
+! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/26/2011 10:52'!
 currentCell
 
 	"return the cell that this sprite is standing on"
@@ -2552,17 +2547,23 @@ currentCell
 
 	^ (self ownerThatIsA: ScratchStageMorph) cellBehind: self! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:02'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 8/26/2011 15:45'!
+die
+
+	"Deletes this sprite, unless it's the prototype"
+	self prototype ifNotNil: [ self deleteSprite ].! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/2/2011 14:02'!
 envAttrNames
 
 	^ (self ownerThatIsA: ScratchStageMorph) cellAttributeNames! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:03'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/2/2011 14:03'!
 envAttrNamesMenu
 
 	^ (self ownerThatIsA: ScratchStageMorph) cellAttributeNames! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/14/2011 13:34'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/14/2011 13:34'!
 face: aString
 
 	"face in one of 8 directions, for cell motion"
@@ -2578,7 +2579,7 @@ face: aString
 
 	! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 13:17'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 13:17'!
 hideAttribute: aString
 
 	"hides the given atttribute"
@@ -2590,7 +2591,7 @@ hideAttribute: aString
 
 	stage hideAttribute: aString! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/2/2011 14:30'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/2/2011 14:30'!
 setCell: aString to: aNumber
 
 	| stage |
@@ -2601,7 +2602,7 @@ setCell: aString to: aNumber
 	stage ifNotNil: [ stage setCellValue: aString for: self to: aNumber ].
 	! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 3/7/2012 11:51'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 3/7/2012 11:51'!
 setCellValue: aString x: aX y: aY to: aNumber
 
 	| stage |
@@ -2610,7 +2611,7 @@ setCellValue: aString x: aX y: aY to: aNumber
 
 	stage setCellValue: aString x: aX y: aY to: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/20/2011 13:17'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 13:17'!
 showAttribute: aString
 
 	"hides the given atttribute"
@@ -2622,14 +2623,32 @@ showAttribute: aString
 
 	stage showAttribute: aString! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 9/26/2011 14:12'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 4/5/2012 16:24'!
 spawnSomewhere
 
+	| clone |
 	"spawns the sprite at a random location"
-	self spawn referencePosition: ((self randomFrom: -240 to: 240) @ (self randomFrom: -180 to: 180))
+
+	clone _ self spawn.
+	(clone isKindOf: ScratchSpriteMorph) ifTrue: [ clone referencePosition: ((self randomFrom: -240 to: 240) @ (self randomFrom: -180 to: 180)) ].
+	^ clone
 ! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 10/6/2011 15:29'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 10/28/2011 15:34'!
+syncToPrototype
+
+	"Updates this sprites blocks bin with a full copy of its prototypes"
+
+	self prototype ifNotNil: [ 
+		"self prototype: self prototype."
+		blocksBin _ self prototype blocksBin fullCopy.
+		].
+	(blocksBin submorphs select: [ :block | block isKindOf: BlockMorph ])
+		do: [ :block |
+			block setReceiversForClone: self.
+		]! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 10/6/2011 15:29'!
 xposCell
 
 	| stage |
@@ -2641,7 +2660,7 @@ xposCell
 
 	! !
 
-!ScratchSpriteMorph methodsFor: 'cell ops' stamp: 'JM 10/6/2011 15:30'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 10/6/2011 15:30'!
 yposCell
 
 	| stage |
