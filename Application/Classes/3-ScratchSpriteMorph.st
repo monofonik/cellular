@@ -616,27 +616,6 @@ forward: distance
 	self ypos: self ypos 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 10/27/2011 12:23'!
-forwardCell: aNumber
-
-	"moves the sprite a given number of cells in the closest discrete direction to the sprites current heading"
-	| stage directions dirIndex |
-
-	self prototype ifNil: [ ^ self ].
-
-	directions _ Array withAll: #('right' 'down / right' 'down' 'down / left' 'left' 'left / up' 'up' 'up / right' ).
-
-	"get a reference to the stage"
-	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ self ].
-
-	"determine which discrete direction to move in"
-	dirIndex _ (rotationDegrees / 45) rounded \\ 8 + 1.
-
-	aNumber timesRepeat: [ | cell |
-		cell _ stage adjacentCellTo: self direction: (directions at: dirIndex).
-		self gotoX: cell referencePosition x y: cell referencePosition y.
-		]! !
-
 !ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 glideSecs: duration toX: endX y: endY elapsed: elapsed from: startPoint
 	"Interpolate my position from my current postion to the given x and y over the given duration. If startPoint is nil, just answer my current position; this sets the starting point for the interpolation."
@@ -674,17 +653,6 @@ glideSecs: duration toX: endX y: endY elapsed: elapsed from: startPoint
 		self releaseSubsprites]
 
 "! !
-
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 9/14/2011 16:14'!
-gotoCellX: xPos y: yPos
-
-	| stage cell |
-
-	stage _ self ownerThatIsA: ScratchStageMorph.
-	stage ifNil: [ ^ self ].
-	cell _ stage cellAtGridX: xPos y: yPos.
-
-	self gotoX: cell referencePosition x y: cell referencePosition y! !
 
 !ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 14:59'!
 gotoSpriteOrMouse: anObject
@@ -1931,7 +1899,7 @@ slideBackToFormerSituation: evt
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'nesting' stamp: 'JM 4/5/2012 16:36'!
+!ScratchSpriteMorph methodsFor: 'nesting' stamp: 'JM 4/23/2012 13:10'!
 spawn
 
 	| stage child |
@@ -1942,8 +1910,6 @@ spawn
 	self prototype ifNotNil: [ ^ prototype spawnAt: self position ].
 
 	"Check that this wont exceed the max number of agents"
-	Transcript show: self cloneCount; cr.
-	Transcript show: self class maxAgents; cr.
 	(self cloneCount asNumber >= self class maxAgents) ifTrue: [ ^ self ].
 
 	stage _ self ownerThatIsA: ScratchStageMorph.
@@ -2414,6 +2380,13 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	^ yLoc.! !
 
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/2/2012 14:43'!
+agentTypesMenu
+
+	| stage |
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ Set new ].
+	^ stage agentTypesMenu! !
+
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/27/2011 15:11'!
 broadcast: aString for: aNumber
 
@@ -2426,10 +2399,27 @@ broadcast: aString for: aNumber
 
 	stage broadcastEventNamed: aString with: 0 from: self referencePosition for: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/14/2011 12:20'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/2/2012 16:13'!
+cell: aDirection contains: aType
+	"check if a neighbouring cell contains an agent type"
+
+	| stage cell |
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ false ].
+	(cell _ (stage neighbouringCellTo: (stage cellBehind: self) direction: aDirection)) ifNil: [ ^ false ].
+	
+	"self halt."
+	Transcript show: (stage spritesAtCell: cell); cr.
+
+	(stage spritesAtCell: cell) do: [ :sprite |
+		(sprite className = aType) ifTrue: [ ^ true ].
+	].
+	
+	^ false.! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/2/2012 12:54'!
 cellDirectionNamesMenu
 
-	^ #('up' 'down' 'left' 'right' 'up / left' 'up / right' 'down / left' 'down / right')! !
+	^ #('above' 'below' 'left' 'right' 'above / left' 'above / right' 'below / left' 'below / right')! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/26/2011 10:53'!
 cellValue: aString
@@ -2579,6 +2569,38 @@ face: aString
 
 	! !
 
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/2/2012 15:44'!
+forwardCell: aNumber
+
+	"moves the sprite a given number of cells in the closest discrete direction to the sprites current heading"
+	| stage directions dirIndex |
+
+	self prototype ifNil: [ ^ self ].
+
+	directions _ Array withAll: #('right' 'down / right' 'down' 'down / left' 'left' 'left / up' 'up' 'up / right' ).
+
+	"get a reference to the stage"
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ self ].
+
+	"determine which discrete direction to move in"
+	dirIndex _ (rotationDegrees / 45) rounded \\ 8 + 1.
+
+	aNumber timesRepeat: [ | cell |
+		cell _ stage neighbouringCellTo: self direction: (directions at: dirIndex).
+		self gotoX: cell referencePosition x y: cell referencePosition y.
+		]! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/14/2011 16:14'!
+gotoCellX: xPos y: yPos
+
+	| stage cell |
+
+	stage _ self ownerThatIsA: ScratchStageMorph.
+	stage ifNil: [ ^ self ].
+	cell _ stage cellAtGridX: xPos y: yPos.
+
+	self gotoX: cell referencePosition x y: cell referencePosition y! !
+
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 13:17'!
 hideAttribute: aString
 
@@ -2590,6 +2612,19 @@ hideAttribute: aString
 	stage ifNil: [ ^ self ].
 
 	stage hideAttribute: aString! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/2/2012 13:45'!
+moveCellRandom
+
+	"moves to a random neighbouring cell"
+	
+	| stage mycell neighbours newcell |
+	stage _ (self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ self ].
+
+	mycell _ stage cellBehind: self.
+	neighbours _ stage neighbouringCellsTo: mycell.
+	newcell _ neighbours asOrderedCollection atRandom.
+	self gotoX: newcell referencePosition x y: newcell referencePosition y.! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/2/2011 14:30'!
 setCell: aString to: aNumber
@@ -2677,7 +2712,7 @@ yposCell
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 3/7/2012 11:34'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/2/2012 15:58'!
 blockSpecs
 
 	| blocks |
@@ -2692,6 +2727,7 @@ blockSpecs
 		'motion'		
 			('move %n steps'				-	forward:)
 			('move %n cells'					-	forwardCell: 1) 	
+			('move 1 cell randomly'			-	moveCellRandom )			
 			-
 			('turn %n degrees'				-	turnRight: 15)	"icon shows turn direction"
 			('turn %n degrees'				-	turnLeft: 15)	"icon shows turn direction"
@@ -2767,6 +2803,8 @@ blockSpecs
 			('clear cell'						-	clearCell)
 			-
 			('value of %3'					r	cellValue: )
+			=
+			('cell %4 has a %5?'				b	cell:contains: )
 			=
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)

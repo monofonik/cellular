@@ -1780,30 +1780,6 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 	^ y.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
-adjacentCellTo: aSprite direction: aString
-
-	"returns the adjacent cell to the sprite in the given direction - up, down, left, right, up / left, up / right, down / left, down / right"
-
-	| gridLoc |
-	
-	gridLoc _ (self cellBehind: aSprite) gridLocation.
-	
-	(aString includesSubString: 'left') ifTrue: [ gridLoc _ gridLoc - (1@0) ].
-	(aString includesSubString: 'right') ifTrue: [ gridLoc _ gridLoc + (1@0) ].
-	(aString includesSubString: 'up') ifTrue: [ gridLoc _ gridLoc - (0@1) ].
-	(aString includesSubString: 'down') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
-
-	"Ensure within cell limits"
-	gridLoc _ gridLoc min: (self cellDims) max: 1@1.
-
-	^ (cells at: gridLoc y) at: gridLoc x
-	
-	
-	
-
-	! !
-
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
 adjacentCellsTo: aCell
 
 	| adjCells x y |
@@ -1839,6 +1815,15 @@ adjustedCursorPoint
 
 
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 14:42'!
+agentTypesMenu
+
+	| names |
+
+	names _ OrderedCollection new.
+	(sprites select: [ :sprite | sprite prototype = nil ]) do: [ :proto | names addLast: (proto className) ].
+	^ names! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:02'!
 allCellsDo: aSelector
@@ -3015,6 +3000,60 @@ mouseMove: evt
 	].
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 16:18'!
+neighbouringCellTo: aSprite direction: aString
+
+	"returns the adjacent cell to the sprite in the given direction - above, below, left, right, above / left, above / right, below / left, below / right"
+
+	| gridLoc |
+	
+	gridLoc _ (self cellBehind: aSprite) gridLocation.
+	
+	(aString includesSubString: 'left') ifTrue: [ gridLoc _ gridLoc - (1@0) ].
+	(aString includesSubString: 'right') ifTrue: [ gridLoc _ gridLoc + (1@0) ].
+	(aString includesSubString: 'above') ifTrue: [ gridLoc _ gridLoc - (0@1) ].
+	(aString includesSubString: 'below') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
+
+
+	"Ensure within cell limits"
+	"gridLoc _ gridLoc min: (self cellDims) max: 1@1."
+
+	"return nil if we're out of bounds"
+	(gridLoc x < 1) | (gridLoc y < 1) | (gridLoc x > (self cellDims x)) | (gridLoc y > (self cellDims y)) ifTrue: [ ^ nil ].
+
+	^ (cells at: gridLoc y) at: gridLoc x
+	
+	
+	
+
+	! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 13:40'!
+neighbouringCellsTo: aCell
+
+	| adjCells x y |
+
+	" returns up to 8 adjacent cells to the given cell, which should be a ScratchCell "
+	(aCell isKindOf: ScratchCell)	ifFalse: [ self halt ].
+
+	adjCells _ Set new.
+	x _ aCell gridLocation x.
+	y _ aCell gridLocation y.
+
+	(-1 to: 1) do: [ :offsetX |
+		(-1 to: 1) do: [ :offsetY || thisX thisY |
+			thisX _ x + offsetX.
+			thisY _ y + offsetY.
+			(offsetX = 0 & offsetY = 0) | (thisX < 1 or: [ thisX > self cellDims x or: [ thisY < 1 or: [ thisY > self cellDims y ]]])
+				ifFalse: [ adjCells add: ((cells at: thisY) at: thisX) ].
+		]
+	].
+
+	^ adjCells
+	
+
+	! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
 newCellAt: xLoc at: yLoc
 
@@ -3536,6 +3575,19 @@ sprites
 	^ sprites
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 14:40'!
+spritesAtCell: aCell
+
+	"returns a list of Sprites located at the given cell"
+	| spriteSet |
+	spriteSet _ Set new.
+
+	sprites do: [ :sprite |
+		((self cellBehind: sprite) = aCell) ifTrue: [ spriteSet add: sprite ].	
+	].
+
+	^ spriteSet! !
+
 !ScratchStageMorph methodsFor: 'event handling' stamp: 'tis 12/7/2006 16:04'!
 stageShot
 
@@ -4039,30 +4091,6 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 	^ y.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
-adjacentCellTo: aSprite direction: aString
-
-	"returns the adjacent cell to the sprite in the given direction - up, down, left, right, up / left, up / right, down / left, down / right"
-
-	| gridLoc |
-	
-	gridLoc _ (self cellBehind: aSprite) gridLocation.
-	
-	(aString includesSubString: 'left') ifTrue: [ gridLoc _ gridLoc - (1@0) ].
-	(aString includesSubString: 'right') ifTrue: [ gridLoc _ gridLoc + (1@0) ].
-	(aString includesSubString: 'up') ifTrue: [ gridLoc _ gridLoc - (0@1) ].
-	(aString includesSubString: 'down') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
-
-	"Ensure within cell limits"
-	gridLoc _ gridLoc min: (self cellDims) max: 1@1.
-
-	^ (cells at: gridLoc y) at: gridLoc x
-	
-	
-	
-
-	! !
-
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
 adjacentCellsTo: aCell
 
 	| adjCells x y |
@@ -4083,6 +4111,15 @@ adjacentCellsTo: aCell
 	
 
 	! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 14:42'!
+agentTypesMenu
+
+	| names |
+
+	names _ OrderedCollection new.
+	(sprites select: [ :sprite | sprite prototype = nil ]) do: [ :proto | names addLast: (proto className) ].
+	^ names! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:02'!
 allCellsDo: aSelector
@@ -4452,6 +4489,60 @@ initialiseCells
 	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 16:18'!
+neighbouringCellTo: aSprite direction: aString
+
+	"returns the adjacent cell to the sprite in the given direction - above, below, left, right, above / left, above / right, below / left, below / right"
+
+	| gridLoc |
+	
+	gridLoc _ (self cellBehind: aSprite) gridLocation.
+	
+	(aString includesSubString: 'left') ifTrue: [ gridLoc _ gridLoc - (1@0) ].
+	(aString includesSubString: 'right') ifTrue: [ gridLoc _ gridLoc + (1@0) ].
+	(aString includesSubString: 'above') ifTrue: [ gridLoc _ gridLoc - (0@1) ].
+	(aString includesSubString: 'below') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
+
+
+	"Ensure within cell limits"
+	"gridLoc _ gridLoc min: (self cellDims) max: 1@1."
+
+	"return nil if we're out of bounds"
+	(gridLoc x < 1) | (gridLoc y < 1) | (gridLoc x > (self cellDims x)) | (gridLoc y > (self cellDims y)) ifTrue: [ ^ nil ].
+
+	^ (cells at: gridLoc y) at: gridLoc x
+	
+	
+	
+
+	! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 13:40'!
+neighbouringCellsTo: aCell
+
+	| adjCells x y |
+
+	" returns up to 8 adjacent cells to the given cell, which should be a ScratchCell "
+	(aCell isKindOf: ScratchCell)	ifFalse: [ self halt ].
+
+	adjCells _ Set new.
+	x _ aCell gridLocation x.
+	y _ aCell gridLocation y.
+
+	(-1 to: 1) do: [ :offsetX |
+		(-1 to: 1) do: [ :offsetY || thisX thisY |
+			thisX _ x + offsetX.
+			thisY _ y + offsetY.
+			(offsetX = 0 & offsetY = 0) | (thisX < 1 or: [ thisX > self cellDims x or: [ thisY < 1 or: [ thisY > self cellDims y ]]])
+				ifFalse: [ adjCells add: ((cells at: thisY) at: thisX) ].
+		]
+	].
+
+	^ adjCells
+	
+
+	! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
 newCellAt: xLoc at: yLoc
 
@@ -4523,6 +4614,19 @@ showGrid: aBoolean
 		ifTrue: [ self createOrResizeGridForm ]
 		ifFalse: [ gridForm _ nil . self invalidRect: self bounds ].
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 14:40'!
+spritesAtCell: aCell
+
+	"returns a list of Sprites located at the given cell"
+	| spriteSet |
+	spriteSet _ Set new.
+
+	sprites do: [ :sprite |
+		((self cellBehind: sprite) = aCell) ifTrue: [ spriteSet add: sprite ].	
+	].
+
+	^ spriteSet! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:32'!
 toggleAttribute: aString

@@ -2018,7 +2018,7 @@ addGlobalVariable
 	self addWatcherForNewVariable: varName withScope: sFrame workPane.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'variables' stamp: 'jm 8/21/2006 11:59'!
+!ScriptableScratchMorph methodsFor: 'variables' stamp: 'JM 4/12/2012 14:58'!
 addVariable: varName
 	"Add a new user variable with the given name to this object. Do nothing if the variable already exists or is built in."
 
