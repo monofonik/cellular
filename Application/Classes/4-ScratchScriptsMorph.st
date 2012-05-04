@@ -3,7 +3,7 @@ PasteUpMorph subclass: #ScratchScriptsMorph
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-UI-Panes'!
-!ScratchScriptsMorph commentStamp: 'jm 8/3/2003 09:30' prior: 0!
+!ScratchScriptsMorph commentStamp: '<historical>' prior: 0!
 I hold the scripts and partially assembled scripts for a ScriptableScratchMorph.
 !
 

@@ -85,6 +85,31 @@ rename
 		ifFalse: [self receiver: obj].
 	self commandSpec: choice first! !
 
+!VariableBlockMorph methodsFor: 'accessing' stamp: 'JM 5/4/2012 15:38'!
+rightButtonMenu
+
+	| menu choice |
+
+	((owner isKindOf: BlockMorph) and: [owner isCustomBlock and: [owner isTemplate]])
+		ifTrue: [^ self click: nil].
+
+	(((owner isKindOf: MultiArgReporterBlockMorph) and: [owner isLambdaForm])
+		or: [owner isKindOf: VariableDeclarationBlockMorph])
+		ifFalse: [
+			^ super rightButtonMenu.
+		].
+
+	menu _ CustomMenu new.
+	menu add: 'help' action: #presentHelpScreen.
+	menu addLine.
+	menu add: 'edit...' action: #editName.
+	menu addLine.
+	menu add: 'delete' action: #deleteTemplate.
+	menu add: 'duplicate' action: #duplicate.
+	(choice _ menu localize; startUp) ifNil: [^ self].
+	self perform: choice.
+! !
+
 !VariableBlockMorph methodsFor: 'accessing' stamp: 'jm 12/13/2006 20:12'!
 variable
 
@@ -386,28 +411,6 @@ parameterDefaultValue: aString
 parameterType: aSymbol
 
 	labelFragment type: aSymbol! !
-
-!VariableBlockMorph methodsFor: 'byob lambdas' stamp: 'jens 10/5/2010 10:28'!
-rightButtonMenu
-
-	| menu choice |
-
-	((owner isKindOf: BlockMorph) and: [owner isCustomBlock and: [owner isTemplate]])
-		ifTrue: [^ self click: nil].
-
-	(((owner isKindOf: MultiArgReporterBlockMorph) and: [owner isLambdaForm])
-		or: [owner isKindOf: VariableDeclarationBlockMorph])
-		ifFalse: [ ^super rightButtonMenu ].
-	menu _ CustomMenu new.
-	menu add: 'help' action: #presentHelpScreen.
-	menu addLine.
-	menu add: 'edit...' action: #editName.
-	menu addLine.
-	menu add: 'delete' action: #deleteTemplate.
-	menu add: 'duplicate' action: #duplicate.
-	(choice _ menu localize; startUp) ifNil: [^ self].
-	self perform: choice.
-! !
 
 !VariableBlockMorph methodsFor: 'byob lambdas' stamp: 'jens 9/1/2010 01:03'!
 rootForGrabOf: aMorph

@@ -3575,7 +3575,7 @@ sprites
 	^ sprites
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 14:40'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/4/2012 12:09'!
 spritesAtCell: aCell
 
 	"returns a list of Sprites located at the given cell"
@@ -3583,7 +3583,9 @@ spritesAtCell: aCell
 	spriteSet _ Set new.
 
 	sprites do: [ :sprite |
-		((self cellBehind: sprite) = aCell) ifTrue: [ spriteSet add: sprite ].	
+		((self cellBehind: sprite) = aCell and: [ sprite prototype isNil not ]) ifTrue: [ 
+			spriteSet add: sprite
+		 ].	
 	].
 
 	^ spriteSet! !
@@ -4615,7 +4617,7 @@ showGrid: aBoolean
 		ifFalse: [ gridForm _ nil . self invalidRect: self bounds ].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 14:40'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/4/2012 12:09'!
 spritesAtCell: aCell
 
 	"returns a list of Sprites located at the given cell"
@@ -4623,7 +4625,9 @@ spritesAtCell: aCell
 	spriteSet _ Set new.
 
 	sprites do: [ :sprite |
-		((self cellBehind: sprite) = aCell) ifTrue: [ spriteSet add: sprite ].	
+		((self cellBehind: sprite) = aCell and: [ sprite prototype isNil not ]) ifTrue: [ 
+			spriteSet add: sprite
+		 ].	
 	].
 
 	^ spriteSet! !

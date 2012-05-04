@@ -758,6 +758,74 @@ replaceArgMorph: oldMorph by: newMorph
 	self layoutChanged.
 ! !
 
+!CommandBlockMorph methodsFor: 'private' stamp: 'JM 5/4/2012 15:55'!
+rightButtonMenu
+
+	| menu sFrame choice spec |
+	menu _ CustomMenu new.
+	menu add: 'help' action: #presentHelpScreen.
+
+	(owner isKindOf: ScratchBlockPaletteMorph) ifFalse: [
+		menu addLine.
+		(#(+ - * / \\) includes: selector) ifTrue: [
+			#(+ - * / mod) with: #(+ - * / \\) do: [:s :op | menu add: s action: op]].
+		(#(< = >) includes: selector) ifTrue: [
+			#(< = >) do: [:op | menu add: op action: op]].
+		(#(& |) includes: selector) ifTrue: [
+			#(and or) with: #(& |) do: [:s :op | menu add: s action: op]].
+
+		menu addLine.
+		menu add: 'duplicate' action: #duplicate.
+		(self isKindOf: ReporterBlockMorph) ifFalse: [
+			menu add: '- this block' action: #fastDuplicate].
+		(self isKindOf: VariableBlockMorph) ifTrue: [
+			menu add: 'relabel' action: #rename].
+		(self owner isKindOf: BlockMorph) ifFalse: [  "can't yet delete a blocks inside a script"
+			menu add: 'delete' action: #delete]].
+
+	menu addLine.
+
+	self isInheritableAttribute ifTrue: [
+		self isDeletedAttribute 
+			ifTrue: [menu add: 'disinherit' action: #disinheritAttribute]
+			ifFalse: [menu add: 'inherit' action: #inheritAttribute]].
+	
+	menu add: 'edit elements' action: #editElements.
+"
+	((self isKindOf: VariableBlockMorph) and: [ (self owner isKindOf: ScratchBlockPaletteMorph) 
+		and: [ self receiver isKindOf: ScratchStageMorph ]]) ifTrue: [
+			menu add: 'plot' action: #plot.
+		].
+"
+	sFrame _ self ownerThatIsA: ScratchFrameMorph.
+	(sFrame notNil and: [#(sensor: sensorPressed:) includes: selector]) ifTrue: [
+		menu addLine.
+		menu add: 'show ScratchBoard watcher' action: #showSensorBoard.
+		sFrame workPane scratchServer
+			ifNil: [menu add: 'enable remote sensor connections' action: #enableRemoteSensors]
+			ifNotNil: [menu add: 'disable remote sensor connections' action: #exitScratchSession]].
+
+	DebugMenu ifTrue: [
+		menu addLine.
+		menu add: 'show tuples' action: #showTuples].
+	
+	(choice _ menu localize; startUp) ifNil: [^ self].
+	(#(presentHelpScreen duplicate fastDuplicate rename delete editElements inheritAttribute disinheritAttribute) includes: choice) ifTrue: [^ self perform: choice].
+	choice = #showSensorBoard ifTrue: [sFrame showSensorBoard. ^ self].
+	choice = #enableRemoteSensors ifTrue: [sFrame enableRemoteSensors. ^ self].
+	choice = #exitScratchSession ifTrue: [sFrame exitScratchSession. ^ self].
+	choice = #showTuples ifTrue: [^ self showTuples].
+
+	"change operator"
+	spec _ '%n ', choice, ' %n'.
+	'\\' = choice	ifTrue: [spec _ ScratchTranslator translationFor: '%n mod %n'].
+	'&' = choice	ifTrue: [spec _ ScratchTranslator translationFor: '%b and %b'].
+	'|' = choice	ifTrue: [spec _ ScratchTranslator translationFor: '%b or %b'].
+
+	self commandSpec: spec.
+	self selector: choice.
+! !
+
 !CommandBlockMorph methodsFor: 'private' stamp: 'jens 6/28/2010 20:29'!
 tabToNextField: evt
 	"Move the keyboard focus to the next submorph that responds to keyboard events."
@@ -1174,69 +1242,6 @@ references: obj
 	(receiver isKindOf: VariableFrame)
 		ifFalse: [^ false].
 	^ receiver references: obj! !
-
-!CommandBlockMorph methodsFor: 'byob' stamp: 'jens 2/8/2011 13:29'!
-rightButtonMenu
-
-	| menu sFrame choice spec |
-	menu _ CustomMenu new.
-	menu add: 'help' action: #presentHelpScreen.
-
-	(owner isKindOf: ScratchBlockPaletteMorph) ifFalse: [
-		menu addLine.
-		(#(+ - * / \\) includes: selector) ifTrue: [
-			#(+ - * / mod) with: #(+ - * / \\) do: [:s :op | menu add: s action: op]].
-		(#(< = >) includes: selector) ifTrue: [
-			#(< = >) do: [:op | menu add: op action: op]].
-		(#(& |) includes: selector) ifTrue: [
-			#(and or) with: #(& |) do: [:s :op | menu add: s action: op]].
-
-		menu addLine.
-		menu add: 'duplicate' action: #duplicate.
-		(self isKindOf: ReporterBlockMorph) ifFalse: [
-			menu add: '- this block' action: #fastDuplicate].
-		(self isKindOf: VariableBlockMorph) ifTrue: [
-			menu add: 'relabel' action: #rename].
-		(self owner isKindOf: BlockMorph) ifFalse: [  "can't yet delete a blocks inside a script"
-			menu add: 'delete' action: #delete]].
-
-	menu addLine.
-
-	self isInheritableAttribute ifTrue: [
-		self isDeletedAttribute 
-			ifTrue: [menu add: 'disinherit' action: #disinheritAttribute]
-			ifFalse: [menu add: 'inherit' action: #inheritAttribute]].
-	
-	menu add: 'edit elements' action: #editElements.
-
-	sFrame _ self ownerThatIsA: ScratchFrameMorph.
-	(sFrame notNil and: [#(sensor: sensorPressed:) includes: selector]) ifTrue: [
-		menu addLine.
-		menu add: 'show ScratchBoard watcher' action: #showSensorBoard.
-		sFrame workPane scratchServer
-			ifNil: [menu add: 'enable remote sensor connections' action: #enableRemoteSensors]
-			ifNotNil: [menu add: 'disable remote sensor connections' action: #exitScratchSession]].
-
-	DebugMenu ifTrue: [
-		menu addLine.
-		menu add: 'show tuples' action: #showTuples].
-	
-	(choice _ menu localize; startUp) ifNil: [^ self].
-	(#(presentHelpScreen duplicate fastDuplicate rename delete editElements inheritAttribute disinheritAttribute) includes: choice) ifTrue: [^ self perform: choice].
-	choice = #showSensorBoard ifTrue: [sFrame showSensorBoard. ^ self].
-	choice = #enableRemoteSensors ifTrue: [sFrame enableRemoteSensors. ^ self].
-	choice = #exitScratchSession ifTrue: [sFrame exitScratchSession. ^ self].
-	choice = #showTuples ifTrue: [^ self showTuples].
-
-	"change operator"
-	spec _ '%n ', choice, ' %n'.
-	'\\' = choice	ifTrue: [spec _ ScratchTranslator translationFor: '%n mod %n'].
-	'&' = choice	ifTrue: [spec _ ScratchTranslator translationFor: '%b and %b'].
-	'|' = choice	ifTrue: [spec _ ScratchTranslator translationFor: '%b or %b'].
-
-	self commandSpec: spec.
-	self selector: choice.
-! !
 
 !CommandBlockMorph methodsFor: 'byob' stamp: 'jens 2/3/2010 01:31'!
 scratchObject

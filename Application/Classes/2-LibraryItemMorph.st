@@ -643,4 +643,3 @@ stageMenu
 
 	menu localize; invokeOn: library.
 ! !
-
