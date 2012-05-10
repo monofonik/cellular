@@ -2399,24 +2399,6 @@ broadcast: aString for: aNumber
 
 	stage broadcastEventNamed: aString with: 0 from: self referencePosition for: aNumber! !
 
-!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/4/2012 11:01'!
-cell: aDirection contains: aType
-	"check if a neighbouring cell contains an agent type"
-
-	| stage cell |
-	stage _ (self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ false ].
-	cell _ (stage neighbouringCellTo: (stage cellBehind: self) direction: aDirection) ifNil: [ ^ false ].
-	
-	"self halt."
-	Transcript show: (stage spritesAtCell: cell); cr.
-
-	(stage spritesAtCell: cell) do: [ :sprite |
-		Transcript show: sprite className; cr.
-		(sprite className = aType) ifTrue: [ ^ true ].
-	].
-	
-	^ false.! !
-
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/4/2012 11:46'!
 cellCostume: aDirection
 
@@ -2425,6 +2407,19 @@ cellCostume: aDirection
 	
 	(stage spritesAtCell: (stage neighbouringCellTo: self direction: aDirection)) do: [ :sprite |
 		^ sprite costumeIndex.
+	].
+
+	^ 0.
+	! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/9/2012 14:43'!
+cellCostumeName: aDirection
+
+	| stage |
+	stage _ (self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ 0 ].
+	
+	(stage spritesAtCell: (stage neighbouringCellTo: self direction: aDirection)) do: [ :sprite |
+		^ sprite costume mediaName.
 	].
 
 	^ 0.
@@ -2444,6 +2439,24 @@ cellHasSprite: aDirection
 	Transcript show: (stage spritesAtCell: cell); cr.
 	^ (stage spritesAtCell: cell) isEmpty not.
 	! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/9/2012 14:33'!
+cellHasType: aType direction: aDirection
+	"check if a neighbouring cell contains an agent type"
+
+	| stage cell |
+	stage _ (self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ false ].
+	cell _ (stage neighbouringCellTo: (stage cellBehind: self) direction: aDirection) ifNil: [ ^ false ].
+	
+	"self halt."
+	Transcript show: (stage spritesAtCell: cell); cr.
+
+	(stage spritesAtCell: cell) do: [ :sprite |
+		Transcript show: sprite className; cr.
+		(sprite className = aType) ifTrue: [ ^ true ].
+	].
+	
+	^ false.! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/26/2011 10:53'!
 cellValue: aString
@@ -2755,7 +2768,7 @@ yposCell
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/4/2012 11:56'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/9/2012 15:43'!
 blockSpecs
 
 	| blocks |
@@ -2771,7 +2784,7 @@ blockSpecs
 			('move %n steps'				-	forward:)
 			('move %n cells'					-	forwardCell: 1) 	
 			('move to neighbour cell'		-	moveCellRandom )			
-			('move to empty neighbour cell' -	moveCellRandomEmpty )
+			('move to empty nbr cell' 		-	moveCellRandomEmpty )
 			-
 			('turn %n degrees'				-	turnRight: 15)	"icon shows turn direction"
 			('turn %n degrees'				-	turnLeft: 15)	"icon shows turn direction"
@@ -2842,16 +2855,25 @@ blockSpecs
 			-
 			('go to front'					-	comeToFront)
 			('go back %n layers'			-	goBackByLayers: 1)
-		'sensing'			
-
+		'cells'
 			('clear cell'						-	clearCell)
 			-
 			('value of %3'					r	cellValue: )
 			=
-			('sprite in cell %4?'				b	cellHasSprite: 'above' )
-			('cell %4 has a %5 sprite?'		b	cell:contains: 'above')
-			('cell %4 sprite costume #'		r	cellCostume: 'above' )
-			=
+			('sprite in cell %4?'				b	cellHasSprite: 'above')
+			('sprite in any nbr cell?'		b 	anyNeighbourHasSprite )
+			('sprite in every nbr cell?' 	b 	everyNeighbourHasSprite )
+			-
+			('%5 in cell %4?'					b	cellHasType:direction: '' 'above' )
+			('%5 in any nbr cell?'			b 	anyNeighbourHasType: '' )
+			('%5 in every nbr cell?'		b 	everyNeighbourHasType: '' )
+			-
+			('nbr wearing costume %l?'		b 	anyNeighbourHasCostumeName: )
+			('nbrs wearing costume %l'		r 	everyNeighbourHasCostumeName: )
+			-
+			('costume # in cell %4'			r	cellCostume: 'above' )
+			('costume name in cell %4'		r	cellCostumeName: 'above' )
+		'sensing'
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)
 			('color %C is touching %C?'		b	color:sees:)

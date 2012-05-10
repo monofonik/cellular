@@ -3000,7 +3000,7 @@ mouseMove: evt
 	].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 16:18'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/9/2012 14:38'!
 neighbouringCellTo: aSprite direction: aString
 
 	"returns the adjacent cell to the sprite in the given direction - above, below, left, right, above / left, above / right, below / left, below / right"
@@ -3011,8 +3011,8 @@ neighbouringCellTo: aSprite direction: aString
 	
 	(aString includesSubString: 'left') ifTrue: [ gridLoc _ gridLoc - (1@0) ].
 	(aString includesSubString: 'right') ifTrue: [ gridLoc _ gridLoc + (1@0) ].
-	(aString includesSubString: 'above') ifTrue: [ gridLoc _ gridLoc - (0@1) ].
-	(aString includesSubString: 'below') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
+	((aString includesSubString: 'above') or: [ (aString includesSubString: 'up') ]) ifTrue: [ gridLoc _ gridLoc - (0@1) ].
+	((aString includesSubString: 'below') or: [ (aString includesSubString: 'down') ]) ifTrue: [ gridLoc _ gridLoc + (0@1) ].
 
 
 	"Ensure within cell limits"
@@ -4491,7 +4491,7 @@ initialiseCells
 	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/2/2012 16:18'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/9/2012 14:38'!
 neighbouringCellTo: aSprite direction: aString
 
 	"returns the adjacent cell to the sprite in the given direction - above, below, left, right, above / left, above / right, below / left, below / right"
@@ -4502,8 +4502,8 @@ neighbouringCellTo: aSprite direction: aString
 	
 	(aString includesSubString: 'left') ifTrue: [ gridLoc _ gridLoc - (1@0) ].
 	(aString includesSubString: 'right') ifTrue: [ gridLoc _ gridLoc + (1@0) ].
-	(aString includesSubString: 'above') ifTrue: [ gridLoc _ gridLoc - (0@1) ].
-	(aString includesSubString: 'below') ifTrue: [ gridLoc _ gridLoc + (0@1) ].
+	((aString includesSubString: 'above') or: [ (aString includesSubString: 'up') ]) ifTrue: [ gridLoc _ gridLoc - (0@1) ].
+	((aString includesSubString: 'below') or: [ (aString includesSubString: 'down') ]) ifTrue: [ gridLoc _ gridLoc + (0@1) ].
 
 
 	"Ensure within cell limits"
