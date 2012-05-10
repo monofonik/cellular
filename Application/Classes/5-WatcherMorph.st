@@ -3,7 +3,7 @@ AlignmentMorph subclass: #WatcherMorph
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-UI-Watchers'!
-!WatcherMorph commentStamp: 'jm 8/21/2006 13:54' prior: 0!
+!WatcherMorph commentStamp: '<historical>' prior: 0!
 I am a Scratch variable readout/editor. I can view both variables and reporter values. I support various display modes.
 !
 

@@ -3054,6 +3054,17 @@ neighbouringCellsTo: aCell
 
 	! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/10/2012 14:38'!
+neighbouringCellsToSprite: aSprite
+
+	| cell |
+
+	" returns up to 8 adjacent cells to the given cell, which should be a ScratchCell "
+	cell _ self cellBehind: aSprite.
+	^ self neighbouringCellsTo: cell
+
+	! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
 newCellAt: xLoc at: yLoc
 
@@ -3575,20 +3586,14 @@ sprites
 	^ sprites
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/4/2012 12:09'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/10/2012 16:07'!
 spritesAtCell: aCell
 
 	"returns a list of Sprites located at the given cell"
-	| spriteSet |
-	spriteSet _ Set new.
 
-	sprites do: [ :sprite |
-		((self cellBehind: sprite) = aCell and: [ sprite prototype isNil not ]) ifTrue: [ 
-			spriteSet add: sprite
-		 ].	
-	].
-
-	^ spriteSet! !
+	^ sprites select: [ :sprite |
+		((self cellBehind: sprite) = aCell and: [ sprite prototype isNil not ]).
+	]! !
 
 !ScratchStageMorph methodsFor: 'event handling' stamp: 'tis 12/7/2006 16:04'!
 stageShot
@@ -4545,6 +4550,17 @@ neighbouringCellsTo: aCell
 
 	! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/10/2012 14:38'!
+neighbouringCellsToSprite: aSprite
+
+	| cell |
+
+	" returns up to 8 adjacent cells to the given cell, which should be a ScratchCell "
+	cell _ self cellBehind: aSprite.
+	^ self neighbouringCellsTo: cell
+
+	! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:15'!
 newCellAt: xLoc at: yLoc
 
@@ -4617,20 +4633,14 @@ showGrid: aBoolean
 		ifFalse: [ gridForm _ nil . self invalidRect: self bounds ].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/4/2012 12:09'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/10/2012 16:07'!
 spritesAtCell: aCell
 
 	"returns a list of Sprites located at the given cell"
-	| spriteSet |
-	spriteSet _ Set new.
 
-	sprites do: [ :sprite |
-		((self cellBehind: sprite) = aCell and: [ sprite prototype isNil not ]) ifTrue: [ 
-			spriteSet add: sprite
-		 ].	
-	].
-
-	^ spriteSet! !
+	^ sprites select: [ :sprite |
+		((self cellBehind: sprite) = aCell and: [ sprite prototype isNil not ]).
+	]! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:32'!
 toggleAttribute: aString
