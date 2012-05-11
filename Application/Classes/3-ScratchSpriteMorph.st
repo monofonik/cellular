@@ -2559,6 +2559,43 @@ cloneCount: aNumber
 	[ (self cloneCount asNumber) > num ] whileTrue: [ (self instances at: 1) deleteSprite. ].
 ! !
 
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/11/2012 14:35'!
+costume: aCostume inCell: aDirection
+
+	| stage |
+
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ false ].
+
+	^ (stage spritesAtCell: (stage neighbouringCellTo: self direction: aDirection)) anySatisfy: [ :sprite | (sprite className = self className) and: [ (sprite costumeNameFromNumber: (sprite costumeIndex)) = aCostume ]]! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/11/2012 15:33'!
+costumeNameInCell: aDirection
+
+	| stage sprites |
+
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ '' ].
+	sprites _ stage spritesAtCell: (stage neighbouringCellTo: self direction: aDirection).
+
+	sprites isEmpty 
+		ifTrue: [ ^ '' ] 
+		ifFalse: [ | sprite | 
+			sprite _ sprites anyOne.
+			^ sprite costumeNameFromNumber: (sprite costumeIndex) ].
+! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/11/2012 15:32'!
+costumeNoInCell: aDirection
+
+	| stage sprites |
+
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ '' ].
+	sprites _ stage spritesAtCell: (stage neighbouringCellTo: self direction: aDirection).
+
+	sprites isEmpty 
+		ifTrue: [ ^ '' ] 
+		ifFalse: [ ^ sprites anyOne costumeIndex ].
+! !
+
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/26/2011 10:52'!
 currentCell
 
@@ -2614,6 +2651,20 @@ everyNeighbourHasType: aType
 		((stage spritesAtCell: cell) select: [ :sprite | sprite className = aType ]) isEmpty ifTrue: [ ^ false ].
 	].
 
+	^ true.! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/11/2012 14:48'!
+everyNeighbourInCostume: aCostume
+
+	| stage |
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ false ].
+
+	(stage neighbouringCellsToSprite: self) do: [ :cell |
+		((stage spritesAtCell: cell) 
+			anySatisfy: [ :sprite | (sprite className = self className) and: [ (sprite costumeNameFromNumber: sprite costumeIndex) = aCostume ]]) 
+		ifFalse: [ ^ false ]
+	].
+	
 	^ true.! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/14/2011 13:34'!
@@ -2723,6 +2774,17 @@ numNeighbourSprites
 	].
 	^ count.! !
 
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/11/2012 15:24'!
+numNeighboursInCostume: aCostume
+
+	| stage |
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ false ].
+
+	^ (stage neighbouringCellsToSprite: self) inject: 0 into: [ :n :cell |
+		n _ n + ((stage spritesAtCell: cell) 
+			collect: [ :sprite | (sprite className = self className) and: [ (sprite costumeNameFromNumber: sprite costumeIndex) = aCostume ]]) size.
+	].! !
+
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/10/2012 16:21'!
 numNeighboursOfType: aType
 
@@ -2820,7 +2882,7 @@ yposCell
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/10/2012 16:51'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/11/2012 15:24'!
 blockSpecs
 
 	| blocks |
@@ -2920,12 +2982,12 @@ blockSpecs
 			('%5 in every nbr cell?'			b 	everyNeighbourHasType: )
 			('# %5s in nbr cells'				r	numNeighboursOfType: )
 			-
-			('%l in cell %4?'					b	cell:hasCostume: )
-			('%l in every nbr cell?'			b	everyNeighbourHasCostume: )
+			('%l in cell %4?'					b	costume:inCell: )
+			('%l in every nbr cell?'			b	everyNeighbourInCostume: )
 			('# %ls in nbr cells'				r	numNeighboursInCostume: )
 			-
-			('costume # in cell %4'			r	cellCostume: )
-			('costume name in cell %4'		r	cellCostumeName: )
+			('costume # in cell %4'			r	costumeNoInCell: )
+			('costume name in cell %4'		r	costumeNameInCell: )
 		'sensing'
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)
