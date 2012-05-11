@@ -4055,14 +4055,14 @@ viewBlocksAndScripts
 		self zoomRectFrom: self bounds to: editor bounds].
 ! !
 
-!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'JM 9/5/2011 11:03'!
+!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'JM 5/11/2012 16:37'!
 viewerPageForCategory: aCategoryName
 	"Answer a morph containing blocks for the given category for use in the given ScratchViewer."
 
 	| bin x y |
 	aCategoryName = 'variables' ifTrue: [^ self variablesPage].
 	aCategoryName = 'motion' ifTrue: [^ self viewerPageForMotion].
-	aCategoryName = 'sensing' ifTrue: [^ self viewerPageForSensing].
+	aCategoryName = 'cells' ifTrue: [^ self viewerPageForCells].
 
 	bin _ ScratchBlockPaletteMorph new.
 	x _ 12.
@@ -4081,6 +4081,30 @@ viewerPageForCategory: aCategoryName
 
 	^ bin
 ! !
+
+!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'JM 5/11/2012 16:38'!
+viewerPageForCells	
+
+	"Answer a morph containing mtion blocks for the given category for use in the given ScratchViewer."		
+	| bin x y |	
+	bin _ ScratchBlockPaletteMorph new.	
+	x _ 12.	
+	y _ 10.
+		
+	y _ self addEnvironmentBlocksTo: bin x: x y: y.		
+	(self blocksFor: 'cells') do: [:blockOrSym |	
+		(blockOrSym = #-) | (blockOrSym = #~) |  (blockOrSym = #=)	
+			ifTrue: [	
+				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"	
+				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"	
+				(blockOrSym = #=) ifTrue: [	
+					y _ y + 7.	
+					bin addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).	
+					y _ y + 20]]  "insert a line"	
+			ifFalse: [	
+				y _ self createBlock: blockOrSym atPosition: x@y onPage: bin]].	
+	
+	^ bin! !
 
 !ScriptableScratchMorph methodsFor: 'blocks' stamp: 'jens 1/7/2010 03:12'!
 viewerPageForMotion
@@ -4139,30 +4163,6 @@ viewerPageForMotion
 
 	^ bin
 ! !
-
-!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'JM 9/5/2011 11:03'!
-viewerPageForSensing	
-
-	"Answer a morph containing mtion blocks for the given category for use in the given ScratchViewer."		
-	| bin x y |	
-	bin _ ScratchBlockPaletteMorph new.	
-	x _ 12.	
-	y _ 10.
-		
-	y _ self addEnvironmentBlocksTo: bin x: x y: y.		
-	(self blocksFor: 'sensing') do: [:blockOrSym |	
-		(blockOrSym = #-) | (blockOrSym = #~) |  (blockOrSym = #=)	
-			ifTrue: [	
-				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"	
-				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"	
-				(blockOrSym = #=) ifTrue: [	
-					y _ y + 7.	
-					bin addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).	
-					y _ y + 20]]  "insert a line"	
-			ifFalse: [	
-				y _ self createBlock: blockOrSym atPosition: x@y onPage: bin]].	
-	
-	^ bin! !
 
 !ScriptableScratchMorph methodsFor: 'blocks' stamp: 'jens 12/18/2009 04:45'!
 wholeBlockSpecForSelector: aSymbol
@@ -6775,10 +6775,30 @@ undeleteAttribute: aSymbol
 	w setCategoryColor: block color! !
 
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/19/2011 16:25'!
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 5/11/2012 16:44'!
 addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
-	self subclassResponsibility! !
+	| addButton deleteButton x y |
+
+	x _ xLoc.
+	y _ yLoc.
+
+	addButton _ ScratchFrameMorph
+			buttonLabel: 'Make a cell attribute' localized
+			selector: #addEnvironmentAttribute.
+	aPane addMorph: (addButton target: self; position: x@y).
+	y _ y + 25.
+
+	deleteButton _ ScratchFrameMorph
+			buttonLabel: 'Delete a cell attribute' localized
+			selector: #deleteEnvironmentAttribute.
+	aPane addMorph: (deleteButton target: self; position: x@y).
+	y _ y + 25.
+
+	"aPane addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
+	y _ y + 20. "
+
+	^ y.! !
 
 !ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:45'!
 cellValue: aString
@@ -6888,7 +6908,7 @@ blockColorDict
 	^ BlockColorDict
 ! !
 
-!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'jens 6/8/2010 22:41'!
+!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 5/11/2012 15:52'!
 blockColorFor: aCategory
 	"Answer the block color for the given category."
 
@@ -6902,6 +6922,10 @@ blockColorFor: aCategory
 	'sensing' = aCategory ifTrue: [^ (Color h: 200 s: 0.98 v: 0.86)].
 	'variables' = aCategory ifTrue: [^ (Color h: 25 s: 0.88 v: 0.95)].
 	'list' = aCategory ifTrue: [^ ListBlockColor].
+
+	"Cellular additions"
+	'neighbours' = aCategory ifTrue: [^ (Color h: 300 s: 1 v: 0.7)].
+
 	(#('none' 'other') includes: aCategory) ifTrue: [^ Color lightGray ].
 
 	^ (Color h: 0 s: 0.81 v: 0.83)  "a shade of red"
@@ -6916,7 +6940,7 @@ blockSpecDict
 
 ! !
 
-!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 5/9/2012 15:58'!
+!ScriptableScratchMorph class methodsFor: 'block specs' stamp: 'JM 5/11/2012 16:39'!
 blockSpecs
 	"Answer a collection of block specifications for the blocks that are common to all objects. Block specificatons (Arrays) are interspersed with category names (Strings). A block specification is an Array of the form: (<block spec string> <block type> <selector> [optional initial argument values]).
 
@@ -6937,6 +6961,7 @@ blockSpecs
 	| blocks |
 	blocks _ #(
 		'cells'
+			=
 			('x cells'						r	numCellsX)
 			('y cells'						r	numCellsY)
 			-

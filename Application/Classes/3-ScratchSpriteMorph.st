@@ -2375,11 +2375,6 @@ penShade
 	^ penShade! !
 
 
-!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/19/2011 16:24'!
-addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
-
-	^ yLoc.! !
-
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/2/2012 14:43'!
 agentTypesMenu
 
@@ -2882,7 +2877,7 @@ yposCell
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/11/2012 15:24'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/11/2012 16:08'!
 blockSpecs
 
 	| blocks |
@@ -2973,7 +2968,7 @@ blockSpecs
 			('clear cell'						-	clearCell)
 			-
 			('value of %3'					r	cellValue: )
-			=
+		'neighbours'
 			('sprite in cell %4?'				b	cellHasSprite: )
 			('sprite in every nbr cell?' 		b 	everyNeighbourHasSprite )
 			('# sprites in nbr cells'			r	numNeighbourSprites )

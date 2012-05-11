@@ -1754,31 +1754,6 @@ acceptDroppingMorph: aMorph event: evt
 
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/19/2011 16:26'!
-addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
-
-	| addButton deleteButton x y |
-
-	x _ xLoc.
-	y _ yLoc.
-
-	addButton _ ScratchFrameMorph
-			buttonLabel: 'Make a cell attribute' localized
-			selector: #addEnvironmentAttribute.
-	aPane addMorph: (addButton target: self; position: x@y).
-	y _ y + 25.
-
-	deleteButton _ ScratchFrameMorph
-			buttonLabel: 'Delete a cell attribute' localized
-			selector: #deleteEnvironmentAttribute.
-	aPane addMorph: (deleteButton target: self; position: x@y).
-	y _ y + 25.
-
-	"aPane addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
-	y _ y + 20. "
-
-	^ y.! !
-
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
 adjacentCellsTo: aCell
 
@@ -4072,31 +4047,6 @@ userSelectSpriteDefault: defaultSprite butNotAnyOf: excludeArray
 ! !
 
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/19/2011 16:26'!
-addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
-
-	| addButton deleteButton x y |
-
-	x _ xLoc.
-	y _ yLoc.
-
-	addButton _ ScratchFrameMorph
-			buttonLabel: 'Make a cell attribute' localized
-			selector: #addEnvironmentAttribute.
-	aPane addMorph: (addButton target: self; position: x@y).
-	y _ y + 25.
-
-	deleteButton _ ScratchFrameMorph
-			buttonLabel: 'Delete a cell attribute' localized
-			selector: #deleteEnvironmentAttribute.
-	aPane addMorph: (deleteButton target: self; position: x@y).
-	y _ y + 25.
-
-	"aPane addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
-	y _ y + 20. "
-
-	^ y.! !
-
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:09'!
 adjacentCellsTo: aCell
 
@@ -4681,14 +4631,14 @@ updateCellsForm
 ScratchStageMorph class
 	instanceVariableNames: ''!
 
-!ScratchStageMorph class methodsFor: 'block specs' stamp: 'JM 9/19/2011 16:20'!
+!ScratchStageMorph class methodsFor: 'block specs' stamp: 'JM 5/11/2012 16:39'!
 blockSpecs
 
 	| blocks |
 	blocks _ #(
-		'sensing'
+		'cells'
 			('clear cells'		-	clearCells)
-			=
+		'sensing'
 			('ask %s and wait'			s	doAsk 'What''s your name?')
 			('answer'					r	answer)
 			-
