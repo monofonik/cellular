@@ -2065,7 +2065,7 @@ cellUnderCursor
 	^ (cells at: gridLoc y) at: gridLoc x.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 11:22'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/14/2012 15:43'!
 cellValue: aString for: aSprite
 
 	| cell |
@@ -2220,26 +2220,27 @@ costumeChanged
 	self changed.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 10:30'!
-createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: colour
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/15/2012 12:34'!
+createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: aColour
 
 	| attr |
 
 	"create the attribtue"
 	attr _ ScratchCellAttribute new.
-	attr name: aString asMacRoman;
+	attr name: aString;
 		min: aMin;
 		max: aMax;
 		spread: aSpread;
-		colour: colour;
+		colour: aColour;
 		default: aNumber.
 
 	"add it to the dictionary of attributes"
-	cellAttributes at: aString asString put: attr.
+	cellAttributes at: aString put: attr.
 		
 	"update all cells"
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
-	"self allCellsDo: #update: with: cellAttributes."! !
+	self allCellsDo: #update: with: cellAttributes.
+	self changed.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:54'!
 createOrResizeCellsForm
@@ -2347,15 +2348,16 @@ deleteAllClones
 	self allClones do: [:clone | clone delete].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 13:50'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/15/2012 12:23'!
 deleteCellAttribute: aString
 
 	"delete a cell attribute (but never the default attribute)"
-	aString = 'default' ifTrue: [ ^ self ].
+	aString = ScratchFrameMorph defaultCellAttribute ifTrue: [ ^ self ].
 
 	self allCellsDo: #deleteValue: with: aString.
 	cellAttributes removeKey: aString.
-	self allCellsDo: #update
+	self allCellsDo: #update.
+	self changed.
 	! !
 
 !ScratchStageMorph methodsFor: 'byob OOP' stamp: 'jens 1/31/2011 00:30'!
@@ -2775,7 +2777,7 @@ initFieldsFrom: anObjStream version: classVersion
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:14'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/14/2012 11:55'!
 initialiseCells
 
 	"create all cells assuming minimum size"
@@ -2789,7 +2791,7 @@ initialiseCells
 
 	"create the cell attribute list"
 	cellAttributes _ Dictionary new.
-	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
+	self createAttribute: ScratchFrameMorph defaultCellAttribute min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
 !ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 10/28/2011 09:21'!
@@ -4233,7 +4235,7 @@ cellUnderCursor
 	^ (cells at: gridLoc y) at: gridLoc x.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/5/2011 11:22'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/14/2012 15:43'!
 cellValue: aString for: aSprite
 
 	| cell |
@@ -4309,26 +4311,27 @@ clearValue: aString
 	"clears the value of the given attribute for allcells"
 	self allCellsDo: #clearValue:spread: with: aString with: 0! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 10:30'!
-createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: colour
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/15/2012 12:34'!
+createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: aColour
 
 	| attr |
 
 	"create the attribtue"
 	attr _ ScratchCellAttribute new.
-	attr name: aString asMacRoman;
+	attr name: aString;
 		min: aMin;
 		max: aMax;
 		spread: aSpread;
-		colour: colour;
+		colour: aColour;
 		default: aNumber.
 
 	"add it to the dictionary of attributes"
-	cellAttributes at: aString asString put: attr.
+	cellAttributes at: aString put: attr.
 		
 	"update all cells"
 	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
-	"self allCellsDo: #update: with: cellAttributes."! !
+	self allCellsDo: #update: with: cellAttributes.
+	self changed.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 16:54'!
 createOrResizeCellsForm
@@ -4393,15 +4396,16 @@ createOrResizeGridForm
 			rule: Form paint.
 		gridForm _ newForm]. ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/16/2011 13:50'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/15/2012 12:23'!
 deleteCellAttribute: aString
 
 	"delete a cell attribute (but never the default attribute)"
-	aString = 'default' ifTrue: [ ^ self ].
+	aString = ScratchFrameMorph defaultCellAttribute ifTrue: [ ^ self ].
 
 	self allCellsDo: #deleteValue: with: aString.
 	cellAttributes removeKey: aString.
-	self allCellsDo: #update
+	self allCellsDo: #update.
+	self changed.
 	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:38'!
@@ -4429,7 +4433,7 @@ hideAttribute: aString
 	self allCellsDo: #update.
 	self changed! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:14'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/14/2012 11:55'!
 initialiseCells
 
 	"create all cells assuming minimum size"
@@ -4443,7 +4447,7 @@ initialiseCells
 
 	"create the cell attribute list"
 	cellAttributes _ Dictionary new.
-	self createAttribute: 'default' min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
+	self createAttribute: ScratchFrameMorph defaultCellAttribute min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/9/2012 14:38'!

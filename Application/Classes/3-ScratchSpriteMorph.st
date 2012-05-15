@@ -2451,14 +2451,14 @@ cellHasType: aType direction: aDirection
 	
 	^ false.! !
 
-!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/26/2011 10:53'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/14/2012 16:13'!
 cellValue: aString
 
-	| cell |
+	| stage |
+	
 	self prototype ifNil: [ ^ 0 ].
-	cell _ self currentCell.
-	cell ifNil: [ ^ 0 ].
-	^ cell value:aString! !
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ 0 ].
+	^ stage cellValue: aString for: self.! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 10/7/2011 12:40'!
 cellValue: aString x: x y: y 
@@ -2591,18 +2591,25 @@ costumeNoInCell: aDirection
 		ifFalse: [ ^ sprites anyOne costumeIndex ].
 ! !
 
-!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/26/2011 10:52'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/14/2012 13:45'!
+createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: aColour
+
+	| stage |
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ nil ].
+
+	stage createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: aColour
+! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/14/2012 12:38'!
 currentCell
 
 	"return the cell that this sprite is standing on"
 	| stage |
 
 	self prototype ifNil: [ ^ nil ].
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ nil ].
 
-	stage _ self ownerThatIsA: ScratchStageMorph.
-	stage ifNil: [ ^ nil ].
-
-	^ (self ownerThatIsA: ScratchStageMorph) cellBehind: self! !
+	^ stage cellBehind: self! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 8/26/2011 15:45'!
 die
@@ -2753,6 +2760,11 @@ moveCellRandomEmpty
 		].
 		neighbours remove: newcell.
 	].! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/15/2012 13:53'!
+myTypeAnyTypeMenu
+
+	^ #('my type', 'any type')! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/10/2012 15:03'!
 numNeighbourSprites

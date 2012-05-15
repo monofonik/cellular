@@ -2391,7 +2391,7 @@ addComment: aScratchCommentMorph
 	blocksBin addMorph: aScratchCommentMorph.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 10/27/2011 10:51'!
+!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 5/14/2012 14:07'!
 addEnvironmentAttribute
 	"Ask the user for the details of a new environment attribute"
 
@@ -6800,11 +6800,6 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	^ y.! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:45'!
-cellValue: aString
-
-	self subclassResponsibility! !
-
 !ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:38'!
 cellValue: aString x: aX y: aY
 
@@ -6843,6 +6838,11 @@ classNamesMenu
 
 !ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
 clear: aString
+
+	self subclassResponsibility! !
+
+!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 5/14/2012 13:49'!
+createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: aColour
 
 	self subclassResponsibility! !
 

@@ -318,7 +318,7 @@ createViewModeButtonsPanel
 	self addMorph: viewModeButtonsPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/26/2011 15:05'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 5/14/2012 12:02'!
 initialize
 
 	super initialize.
@@ -334,7 +334,7 @@ initialize
 	loginPassword _ ''.
 	viewMode _ #normal.
 	brushSize _ 2.
-	selectedAttribute _ 'default'.
+	selectedAttribute _ ScratchFrameMorph defaultCellAttribute.
 
 
 	self createBasicPanes.
@@ -5734,7 +5734,7 @@ importSpriteOrProject: fileNameOrData
 	workPane layoutChanged.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 9/26/2011 15:05'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 5/14/2012 12:02'!
 initialize
 
 	super initialize.
@@ -5750,7 +5750,7 @@ initialize
 	loginPassword _ ''.
 	viewMode _ #normal.
 	brushSize _ 2.
-	selectedAttribute _ 'default'.
+	selectedAttribute _ ScratchFrameMorph defaultCellAttribute.
 
 
 	self createBasicPanes.
@@ -8936,6 +8936,12 @@ versionControlStartDate
 	"Only classes that have changed since this date will be exported to the revision control system"
 
 	^ '07/01/2011' asDate! !
+
+
+!ScratchFrameMorph class methodsFor: 'Cellular' stamp: 'JM 5/14/2012 12:02'!
+defaultCellAttribute
+
+	^ 'CellAttr1'! !
 
 
 ScratchFrameMorph initialize!

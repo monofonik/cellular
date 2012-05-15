@@ -120,11 +120,12 @@ damaged: aBoolean
 
 	damaged _ aBoolean.! !
 
-!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 10/6/2011 14:56'!
+!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 5/14/2012 16:43'!
 deleteValue: aString
 
-	values removeKey: aString ifAbsent: [ ^ self ].
-	colors removeKey: aString ifAbsent: [ ^ self ]! !
+	values removeKey: aString ifAbsent: [].
+	values removeKey: aString asMacRoman ifAbsent: []. "hack for files created with old version"
+	colors removeKey: aString ifAbsent: []! !
 
 !ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 9/28/2011 10:23'!
 gridLocation
@@ -242,10 +243,10 @@ update
 	damaged _ true.
 	"self changed."! !
 
-!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 9/28/2011 10:23'!
+!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 5/14/2012 15:49'!
 value: aString
 
-	^ values at: aString ifAbsent: [ ^ 0 ].! !
+	^ values at: aString asUTF8 ifAbsent: [ ^ 0 ].! !
 
 
 !ScratchCell methodsFor: 'nil' stamp: 'JM 9/28/2011 13:35'!
