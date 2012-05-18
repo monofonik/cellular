@@ -53,14 +53,14 @@ changeValue: aString by: aNumber
 	spread _ (stage cellAttribute: aString) spread.
 	self changeValue: aString by: aNumber spread: spread.! !
 
-!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 10/6/2011 15:01'!
+!ScratchCell methodsFor: 'as yet unclassified' stamp: 'JM 5/17/2012 13:59'!
 changeValue: aString by: aNumber spread: aSpread
 
 	" check for a spread amount and update neighbouring cells "
 	| cellAttr min max oldValue newValue |	
 
 	cellAttr _ stage cellAttribute: aString.
-	cellAttr ifNil: [ ^ self ].
+	cellAttr ifNil: [ Transcript show: 'no attr'; cr. ^ self ].
 
 	changing ifTrue: [ ^ self ].
 	changing _ true.

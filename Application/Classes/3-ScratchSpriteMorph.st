@@ -2729,6 +2729,34 @@ hideAttribute: aString
 
 	stage hideAttribute: aString! !
 
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/17/2012 16:16'!
+moveAnyCellRandom
+
+	"moves to a random cell"
+	
+	| stage newcell |
+	stage _ (self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ self ].
+	newcell _ stage allCells atRandom.
+	self gotoX: newcell referencePosition x y: newcell referencePosition y.! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/17/2012 16:29'!
+moveAnyCellRandomEmpty
+
+	"moves to a random cell"
+	
+	| stage allcells |
+	stage _ (self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ self ].
+	allcells _ stage allCells.
+	
+	[allcells isEmpty] whileFalse: [ | newcell sprites |
+		newcell _ allcells atRandom.
+		sprites _ stage spritesAtCell: newcell.
+		sprites remove: self ifAbsent: [].
+		sprites isEmpty
+			ifTrue: [ ^ self gotoX: newcell referencePosition x y: newcell referencePosition y ]
+			ifFalse: [ allcells remove: newcell ].
+	].! !
+
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/2/2012 13:45'!
 moveCellRandom
 
@@ -2781,16 +2809,19 @@ numNeighbourSprites
 	].
 	^ count.! !
 
-!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/11/2012 15:24'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/18/2012 14:59'!
 numNeighboursInCostume: aCostume
 
-	| stage |
+	| stage n |
 	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ false ].
-
-	^ (stage neighbouringCellsToSprite: self) inject: 0 into: [ :n :cell |
-		n _ n + ((stage spritesAtCell: cell) 
-			collect: [ :sprite | (sprite className = self className) and: [ (sprite costumeNameFromNumber: sprite costumeIndex) = aCostume ]]) size.
-	].! !
+	
+	n _ 0. "can't we do this with an INJECT statement??"
+	(stage neighbouringCellsToSprite: self) do: [ :cell |
+		(stage spritesAtCell: cell) do: [ :sprite | 
+			((sprite className = (self className)) and: [sprite costumeName = aCostume]) ifTrue: [ n _ n + 1 ].
+		]
+	].
+	^ n! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/10/2012 16:21'!
 numNeighboursOfType: aType
@@ -2889,7 +2920,7 @@ yposCell
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/11/2012 16:08'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/17/2012 16:41'!
 blockSpecs
 
 	| blocks |
@@ -2904,8 +2935,12 @@ blockSpecs
 		'motion'		
 			('move %n steps'				-	forward:)
 			('move %n cells'					-	forwardCell: 1) 	
+			-
 			('move to neighbour cell'		-	moveCellRandom )			
 			('move to empty nbr cell' 		-	moveCellRandomEmpty )
+			-
+			('move to any cell'				-	moveAnyCellRandom )
+			('move to any empty cell'		-	moveAnyCellRandomEmpty )
 			-
 			('turn %n degrees'				-	turnRight: 15)	"icon shows turn direction"
 			('turn %n degrees'				-	turnLeft: 15)	"icon shows turn direction"
@@ -2956,6 +2991,7 @@ blockSpecs
 		'looks'
 			('switch to costume %l'			-	lookLike:)
 			('next costume'					-	nextCostume)
+			('costume name'					r	costumeName)
 			('costume #'						r	costumeIndex)
 			-
 			('say %s for %n secs'			t	say:duration:elapsed:from: 'Hello!!' 2)

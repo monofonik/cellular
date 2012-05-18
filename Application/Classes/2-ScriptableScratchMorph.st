@@ -280,6 +280,11 @@ costumeIndex: aNumber
 	costume == newC ifFalse: [self lookLike: newC mediaName].
 ! !
 
+!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'JM 5/17/2012 16:39'!
+costumeName
+
+	^ self costumeNameFromNumber: self costumeIndex! !
+
 !ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'jm 4/30/2007 22:00'!
 costumeNameFromNumber: aNumber
 	"Return a costume name for the given number--rounded and modulo the number of costumes."
@@ -7396,11 +7401,11 @@ keepOnStage: aBool
 	KeepOnStage _ aBool! !
 
 
-!ScriptableScratchMorph class methodsFor: 'cellular' stamp: 'JM 4/5/2012 16:08'!
+!ScriptableScratchMorph class methodsFor: 'cellular' stamp: 'JM 5/17/2012 16:31'!
 maxAgents
 
 	"The maximum number of agents allowed to exist for each type"
-	^ 100! !
+	^ 200! !
 
 
 ScriptableScratchMorph initialize!

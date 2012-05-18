@@ -189,7 +189,7 @@ selectorAndArg
 	^ Array with: selector with: (args size = 0 ifTrue: [nil] ifFalse: [args first])
 ! !
 
-!CommandBlockMorph methodsFor: 'accessing' stamp: 'JM 5/15/2012 13:54'!
+!CommandBlockMorph methodsFor: 'accessing' stamp: 'JM 5/16/2012 11:32'!
 uncoloredArgMorphFor: specString
 	"Answer an argument morph for the given argument specification string."
 
@@ -277,9 +277,9 @@ uncoloredArgMorphFor: specString
 
 	"special args for cellular"
 	$3 = code ifTrue: [^ ChoiceArgMorph new getOptionsSelector: #envAttrNamesMenu; choice: ScratchFrameMorph defaultCellAttribute].
-	$4 = code ifTrue: [^ ChoiceArgMorph new getOptionsSelector: #cellDirectionNamesMenu; choice: 'above' ].
-	$5 = code ifTrue: [^ ChoiceArgMorph new getOptionsSelector: #classNamesMenu; choice: 'Type1'].
-	"$6 = code ifTrue: [^ ChoiceArgMorph new getOptionsSelector: #agentTypesMenu; choice: 'Type1']."
+	$4 = code ifTrue: [^ ChoiceOrExpressionArgMorph new getOptionsSelector: #cellDirectionNamesMenu; choice: 'above' ].
+	$5 = code ifTrue: [^ ChoiceOrExpressionArgMorph new getOptionsSelector: #classNamesMenu; choice: 'Type1'].
+	"$6 = code ifTrue: [^ ChoiceOrExpressionArgMorph new getOptionsSelector: #agentTypesMenu; choice: 'Type1']."
 	"$7 = code ifTrue: [^ ChoiceArgMorph new getOptionsSelector: #myTypeAnyTypeMenu; choice: 'my type']."
 
 

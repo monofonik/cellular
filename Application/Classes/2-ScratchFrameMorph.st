@@ -8938,10 +8938,10 @@ versionControlStartDate
 	^ '07/01/2011' asDate! !
 
 
-!ScratchFrameMorph class methodsFor: 'Cellular' stamp: 'JM 5/14/2012 12:02'!
+!ScratchFrameMorph class methodsFor: 'Cellular' stamp: 'JM 5/17/2012 13:58'!
 defaultCellAttribute
 
-	^ 'CellAttr1'! !
+	^ 'CellAttr1' asUTF8! !
 
 
 ScratchFrameMorph initialize!

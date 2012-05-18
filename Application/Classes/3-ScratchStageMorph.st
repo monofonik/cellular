@@ -300,16 +300,6 @@ getAttribute: attr
 	^ 0
 ! !
 
-!ScratchStageMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:01'!
-numCellsX
-
-	^ self cellDims x! !
-
-!ScratchStageMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:01'!
-numCellsY
-
-	^ self cellDims y! !
-
 
 !ScratchStageMorph methodsFor: 'sound ops' stamp: 'jens 2/4/2011 02:37'!
 setTempoTo: aNumber
@@ -356,7 +346,7 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/27/2011 12:19'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 5/17/2012 14:01'!
 handleTool: toolName hand: hand
 
 	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
@@ -381,8 +371,8 @@ handleTool: toolName hand: hand
 
 		cell _ (cells at: gridLoc y) at: gridLoc x.
 
-		toolName = 'PaintTool' ifTrue: [ cell changeValue: attrName by: tenPC spread: toolSpread ].
-		toolName = 'EraseTool' ifTrue: [ cell changeValue: attrName by: tenPC negated spread: toolSpread ].
+		toolName = 'PaintTool' ifTrue: [ cell changeValue: attrName asUTF8 by: tenPC spread: toolSpread ].
+		toolName = 'EraseTool' ifTrue: [ cell changeValue: attrName asUTF8 by: tenPC negated spread: toolSpread ].
 
 		^ self updateCellsForm.
 
@@ -1800,6 +1790,19 @@ agentTypesMenu
 	(sprites select: [ :sprite | sprite prototype = nil ]) do: [ :proto | names addLast: (proto className) ].
 	^ names! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/17/2012 16:13'!
+allCells
+
+	"returns a list of all cells in the environment"
+	| col |
+	col _ OrderedCollection new.
+
+	(1 to: self cellDims y) do: [ :i |
+		(1 to: self cellDims x) do: [ :j | col add: ((cells at: i) at: j) ]
+	].
+
+	^ col! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:02'!
 allCellsDo: aSelector
 
@@ -2620,7 +2623,7 @@ grabSpriteFromScreen
 
 ! !
 
-!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 10/27/2011 12:19'!
+!ScratchStageMorph methodsFor: 'event handling' stamp: 'JM 5/17/2012 14:01'!
 handleTool: toolName hand: hand
 
 	((toolName = 'PaintTool') | (toolName = 'EraseTool')) ifTrue: [
@@ -2645,8 +2648,8 @@ handleTool: toolName hand: hand
 
 		cell _ (cells at: gridLoc y) at: gridLoc x.
 
-		toolName = 'PaintTool' ifTrue: [ cell changeValue: attrName by: tenPC spread: toolSpread ].
-		toolName = 'EraseTool' ifTrue: [ cell changeValue: attrName by: tenPC negated spread: toolSpread ].
+		toolName = 'PaintTool' ifTrue: [ cell changeValue: attrName asUTF8 by: tenPC spread: toolSpread ].
+		toolName = 'EraseTool' ifTrue: [ cell changeValue: attrName asUTF8 by: tenPC negated spread: toolSpread ].
 
 		^ self updateCellsForm.
 
@@ -2777,7 +2780,7 @@ initFieldsFrom: anObjStream version: classVersion
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/14/2012 11:55'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/17/2012 13:58'!
 initialiseCells
 
 	"create all cells assuming minimum size"
@@ -3103,12 +3106,12 @@ notePlayerFor: aScratchObject
 	^ newPlayer
 ! !
 
-!ScratchStageMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:01'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:01'!
 numCellsX
 
 	^ self cellDims x! !
 
-!ScratchStageMorph methodsFor: 'sensing ops' stamp: 'JM 3/7/2012 11:01'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:01'!
 numCellsY
 
 	^ self cellDims y! !
@@ -4080,6 +4083,19 @@ agentTypesMenu
 	(sprites select: [ :sprite | sprite prototype = nil ]) do: [ :proto | names addLast: (proto className) ].
 	^ names! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/17/2012 16:13'!
+allCells
+
+	"returns a list of all cells in the environment"
+	| col |
+	col _ OrderedCollection new.
+
+	(1 to: self cellDims y) do: [ :i |
+		(1 to: self cellDims x) do: [ :j | col add: ((cells at: i) at: j) ]
+	].
+
+	^ col! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:02'!
 allCellsDo: aSelector
 
@@ -4433,7 +4449,7 @@ hideAttribute: aString
 	self allCellsDo: #update.
 	self changed! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/14/2012 11:55'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/17/2012 13:58'!
 initialiseCells
 
 	"create all cells assuming minimum size"
@@ -4524,6 +4540,16 @@ newCellAt: xLoc at: yLoc
 	cell stage: self.
 	^ cell.
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:01'!
+numCellsX
+
+	^ self cellDims x! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:01'!
+numCellsY
+
+	^ self cellDims y! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/27/2012 11:07'!
 pauseCellUpdates
