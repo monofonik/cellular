@@ -970,7 +970,7 @@ serializeAndDeserialize: anObject
 	^ ObjStream new readObjFrom: (ReadStream on: stream contents)
 ! !
 
-!ObjStream class methodsFor: 'testing' stamp: 'jens 5/3/2010 21:54'!
+!ObjStream class methodsFor: 'testing' stamp: 'JM 5/22/2012 12:33'!
 tallyScratchObjectsFrom: aDirectory
 	"Tally the object class ID's for all Scratch projects in the given directory into the given array."
 	"self tallyScratchObjectsFrom: FileDirectory default"
@@ -978,7 +978,7 @@ tallyScratchObjectsFrom: aDirectory
 	| classIDCounts objTable id result count cName |
 	classIDCounts _ Array new: 256 withAll: 0.
 	aDirectory fileNames do: [:fn |
-		((fn endsWith: '.sb') | (fn endsWith: '.ypr')) ifTrue: [
+		((fn endsWith: '.sb') | (fn endsWith: '.ypr') | (fn endsWith: '.cel')) ifTrue: [
 			objTable _ self scratchObjectsFrom: (aDirectory fullNameFor: fn).
 			objTable do: [:entry |
 				id _ entry at: 2.

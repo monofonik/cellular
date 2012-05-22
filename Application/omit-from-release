@@ -1,0 +1,12 @@
+.bzr*
+*.~?~
+BaseCellular.*
+Classes
+compile.sh
+copyforrelease.sh
+omit-from-release
+ScratchSkin
+cellular_development
+Cellular.exe
+Cellular.ini
+

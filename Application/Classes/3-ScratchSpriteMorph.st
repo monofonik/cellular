@@ -2866,14 +2866,14 @@ showAttribute: aString
 
 	stage showAttribute: aString! !
 
-!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 4/5/2012 16:24'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/22/2012 11:59'!
 spawnSomewhere
 
 	| clone |
 	"spawns the sprite at a random location"
 
 	clone _ self spawn.
-	(clone isKindOf: ScratchSpriteMorph) ifTrue: [ clone referencePosition: ((self randomFrom: -240 to: 240) @ (self randomFrom: -180 to: 180)) ].
+	(clone isKindOf: ScratchSpriteMorph) ifTrue: [ clone moveAnyCellRandomEmpty ].
 	^ clone
 ! !
 
@@ -2890,6 +2890,11 @@ syncToPrototype
 		do: [ :block |
 			block setReceiversForClone: self.
 		]! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/22/2012 11:00'!
+wearingCostume: aCostume
+
+	^ self costumeName = aCostume! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 10/6/2011 15:29'!
 xposCell
@@ -2920,7 +2925,7 @@ yposCell
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/17/2012 16:41'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/22/2012 11:01'!
 blockSpecs
 
 	| blocks |
@@ -2991,6 +2996,8 @@ blockSpecs
 		'looks'
 			('switch to costume %l'			-	lookLike:)
 			('next costume'					-	nextCostume)
+			-
+			('wearing costume %l?'			b	wearingCostume:)
 			('costume name'					r	costumeName)
 			('costume #'						r	costumeIndex)
 			-

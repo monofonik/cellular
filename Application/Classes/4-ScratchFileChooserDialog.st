@@ -51,7 +51,7 @@ addShortcutButtons
 
 ! !
 
-!ScratchFileChooserDialog methodsFor: 'initialization' stamp: 'jens 5/4/2010 01:12'!
+!ScratchFileChooserDialog methodsFor: 'initialization' stamp: 'JM 5/22/2012 14:16'!
 createScratchFileChooserFor: aScratchFrameMorph saving: savingFlag
 	"Create a Scratch file chooser dialog box with a project thumbnail and info box."
 
@@ -59,7 +59,7 @@ createScratchFileChooserFor: aScratchFrameMorph saving: savingFlag
 	scratchFrame _ aScratchFrameMorph.
 	readingScratchFile _ savingFlag not.
 
-	list _ ScratchFilePicker new extensions: #(scratch sb ypr).
+	list _ ScratchFilePicker new extensions: #(scratch sb ypr cel).
 	self removeAllMorphs.
 	bottomSpacer delete.
 	bottomSpacer _ nil.
@@ -448,13 +448,13 @@ myHome
 	list currentDirectory: self class homeDir.
 ! !
 
-!ScratchFileChooserDialog methodsFor: 'shortcuts' stamp: 'jm 2/22/2009 23:35'!
+!ScratchFileChooserDialog methodsFor: 'shortcuts' stamp: 'JM 5/22/2012 15:12'!
 sampleProjects
 	"Sample Projects button was pressed."
 
-	(FileDirectory default directoryExists: 'Projects') ifTrue: [
+	(FileDirectory default directoryExists: 'Cellular Projects') ifTrue: [
 		list currentDirectory:
-			(FileDirectory default directoryNamed: 'Projects')].
+			(FileDirectory default directoryNamed: 'Cellular Projects')].
 ! !
 
 !ScratchFileChooserDialog methodsFor: 'shortcuts' stamp: 'tis 12/16/2006 14:58'!
@@ -614,7 +614,7 @@ chooseNewFileDefault: defaultName title: titleString type: type
 	^ m getUserResponseForNewFile
 ! !
 
-!ScratchFileChooserDialog class methodsFor: 'instance creation' stamp: 'jens 5/4/2010 01:16'!
+!ScratchFileChooserDialog class methodsFor: 'instance creation' stamp: 'JM 5/22/2012 14:15'!
 chooseSpriteCostumeFor: aScratchFrameMorph
 	"ScratchFileChooserDialog chooseSpriteCostumeFor: nil"
 
@@ -625,7 +625,7 @@ chooseSpriteCostumeFor: aScratchFrameMorph
 		title: 'New Sprite';
 		showThumbnails: true;
 		type: #costume;
-		extensions: #(gif jpeg jpg bmp png sprite ysp);
+		extensions: #(gif jpeg jpg bmp png sprite ysp cel);
 		scratchFrame: aScratchFrameMorph;
 		listExtent: 550@300.
 
@@ -671,7 +671,7 @@ openScratchFileFor: aScratchFrameMorph
 	^ response bodyData
 ! !
 
-!ScratchFileChooserDialog class methodsFor: 'instance creation' stamp: 'jens 5/3/2010 21:56'!
+!ScratchFileChooserDialog class methodsFor: 'instance creation' stamp: 'JM 5/22/2012 12:33'!
 saveScratchFileFor: aScratchFrameMorph
 	"Choose a file for saving the current Scratch project file. Display the thumbnail and info string for the current project and allow the info string to be edited. Answer the full name of the file in which to save the project or #cancelled if the operation is cancelled."
 	"ScratchFileChooserDialog saveScratchFileFor: nil"
@@ -687,7 +687,8 @@ saveScratchFileFor: aScratchFrameMorph
 	result = #cancelled ifTrue: [^ result].
 
 "	(result asLowercase endsWith: '.sb') ifFalse: [result _ result, '.sb']."
-	(result asLowercase endsWith: '.ypr') ifFalse: [result _ result, '.ypr'].
+"	(result asLowercase endsWith: '.ypr') ifFalse: [result _ result, '.ypr']."
+	(result asLowercase endsWith: '.cel') ifFalse: [result _ result, '.cel'].
 	^ result
 ! !
 
@@ -795,14 +796,15 @@ userScratchProjectsDir
 ! !
 
 
-!ScratchFileChooserDialog class methodsFor: 'utilities' stamp: 'jens 5/3/2010 21:56'!
+!ScratchFileChooserDialog class methodsFor: 'utilities' stamp: 'JM 5/22/2012 12:33'!
 confirmFileOverwriteIfExisting: aFilename
 	"If the given file exists, ask the user if they want to overwrite it or pick a different file name."
 
 	| response fName |
 	fName _ aFilename.
 "	(fName endsWith: '.sb') ifFalse: [fName _ fName, '.sb']."
-	(fName endsWith: '.ypr') ifFalse: [fName _ fName, '.ypr'].
+"	(fName endsWith: '.ypr') ifFalse: [fName _ fName, '.ypr']."
+	(fName endsWith: '.cel') ifFalse: [fName _ fName, '.cel'].
 	(FileDirectory default fileExists: fName) ifFalse: [^ aFilename].
 
 	response _ DialogBoxMorph

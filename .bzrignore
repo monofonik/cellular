@@ -3,3 +3,8 @@ Cellular.changes
 .DS_Store
 *.db
 *.dmg
+Cellular-*.exe
+installers/mac/Cellular
+Icon*
+Thumbs.db
+*.ini

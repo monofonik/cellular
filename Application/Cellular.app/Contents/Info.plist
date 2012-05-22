@@ -9,12 +9,12 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>image</string>
+				<string>srb</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>SqueakImage.icns</string>
+			<string>ScribbleDoc.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Squeak Image File</string>
+			<string>Scribble Document</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>STim</string>
@@ -57,104 +57,340 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>ysp</string>
-				<string>sprite</string>
+				<string>sobj</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>CellularSprite.icns</string>
+			<string>SqueakScript.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Scratch Sprite File</string>
+			<string>Squeak Script File</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
-				<string>STyp</string>
-				<string>STsp</string>
+				<string>SOBJ</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
-			<key>LSTypeIsPackage</key>
-			<false/>
-			<key>NSPersistentStoreTypeKey</key>
-			<string>XML</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>byob</string>
-				<string>scratch</string>
+				<string>pr</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>CellularProject.icns</string>
+			<string>SqueakProject.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Scratch Project File</string>
+			<string>Squeak Project File</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
-				<string>STyb</string>
-				<string>STsb</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>LSTypeIsPackage</key>
-			<false/>
-			<key>NSPersistentStoreTypeKey</key>
-			<string>XML</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>ypr</string>
-				<string>sb</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>CellularProject.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>Scratch Project File</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>STyb</string>
-				<string>STsb</string>
+				<string>STpr</string>
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>bundle</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>SqueakPlugin.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Squeak Plugin</string>
+			<string>JPEG</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
-				<string>BNDL</string>
+				<string>JPEG</string>
 			</array>
 			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>TEXT</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TEXT</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>ttro</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>ttro</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>HTML</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>HTML</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>RTF </string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>RTF</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>TIFF </string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TIFF</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PICT </string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>PICT</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>URL  </string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>URL</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>ZIP </string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>ZIP</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>zip </string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>zip</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>BINA</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>BINA</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>GIFf</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>GIFf</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PNGf</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>PNGf</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>MP3 </string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>MP3</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>MP3!</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>MP3!</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>MP3U</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>MP3U</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>MPEG</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>MPEG</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>mp3!</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>mp3!</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>MPG2</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>MPG2</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>MPG3</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>MPG3</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>MPG </string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>MPG</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Mp3</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>mp3</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>M3U</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>M3U</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>SRCS</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>SRCS</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Chng</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>Chng</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>HPS5</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>HPS5</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>Cellular</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Scratch VM 3.8.14b7y http://www.mit.edu </string>
+	<string>Cellular - Copyright 2012 Monash University</string>
 	<key>CFBundleIconFile</key>
-	<string>CellularApp</string>
+	<string>CellularApp.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>edu.monash.cellular</string>
+	<string>au.edu.monash.infotech.cellular</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>3.0</string>
+	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>Cellular</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>Scratch VM 3.8.14b7y</string>
+	<string>Cellular 0.0.4</string>
 	<key>CFBundleSignature</key>
-	<string>Cellular</string>
+	<string>FAST</string>
 	<key>CFBundleVersion</key>
-	<string>3.8.14b7y</string>
+	<string>0.0.4</string>
 	<key>CGDisableCoalescedUpdates</key>
 	<true/>
 	<key>LSBackgroundOnly</key>
 	<false/>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Squeak DoIt</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>doitandreturn</string>
+			<key>NSPortName</key>
+			<string>Squeak</string>
+			<key>NSReturnTypes</key>
+			<array>
+				<string>NSStringPboardType</string>
+			</array>
+			<key>NSSendTypes</key>
+			<array>
+				<string>NSStringPboardType</string>
+			</array>
+		</dict>
+	</array>
 	<key>SqueakBrowserMouseCmdButton1</key>
 	<integer>3</integer>
 	<key>SqueakBrowserMouseCmdButton2</key>
@@ -179,10 +415,12 @@
 	<integer>3</integer>
 	<key>SqueakBrowserMouseOptionButton3</key>
 	<integer>2</integer>
-	<key>SqueakBrowserUnTrustedDirectory</key>
-	<string>~/Library/Preferences/Squeak/Internet/My Squeak/</string>
+	<key>SqueakDebug</key>
+	<integer>0</integer>
 	<key>SqueakEncodingType</key>
-	<string>UTF-8</string>
+	<string>macintosh</string>
+	<key>SqueakExplicitWindowOpenNeeded</key>
+	<false/>
 	<key>SqueakFloatingWindowGetsFocus</key>
 	<true/>
 	<key>SqueakImageName</key>
@@ -217,6 +455,8 @@
 	<true/>
 	<key>SqueakQuitOnQuitAppleEvent</key>
 	<true/>
+	<key>SqueakTrustedDirectory</key>
+	<string>/foobar/tooBar/forSqueak/bogus/</string>
 	<key>SqueakUIFlushPrimaryDeferNMilliseconds</key>
 	<integer>20</integer>
 	<key>SqueakUIFlushSecondaryCheckForPossibleNeedEveryNMilliseconds</key>
@@ -225,11 +465,11 @@
 	<integer>25</integer>
 	<key>SqueakUIFlushUseHighPercisionClock</key>
 	<true/>
+	<key>SqueakUnTrustedDirectory</key>
+	<string>~/Library/Preferences/Squeak/Internet/My Squeak/</string>
 	<key>SqueakWindowAttribute</key>
 	<data>ggAAHw==</data>
 	<key>SqueakWindowHasTitle</key>
 	<true/>
-	<key>SqueakWindowType</key>
-	<integer>6</integer>
 </dict>
 </plist>

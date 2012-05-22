@@ -65,8 +65,10 @@ setCategoryColor: aColor
 	readoutFrame color: aColor.
 ! !
 
-!WatcherMorph methodsFor: 'initialization' stamp: 'JM 5/4/2012 16:50'!
+!WatcherMorph methodsFor: 'initialization' stamp: 'JM 5/21/2012 15:11'!
 step
+
+	| frame |
 
 	self updateTargetName.
 	readoutFrame ifNotNil: [readoutFrame fixLayout].
@@ -75,7 +77,9 @@ step
 			scratchSlider width: self width - 12.
 			scratchSlider updateSliderPosition]].
 
-	plot ifNotNil: [ plot addDataPoint: readout contents asNumberNoError ].
+	"only plot if simulation is running"
+	(frame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [ ^ self ].
+	plot ~= nil & (frame isRunning) ifTrue: [ plot addDataPoint: readout contents asNumberNoError ].
 ! !
 
 !WatcherMorph methodsFor: 'initialization' stamp: 'jm 11/30/2007 19:23'!
@@ -647,3 +651,4 @@ updateTargetName
 
 	lastTargetName _ targetName.
 ! !
+
