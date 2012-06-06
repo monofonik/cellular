@@ -8861,9 +8861,9 @@ version
 	^ Version
 ! !
 
-!ScratchFrameMorph class methodsFor: 'utilities' stamp: 'JM 5/22/2012 12:28'!
+!ScratchFrameMorph class methodsFor: 'utilities' stamp: 'JM 6/5/2012 14:41'!
 version: aString
-	"self version: '0.0.4 (', (Date today printFormat: #(1 2 3 $- 2 2)), ')'"
+	"self version: '0.0.5 (', (Date today printFormat: #(1 2 3 $- 2 2)), ')'"
 	"self version: '1.0'"
 
 	Version _ aString.

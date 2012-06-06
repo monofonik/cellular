@@ -1803,29 +1803,33 @@ allCells
 
 	^ col! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:02'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:30'!
 allCellsDo: aSelector
 
 	"perform the provided action on all cells"
-	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector ]]! !
+	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector ]].
+	"self updateCellsForm"! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:03'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:30'!
 allCellsDo: aSelector with: anArg
 
 	"perform the provided action on all cells"
-	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg]]! !
+	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg]].
+	"self updateCellsForm"! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:03'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:30'!
 allCellsDo: aSelector with: anArg with: anotherArg
 
 	"perform the provided action on all cells"
-	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg]]! !
+	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg]].
+	"self updateCellsForm"! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:14'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:30'!
 allCellsDo: aSelector with: anArg with: anotherArg with: lastArg
 
 	"perform the provided action on all cells"
-	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]]! !
+	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]].
+	"self updateCellsForm"! !
 
 !ScratchStageMorph methodsFor: 'clones' stamp: 'jm 6/6/2008 14:41'!
 allClones
@@ -2090,12 +2094,13 @@ changeBackgroundIndexBy: aNumber
 	self changeCostumeIndexBy: aNumber.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:50'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:35'!
 changeCellValue: aString by: aNumber
 
-	self allCellsDo: #changeValue:by:spread: with: aString with: aNumber with: 0! !
+	self allCellsDo: #changeValue:by:spread: with: aString with: aNumber with: 0.
+	self changed.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:40'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:37'!
 changeCellValue: aString for: aSprite by: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -2104,9 +2109,10 @@ changeCellValue: aString for: aSprite by: aNumber
 	attr _ cellAttributes at: aString.
 
 	cell changeValue: aString by: aNumber spread: attr spread.
-	cell update: cellAttributes.! !
+	cell update: cellAttributes.
+	self changed.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:45'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:37'!
 changeCellValue: aString x: aX y: aY by: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -2115,7 +2121,8 @@ changeCellValue: aString x: aX y: aY by: aNumber
 	attr _ cellAttributes at: aString.
 
 	cell changeValue: aString by: aNumber spread: attr spread.
-	cell update: cellAttributes.! !
+	cell update: cellAttributes.
+	self changed.! !
 
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 6/2/2004 18:58'!
 changeHPanBy: amount
@@ -2169,11 +2176,12 @@ clearCellValue: aString for: aSprite
 	cell clearValue: aString spread: attr spread.
 	cell update: cellAttributes.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:33'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:33'!
 clearCells
 
 	"clear all cells values for every attribute"
 	self allCellsDo: #clearValues.
+	self changed.
 
 	! !
 
@@ -2185,11 +2193,12 @@ clearPenTrails
 	self changed.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:32'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:34'!
 clearValue: aString
 
 	"clears the value of the given attribute for allcells"
-	self allCellsDo: #clearValue:spread: with: aString with: 0! !
+	self allCellsDo: #clearValue:spread: with: aString with: 0.
+	self changed.! !
 
 !ScratchStageMorph methodsFor: 'midi' stamp: 'jm 8/2/2005 19:08'!
 closeMIDI
@@ -2351,7 +2360,7 @@ deleteAllClones
 	self allClones do: [:clone | clone delete].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/15/2012 12:23'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:39'!
 deleteCellAttribute: aString
 
 	"delete a cell attribute (but never the default attribute)"
@@ -2678,7 +2687,7 @@ hasAttribute: aString
 
 	^ cellAttributes includes: aString! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:33'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:35'!
 hideAttribute: aString
 
 	"hides the given atttribute"
@@ -3441,12 +3450,13 @@ sensorBoard: aSensorBoardMorph
 	sensorBoard _ aSensorBoardMorph.
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:40'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:36'!
 setCell: aString to: aNumber
 
-	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.! !
+	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
+	self changed.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 14:44'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:37'!
 setCellValue: aString for: aSprite to: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -3456,9 +3466,10 @@ setCellValue: aString for: aSprite to: aNumber
 
 	cell ifNotNil: [ 
 		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
+		self changed.
 	]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:44'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:37'!
 setCellValue: aString x: aX y: aY to: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -3468,6 +3479,7 @@ setCellValue: aString x: aX y: aY to: aNumber
 
 	cell ifNotNil: [ 
 		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
+		self changed.
 	]! !
 
 !ScratchStageMorph methodsFor: 'looks ops' stamp: 'jm 6/2/2004 19:00'!
@@ -4096,29 +4108,33 @@ allCells
 
 	^ col! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:02'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:30'!
 allCellsDo: aSelector
 
 	"perform the provided action on all cells"
-	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector ]]! !
+	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector ]].
+	"self updateCellsForm"! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:03'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:30'!
 allCellsDo: aSelector with: anArg
 
 	"perform the provided action on all cells"
-	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg]]! !
+	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg]].
+	"self updateCellsForm"! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:03'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:30'!
 allCellsDo: aSelector with: anArg with: anotherArg
 
 	"perform the provided action on all cells"
-	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg]]! !
+	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg]].
+	"self updateCellsForm"! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 12:14'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:30'!
 allCellsDo: aSelector with: anArg with: anotherArg with: lastArg
 
 	"perform the provided action on all cells"
-	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]]! !
+	cells do: [ :outer | outer do: [ :inner | inner perform: aSelector with: anArg with: anotherArg with: lastArg]].
+	"self updateCellsForm"! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/27/2011 12:10'!
 cellAtGridX: xLoc y: yLoc
@@ -4266,12 +4282,13 @@ cellValue: aString x: x y: y
 
 	^ (self cellAtGridX: x y: y) value: aString! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:50'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:35'!
 changeCellValue: aString by: aNumber
 
-	self allCellsDo: #changeValue:by:spread: with: aString with: aNumber with: 0! !
+	self allCellsDo: #changeValue:by:spread: with: aString with: aNumber with: 0.
+	self changed.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/1/2011 14:40'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:37'!
 changeCellValue: aString for: aSprite by: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -4280,9 +4297,10 @@ changeCellValue: aString for: aSprite by: aNumber
 	attr _ cellAttributes at: aString.
 
 	cell changeValue: aString by: aNumber spread: attr spread.
-	cell update: cellAttributes.! !
+	cell update: cellAttributes.
+	self changed.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:45'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:37'!
 changeCellValue: aString x: aX y: aY by: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -4291,7 +4309,8 @@ changeCellValue: aString x: aX y: aY by: aNumber
 	attr _ cellAttributes at: aString.
 
 	cell changeValue: aString by: aNumber spread: attr spread.
-	cell update: cellAttributes.! !
+	cell update: cellAttributes.
+	self changed.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 14:13'!
 classNamesMenu
@@ -4313,19 +4332,21 @@ clearCellValue: aString for: aSprite
 	cell clearValue: aString spread: attr spread.
 	cell update: cellAttributes.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/29/2011 11:33'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:33'!
 clearCells
 
 	"clear all cells values for every attribute"
 	self allCellsDo: #clearValues.
+	self changed.
 
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:32'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:34'!
 clearValue: aString
 
 	"clears the value of the given attribute for allcells"
-	self allCellsDo: #clearValue:spread: with: aString with: 0! !
+	self allCellsDo: #clearValue:spread: with: aString with: 0.
+	self changed.! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/15/2012 12:34'!
 createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: aColour
@@ -4412,7 +4433,7 @@ createOrResizeGridForm
 			rule: Form paint.
 		gridForm _ newForm]. ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/15/2012 12:23'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:39'!
 deleteCellAttribute: aString
 
 	"delete a cell attribute (but never the default attribute)"
@@ -4434,7 +4455,7 @@ hasAttribute: aString
 
 	^ cellAttributes includes: aString! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:33'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:35'!
 hideAttribute: aString
 
 	"hides the given atttribute"
@@ -4556,12 +4577,13 @@ pauseCellUpdates
 
 	pauseCellUpdates _ true! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:40'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:36'!
 setCell: aString to: aNumber
 
-	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.! !
+	self allCellsDo: #setValue:to:spread: with: aString with: aNumber with: 0.
+	self changed.! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/2/2011 14:44'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:37'!
 setCellValue: aString for: aSprite to: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -4571,9 +4593,10 @@ setCellValue: aString for: aSprite to: aNumber
 
 	cell ifNotNil: [ 
 		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
+		self changed.
 	]! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:44'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:37'!
 setCellValue: aString x: aX y: aY to: aNumber
 
 	"change the cell value behind a sprite by the given amount"
@@ -4583,6 +4606,7 @@ setCellValue: aString x: aX y: aY to: aNumber
 
 	cell ifNotNil: [ 
 		cell setValue: aString to: aNumber spread: attr spread; update: cellAttributes.
+		self changed.
 	]! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 10/7/2011 17:33'!

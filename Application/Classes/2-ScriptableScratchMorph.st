@@ -137,12 +137,6 @@ isVisible
 	^ self isHidden not and: [visibility > 0]
 ! !
 
-!ScriptableScratchMorph methodsFor: 'accessing' stamp: 'jm 5/8/2005 11:44'!
-media
-
-	^ media
-! !
-
 !ScriptableScratchMorph methodsFor: 'accessing' stamp: 'jens 2/21/2011 23:45'!
 objName
 
@@ -238,23 +232,27 @@ changeVisibilityBy: delta
 	"Obsolete. Do nothing."
 ! !
 
-!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'jens 3/15/2011 00:05'!
+!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'JM 6/5/2012 15:33'!
 costumeFromName: aString
 	"If there is a costume by the given name, return it. Otherwise, return nil."
 
 	| cameraCostume |
+
+	"added for cellular"
+	"self prototype ifNotNil: [ ^ self prototype costumeFromName: aString ]."
+
 	((aString = '*** camera ***') and:
 	 [CameraPlugin cameraIsAvailable]) ifTrue: [
 		cameraCostume _ CameraMedia new.
 		(self class = ScratchStageMorph) ifTrue: [cameraCostume frameExtent: self extent].
 		^ cameraCostume].
 
-	^ media
+	^ self media
 		detect: [:el | el isSound not and: [el mediaName = aString or: [el mediaName = aString asMacRoman]]]
 		ifNone: [nil]
 ! !
 
-!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'jens 2/8/2011 22:37'!
+!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'JM 6/5/2012 15:33'!
 costumeIndex
 	"Answer the index of my current costume."
 
@@ -264,33 +262,40 @@ costumeIndex
 		(self deletedAttributes includes: att) ifTrue: [
 			^ self prototype get: att]].
 
-	^ (media reject: [:m | m isSound])
+	^ (self media reject: [:m | m isSound])
 		indexOf: costume ifAbsent: [1]
 ! !
 
-!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'jm 7/10/2004 09:59'!
+!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'JM 6/5/2012 15:33'!
 costumeIndex: aNumber
 	"Set my costume to the costume at the given index modulo my total number of costumes. Costumes are numbered starting at 1."
 
 	| cList i newC |
-	cList _ media reject: [:m | m isSound].
+	cList _ self media reject: [:m | m isSound].
 	cList size = 0 ifTrue: [^ self].  "should never happen..."
 	i _ ((aNumber rounded - 1) \\ cList size) + 1.
 	newC _ cList at: i.
 	costume == newC ifFalse: [self lookLike: newC mediaName].
 ! !
 
-!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'JM 5/17/2012 16:39'!
+!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'JM 6/5/2012 15:31'!
 costumeName
+
+	"added for cellular"
+	"self prototype ifNil: [ ^ self prototype costumeNameFromNumber: self costumeIndex ]."
 
 	^ self costumeNameFromNumber: self costumeIndex! !
 
-!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'jm 4/30/2007 22:00'!
+!ScriptableScratchMorph methodsFor: 'looks ops' stamp: 'JM 6/5/2012 15:33'!
 costumeNameFromNumber: aNumber
 	"Return a costume name for the given number--rounded and modulo the number of costumes."
 
 	| costumeList i |
-	costumeList _ media reject: [:m | m isSound].
+
+	"added for cellular"
+	"self prototype ifNotNil: [ ^ self prototype costumeNameFromNumber: aNumber ]."
+
+	costumeList _ self media reject: [:m | m isSound].
 	costumeList size = 0 ifTrue: [^ 'costume'].
 
 	i _ ((aNumber rounded - 1) \\ costumeList size) + 1.
@@ -6780,7 +6785,7 @@ undeleteAttribute: aSymbol
 	w setCategoryColor: block color! !
 
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 5/11/2012 16:44'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 5/11/2012 16:44'!
 addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	| addButton deleteButton x y |
@@ -6805,24 +6810,24 @@ addEnvironmentBlocksTo: aPane x: xLoc y: yLoc
 
 	^ y.! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:38'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 3/7/2012 11:38'!
 cellValue: aString x: aX y: aY
 
 	self subclassResponsibility
 
 	! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 9/9/2011 16:46'!
 change: aString by: aNumber
 
 	self subclassResponsibility! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:41'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 3/7/2012 11:41'!
 changeCellValue: aString x: aX y: aY by: aNumber
 
 	self subclassResponsibility! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/19/2011 16:49'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 9/19/2011 16:49'!
 className
 
 	"returns the class name of this sprite"
@@ -6831,32 +6836,39 @@ className
 
 	^ className! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 11:03'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 11:03'!
 className: aString
 
 	className _ aString! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 14:04'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 14:04'!
 classNamesMenu
 
 	self subclassResponsibility.! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 9/9/2011 16:46'!
 clear: aString
 
 	self subclassResponsibility! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 5/14/2012 13:49'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 5/14/2012 13:49'!
 createAttribute: aString min: aMin max: aMax default: aNumber spread: aSpread colour: aColour
 
 	self subclassResponsibility! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 13:15'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 13:15'!
 hideAttribute: aString
 
 	self subclassResponsibility! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/20/2011 11:03'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 6/5/2012 15:33'!
+media
+
+	"ensures that prototypes use their super's media objects"
+	self prototype ifNotNil: [ ^ self prototype media ].
+	^ media! !
+
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 9/20/2011 11:03'!
 nextClassName
 
 	| stage lastN digits |
@@ -6874,12 +6886,12 @@ nextClassName
 
 	^ 'Type' localized asUTF8, (lastN + 1) printString! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:46'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 9/9/2011 16:46'!
 setCell: aString to: aNumber
 
 		self subclassResponsibility! !
 
-!ScriptableScratchMorph methodsFor: 'cells' stamp: 'JM 3/7/2012 11:41'!
+!ScriptableScratchMorph methodsFor: 'cellular' stamp: 'JM 3/7/2012 11:41'!
 setCellValue: aString x: aX y: aY to: aNumber
 
 	self subclassResponsibility! !
