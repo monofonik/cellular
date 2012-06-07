@@ -13,7 +13,7 @@
 #shift
 
 DEST="../installers/mac/Cellular/"
-rsync -a ./ $DEST --delete --exclude-from=../.bzrignore --exclude-from=omit-from-release $@
+rsync -a ./ $DEST --delete --exclude-from=../.gitignore --exclude-from=omit-from-release $@
 cp ./Cellular.image $DEST
 cp ./Icon* $DEST
 echo "Completed - Files in $DEST are up to date."

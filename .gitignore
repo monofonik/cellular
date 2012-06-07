@@ -4,6 +4,6 @@ Cellular.changes
 *.db
 *.dmg
 Cellular-*.exe
-installers/mac/Cellular
+deployment/mac/Cellular
 Thumbs.db
 *.ini
