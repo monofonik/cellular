@@ -5,7 +5,7 @@ Name Cellular
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.0.4
+!define VERSION 0.0.5
 !define COMPANY "Monash University FIT"
 !define URL ""
 
@@ -47,7 +47,7 @@ InstallDir Cellular
 CRCCheck on
 XPStyle on
 ShowInstDetails hide
-VIProductVersion 0.0.1.0
+VIProductVersion ${VERSION}
 VIAddVersionKey ProductName Cellular
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
@@ -67,6 +67,7 @@ Section -Main SEC0000
     File ..\..\application\license.txt
     File ..\..\application\README-BYOB.txt
     File ..\..\application\README-SCRATCH.txt
+    File ..\..\application\README-CELLULAR.txt
     File ..\..\application\Cellular.changes
     File ..\..\application\Cellular.exe
     File ..\..\application\Cellular.image
