@@ -2789,7 +2789,7 @@ initFieldsFrom: anObjStream version: classVersion
 	
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/17/2012 13:58'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/13/2012 15:20'!
 initialiseCells
 
 	"create all cells assuming minimum size"
@@ -2803,7 +2803,7 @@ initialiseCells
 
 	"create the cell attribute list"
 	cellAttributes _ Dictionary new.
-	self createAttribute: ScratchFrameMorph defaultCellAttribute min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
+	self createAttribute: ScratchFrameMorph defaultCellAttribute min: 0 max: 100 default: 0 spread: 0 colour: (Color fromString: 'red').
 	! !
 
 !ScratchStageMorph methodsFor: 'initialization' stamp: 'JM 10/28/2011 09:21'!
@@ -4470,7 +4470,7 @@ hideAttribute: aString
 	self allCellsDo: #update.
 	self changed! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/17/2012 13:58'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/13/2012 15:20'!
 initialiseCells
 
 	"create all cells assuming minimum size"
@@ -4484,7 +4484,7 @@ initialiseCells
 
 	"create the cell attribute list"
 	cellAttributes _ Dictionary new.
-	self createAttribute: ScratchFrameMorph defaultCellAttribute min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
+	self createAttribute: ScratchFrameMorph defaultCellAttribute min: 0 max: 100 default: 0 spread: 0 colour: (Color fromString: 'red').
 	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/13/2012 15:15'!
