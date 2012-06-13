@@ -2445,10 +2445,11 @@ addStack: aBlockStack
 	blocksBin addMorph: aBlockStack.
 ! !
 
-!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'jm 5/7/2009 15:05'!
+!ScriptableScratchMorph methodsFor: 'scripts' stamp: 'JM 6/13/2012 14:08'!
 duplicate
 
 	| newSprite s |
+
 	newSprite _ self duplicateNoAttach.
 	self world activeHand attachMorph: newSprite.
 
@@ -4302,15 +4303,17 @@ startDrag: evt
 ! !
 
 
-!ScriptableScratchMorph methodsFor: 'right button menu' stamp: 'jens 2/9/2011 10:50'!
+!ScriptableScratchMorph methodsFor: 'right button menu' stamp: 'JM 6/13/2012 14:11'!
 duplicateNoAttach
 	"Duplicate this sprite, but do not attach to the hand."
 
 	| newSprite frame |
+
 	newSprite _ self fullCopy.
 	newSprite undeleteAllAttributes.
 	newSprite unhinge; unhingeAll; initializeNodes.
 	newSprite position: (newSprite position + 20).
+	newSprite className: self nextClassName.
 	frame _ self ownerThatIsA: ScratchFrameMorph.
 	frame ifNotNil: [
 		frame workPane addMorphFront: newSprite.

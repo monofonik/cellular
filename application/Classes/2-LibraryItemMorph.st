@@ -454,40 +454,6 @@ rejectDropEvent: evt
 	evt hand rejectDropMorph: self event: evt.
 ! !
 
-!LibraryItemMorph methodsFor: 'dropping/grabbing' stamp: 'JM 9/20/2011 12:03'!
-rightButtonMenu
-	"Present the right button menu."
-
-	| menu stage |
-	menu _ CustomMenu new.
-	menu add: 'show' action: #makeVisible.
-	menu add: 'export this sprite' action: #exportObject.
-
-	stage _ self target ownerThatIsA: ScratchStageMorph.
-	stage ifNotNil: [
-		(stage scratchServer notNil and: 
-		[stage scratchServer sessionInProgress])
-			ifTrue: [
-				menu add: 'share this sprite' action: #shareObject ]].
-
-	menu addLine.
-	menu add: 'duplicate' action: #duplicateNoAttach.
-	menu add: 'delete' action: #undoableDeleteSprite.
-	(self target isKindOf: ScratchSpriteMorph) ifTrue: [
-		"menu addLine.
-		menu add: 'clone' action: #spawn.
-		menu add: 'parent...' action: #choosePrototype.
-		self target instances size > 0 ifTrue: [
-			menu add: 'children...' action: [self childrenMenu]].
-		self target isNested ifTrue: [
-			menu addLine ].
-		self target hasSubsprites ifTrue: [
-			menu add: 'detach all subsprites' action: #unhingeAll ].
-		self target ownerSprite ifNotNil: [
-			menu add: 'detach from ', self target ownerSprite objName action: #unhinge  ]"].
-	menu localize; invokeOn: self target.
-! !
-
 !LibraryItemMorph methodsFor: 'dropping/grabbing' stamp: 'ee 2/19/2009 11:52'!
 wantsDroppedMorph: aMorph event: evt
 	"Answer true if the given morph is a script, costume, sound or comment."
@@ -573,6 +539,40 @@ updateThumbnail
 	thumbnailMorph changed.
 ! !
 
+
+!LibraryItemMorph methodsFor: 'right button menu' stamp: 'JM 9/20/2011 12:03'!
+rightButtonMenu
+	"Present the right button menu."
+
+	| menu stage |
+	menu _ CustomMenu new.
+	menu add: 'show' action: #makeVisible.
+	menu add: 'export this sprite' action: #exportObject.
+
+	stage _ self target ownerThatIsA: ScratchStageMorph.
+	stage ifNotNil: [
+		(stage scratchServer notNil and: 
+		[stage scratchServer sessionInProgress])
+			ifTrue: [
+				menu add: 'share this sprite' action: #shareObject ]].
+
+	menu addLine.
+	menu add: 'duplicate' action: #duplicateNoAttach.
+	menu add: 'delete' action: #undoableDeleteSprite.
+	(self target isKindOf: ScratchSpriteMorph) ifTrue: [
+		"menu addLine.
+		menu add: 'clone' action: #spawn.
+		menu add: 'parent...' action: #choosePrototype.
+		self target instances size > 0 ifTrue: [
+			menu add: 'children...' action: [self childrenMenu]].
+		self target isNested ifTrue: [
+			menu addLine ].
+		self target hasSubsprites ifTrue: [
+			menu add: 'detach all subsprites' action: #unhingeAll ].
+		self target ownerSprite ifNotNil: [
+			menu add: 'detach from ', self target ownerSprite objName action: #unhinge  ]"].
+	menu localize; invokeOn: self target.
+! !
 
 
 !LibraryItemMorph methodsFor: 'private' stamp: 'jens 9/16/2010 23:21'!
