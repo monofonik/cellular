@@ -144,17 +144,24 @@ response
 		color evaluate 
 		}! !
 
-!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 9/1/2011 16:39'!
+!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 6/13/2012 16:12'!
 yes
 
 	"verify all fields valid"
-
+	typeinMorph contents isEmpty ifTrue: [ typeinMorph borderColor: (Color fromString: 'red'). ^ self ].
+	typeinMorph borderColor: #inset.
+	
+	minText contents isEmpty ifTrue: [ minText borderColor: (Color fromString: 'red'). ^ self ].
 	[minText contents asNumber] ifError: [ minText borderColor: (Color fromString: 'red'). ^ self ].
 	minText borderColor: #inset.
+
+	maxText contents isEmpty ifTrue: [ maxText borderColor: (Color fromString: 'red'). ^ self ].
 	[maxText contents asNumber] ifError: [ maxText borderColor: (Color fromString: 'red'). ^ self ].
 	maxText borderColor: #inset.
+
 	[defaultText contents asNumber] ifError: [ defaultText borderColor: (Color fromString: 'red'). ^ self ].
 	defaultText borderColor: #inset.
+
 	[spreadText contents asNumber] ifError: [ spreadText borderColor: (Color fromString: 'red'). ^ self ].
 	spreadText borderColor: #inset.
 	
