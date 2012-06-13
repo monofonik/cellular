@@ -2685,7 +2685,7 @@ face: aString
 
 	! !
 
-!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/2/2012 15:44'!
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 6/13/2012 15:12'!
 forwardCell: aNumber
 
 	"moves the sprite a given number of cells in the closest discrete direction to the sprites current heading"
@@ -2703,7 +2703,7 @@ forwardCell: aNumber
 
 	aNumber timesRepeat: [ | cell |
 		cell _ stage neighbouringCellTo: self direction: (directions at: dirIndex).
-		self gotoX: cell referencePosition x y: cell referencePosition y.
+		cell ifNotNil: [ self gotoX: cell referencePosition x y: cell referencePosition y ].
 		]! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 9/14/2011 16:14'!

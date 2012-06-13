@@ -2989,7 +2989,7 @@ mouseMove: evt
 	].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/9/2012 14:38'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/13/2012 15:15'!
 neighbouringCellTo: aSprite direction: aString
 
 	"returns the adjacent cell to the sprite in the given direction - above, below, left, right, above / left, above / right, below / left, below / right"
@@ -4487,7 +4487,7 @@ initialiseCells
 	self createAttribute: ScratchFrameMorph defaultCellAttribute min: 0 max: 100 default: 0 spread: 2 colour: (Color fromString: 'red').
 	! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/9/2012 14:38'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/13/2012 15:15'!
 neighbouringCellTo: aSprite direction: aString
 
 	"returns the adjacent cell to the sprite in the given direction - above, below, left, right, above / left, above / right, below / left, below / right"

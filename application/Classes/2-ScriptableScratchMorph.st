@@ -7407,9 +7407,12 @@ decodeAsScratch
 doMakeNewList
 	^nil! !
 
-!ScriptableScratchMorph class methodsFor: 'byob' stamp: 'jens 2/10/2010 00:41'!
+!ScriptableScratchMorph class methodsFor: 'byob' stamp: 'JM 6/13/2012 14:26'!
 keepOnStage
-	^KeepOnStage ifNil: [true ]! !
+	
+	^ true "always keep on stage in cellular"
+	"^KeepOnStage ifNil: [true ]"
+	! !
 
 !ScriptableScratchMorph class methodsFor: 'byob' stamp: 'jens 11/2/2009 23:41'!
 keepOnStage: aBool

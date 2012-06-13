@@ -422,17 +422,21 @@ author: aString
 
 ! !
 
-!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 10/27/2011 16:39'!
+!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 6/13/2012 14:26'!
 editMenu: aMenuTitleMorph
 
-	| menu onstage |
+	| menu translucent |
 
 	"first create the widest label"
-	onstage _ self checkBoxLabelled: 
-				'Allow Sprites offstage' "localized asMacRoman"
-				marked: ScriptableScratchMorph keepOnStage not
+	translucent _ self checkBoxLabelled: 'Translucent Dragging'
+				marked: HandMorph translucentWhenDragging 
 				width: 0.
 
+"	onstage _ self checkBoxLabelled: 
+				'Allow Sprites offstage'" "localized asMacRoman"
+				"marked: ScriptableScratchMorph keepOnStage not
+				width: 0.
+"
 	menu _ CustomMenu new.
 	menu add: 'Undelete' action: #undoTool.
 	menu add: 'Undo last drop' action: #undoLastDrop.
@@ -441,51 +445,49 @@ editMenu: aMenuTitleMorph
 
 	menu addIcon: (self checkBoxLabelled: 'Turbo'
 				marked: self isTurbo
-				width: onstage width)
+				width: translucent width)
 			toolTip: 'check to squeeze more computational steps into one display cycle'
 			action: #toggleTurboMode.
 
 "
 	menu addIcon: (self checkBoxLabelled: 'Single Stepping'
 				marked: (ScratchProcess blockHighlightMSecs <= 1) not
-				width: onstage width)
+				width: translucent width)
 			toolTip: nil
 			action: #toggleSingleStepping.
 
 	menu add: 'Set Single Stepping' action: #setSingleStepping.
 	menu addLine.
 "
-	menu addIcon: onstage
+"	menu addIcon: onstage
 			toolTip: 'check to allow sprites to move offscreen'
 			action: #toggleKeepSpritesOnStage.
-
+"
 	menu addIcon: (self checkBoxLabelled: 'Thread safe scripts' 
 				marked: EventHatMorph threadSafeMode 
-				width: onstage width)
+				width: translucent width)
 			toolTip: 'check to disallow script reentrancy'
 			action: #toggleThreadSafeMode.
 
 	menu addIcon: (self checkBoxLabelled: 'Zebra Coloring' 
 				marked: BlockMorph contrast = #strong 
-				width: onstage width)
+				width: translucent width)
 			toolTip: 'check to alternate color contrast among nested reporters with the same color' localized asMacRoman
 			action: #toggleZebraColoring.
 
-	menu addIcon: (self checkBoxLabelled: 'Translucent Dragging'
-				marked: HandMorph translucentWhenDragging 
-				width: onstage width)
+	menu addIcon: translucent
 			toolTip: 'check to see through objects when they are dragged'
 			action: #toggleTranslucentDragging.
 
 	menu addIcon: (self checkBoxLabelled: 'Scope Contrast'
 				marked: VariableFrame scopeContrast 
-				width: onstage width)
+				width: translucent width)
 			toolTip: 'check to contrast the color of lexically scoped blocks'
 			action: #toggleScopeContrast.
 
 	menu addIcon: (self checkBoxLabelled: 'Show Grid'
 				marked: workPane showGrid
-				width: onstage width )
+				width: translucent width )
 			toolTip: 'check to display environment grid'
 			action: #toggleGrid.
 				
@@ -500,7 +502,7 @@ editMenu: aMenuTitleMorph
 
 	menu addIcon: (self checkBoxLabelled: 'Show Motor Blocks'
 				marked: workPane showMotorBlocks
-				width: onstage width)
+				width: translucent width)
 			toolTip: nil
 			action: #toggleShowMotorBlocks.
 
@@ -2162,7 +2164,7 @@ view: aMorph tab: t category: c
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'startup' stamp: 'jens 8/2/2010 23:27'!
+!ScratchFrameMorph methodsFor: 'startup' stamp: 'JM 6/13/2012 14:22'!
 processSettingsFile
 	"Process settings from the Scratch.ini file."
 
@@ -2180,7 +2182,7 @@ processSettingsFile
 		k = 'share' ifTrue: [(assoc value) = '0' ifTrue: [AllowSharing _ false]].
 "		k = 'proxyserver' ifTrue: [ScratchUploadProgressDialog proxyServer: assoc value].
 		k = 'proxyport' ifTrue: [ScratchUploadProgressDialog proxyPort: assoc value asNumberNoError]."
-		k = 'keepspritesonstage' ifTrue: [self keepSpritesOnStage: assoc value asNumberNoError].
+		"k = 'keepspritesonstage' ifTrue: [self keepSpritesOnStage: assoc value asNumberNoError]."
 		k = 'blockcontrast' ifTrue: [assoc value = '0' ifTrue: [self blockContrastOff] ifFalse: [self blockContrastStrong]].
 		k = 'threadsafemode' ifTrue: [assoc value = '0' ifTrue: [EventHatMorph threadSafeMode: false] ifFalse: [EventHatMorph threadSafeMode: true]].
 		k = 'scopecontrast' ifTrue: [assoc value = '0' ifTrue: [VariableFrame scopeContrast: false] ifFalse: [VariableFrame scopeContrast: true]].
@@ -4942,17 +4944,21 @@ editBlockDefinition: aCustomBlockDefinition for: aScriptableScratchMorph
 	editor getUserResponse.
 	blockEditors remove: editor ifAbsent: []! !
 
-!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 10/27/2011 16:39'!
+!ScratchFrameMorph methodsFor: 'accessing' stamp: 'JM 6/13/2012 14:26'!
 editMenu: aMenuTitleMorph
 
-	| menu onstage |
+	| menu translucent |
 
 	"first create the widest label"
-	onstage _ self checkBoxLabelled: 
-				'Allow Sprites offstage' "localized asMacRoman"
-				marked: ScriptableScratchMorph keepOnStage not
+	translucent _ self checkBoxLabelled: 'Translucent Dragging'
+				marked: HandMorph translucentWhenDragging 
 				width: 0.
 
+"	onstage _ self checkBoxLabelled: 
+				'Allow Sprites offstage'" "localized asMacRoman"
+				"marked: ScriptableScratchMorph keepOnStage not
+				width: 0.
+"
 	menu _ CustomMenu new.
 	menu add: 'Undelete' action: #undoTool.
 	menu add: 'Undo last drop' action: #undoLastDrop.
@@ -4961,51 +4967,49 @@ editMenu: aMenuTitleMorph
 
 	menu addIcon: (self checkBoxLabelled: 'Turbo'
 				marked: self isTurbo
-				width: onstage width)
+				width: translucent width)
 			toolTip: 'check to squeeze more computational steps into one display cycle'
 			action: #toggleTurboMode.
 
 "
 	menu addIcon: (self checkBoxLabelled: 'Single Stepping'
 				marked: (ScratchProcess blockHighlightMSecs <= 1) not
-				width: onstage width)
+				width: translucent width)
 			toolTip: nil
 			action: #toggleSingleStepping.
 
 	menu add: 'Set Single Stepping' action: #setSingleStepping.
 	menu addLine.
 "
-	menu addIcon: onstage
+"	menu addIcon: onstage
 			toolTip: 'check to allow sprites to move offscreen'
 			action: #toggleKeepSpritesOnStage.
-
+"
 	menu addIcon: (self checkBoxLabelled: 'Thread safe scripts' 
 				marked: EventHatMorph threadSafeMode 
-				width: onstage width)
+				width: translucent width)
 			toolTip: 'check to disallow script reentrancy'
 			action: #toggleThreadSafeMode.
 
 	menu addIcon: (self checkBoxLabelled: 'Zebra Coloring' 
 				marked: BlockMorph contrast = #strong 
-				width: onstage width)
+				width: translucent width)
 			toolTip: 'check to alternate color contrast among nested reporters with the same color' localized asMacRoman
 			action: #toggleZebraColoring.
 
-	menu addIcon: (self checkBoxLabelled: 'Translucent Dragging'
-				marked: HandMorph translucentWhenDragging 
-				width: onstage width)
+	menu addIcon: translucent
 			toolTip: 'check to see through objects when they are dragged'
 			action: #toggleTranslucentDragging.
 
 	menu addIcon: (self checkBoxLabelled: 'Scope Contrast'
 				marked: VariableFrame scopeContrast 
-				width: onstage width)
+				width: translucent width)
 			toolTip: 'check to contrast the color of lexically scoped blocks'
 			action: #toggleScopeContrast.
 
 	menu addIcon: (self checkBoxLabelled: 'Show Grid'
 				marked: workPane showGrid
-				width: onstage width )
+				width: translucent width )
 			toolTip: 'check to display environment grid'
 			action: #toggleGrid.
 				
@@ -5020,7 +5024,7 @@ editMenu: aMenuTitleMorph
 
 	menu addIcon: (self checkBoxLabelled: 'Show Motor Blocks'
 				marked: workPane showMotorBlocks
-				width: onstage width)
+				width: translucent width)
 			toolTip: nil
 			action: #toggleShowMotorBlocks.
 
@@ -6497,7 +6501,7 @@ processKeyboardEvents
 			workPane broadcastEventNamed: 'Scratch-KeyPressedEvent' with: evt]].
 ! !
 
-!ScratchFrameMorph methodsFor: 'startup' stamp: 'jens 8/2/2010 23:27'!
+!ScratchFrameMorph methodsFor: 'startup' stamp: 'JM 6/13/2012 14:22'!
 processSettingsFile
 	"Process settings from the Scratch.ini file."
 
@@ -6515,7 +6519,7 @@ processSettingsFile
 		k = 'share' ifTrue: [(assoc value) = '0' ifTrue: [AllowSharing _ false]].
 "		k = 'proxyserver' ifTrue: [ScratchUploadProgressDialog proxyServer: assoc value].
 		k = 'proxyport' ifTrue: [ScratchUploadProgressDialog proxyPort: assoc value asNumberNoError]."
-		k = 'keepspritesonstage' ifTrue: [self keepSpritesOnStage: assoc value asNumberNoError].
+		"k = 'keepspritesonstage' ifTrue: [self keepSpritesOnStage: assoc value asNumberNoError]."
 		k = 'blockcontrast' ifTrue: [assoc value = '0' ifTrue: [self blockContrastOff] ifFalse: [self blockContrastStrong]].
 		k = 'threadsafemode' ifTrue: [assoc value = '0' ifTrue: [EventHatMorph threadSafeMode: false] ifFalse: [EventHatMorph threadSafeMode: true]].
 		k = 'scopecontrast' ifTrue: [assoc value = '0' ifTrue: [VariableFrame scopeContrast: false] ifFalse: [VariableFrame scopeContrast: true]].
