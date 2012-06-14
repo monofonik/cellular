@@ -144,7 +144,7 @@ response
 		color evaluate 
 		}! !
 
-!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 6/13/2012 16:12'!
+!NewEnvAttributeDialog methodsFor: 'as yet unclassified' stamp: 'JM 6/14/2012 13:08'!
 yes
 
 	"verify all fields valid"
@@ -158,6 +158,12 @@ yes
 	maxText contents isEmpty ifTrue: [ maxText borderColor: (Color fromString: 'red'). ^ self ].
 	[maxText contents asNumber] ifError: [ maxText borderColor: (Color fromString: 'red'). ^ self ].
 	maxText borderColor: #inset.
+
+	"check that max > min"
+	maxText contents asNumber > (minText contents asNumber) ifFalse: [ 
+		minText borderColor: (Color fromString: 'red').
+		maxText borderColor: (Color fromString: 'red').
+		^ self ].
 
 	[defaultText contents asNumber] ifError: [ defaultText borderColor: (Color fromString: 'red'). ^ self ].
 	defaultText borderColor: #inset.

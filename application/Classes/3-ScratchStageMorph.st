@@ -2360,8 +2360,10 @@ deleteAllClones
 	self allClones do: [:clone | clone delete].
 ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:39'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/14/2012 12:58'!
 deleteCellAttribute: aString
+
+	| frame |
 
 	"delete a cell attribute (but never the default attribute)"
 	aString = ScratchFrameMorph defaultCellAttribute ifTrue: [ ^ self ].
@@ -2370,6 +2372,10 @@ deleteCellAttribute: aString
 	cellAttributes removeKey: aString.
 	self allCellsDo: #update.
 	self changed.
+
+	"if the deleted attribute was selected, reset selection to default"
+	(frame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [ ^ self ].
+	(aString = frame selectedAttribute) ifTrue: [ frame selectDefaultAttribute ].
 	! !
 
 !ScratchStageMorph methodsFor: 'byob OOP' stamp: 'jens 1/31/2011 00:30'!
@@ -4433,8 +4439,10 @@ createOrResizeGridForm
 			rule: Form paint.
 		gridForm _ newForm]. ! !
 
-!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/5/2012 13:39'!
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/14/2012 12:58'!
 deleteCellAttribute: aString
+
+	| frame |
 
 	"delete a cell attribute (but never the default attribute)"
 	aString = ScratchFrameMorph defaultCellAttribute ifTrue: [ ^ self ].
@@ -4443,6 +4451,10 @@ deleteCellAttribute: aString
 	cellAttributes removeKey: aString.
 	self allCellsDo: #update.
 	self changed.
+
+	"if the deleted attribute was selected, reset selection to default"
+	(frame _ self ownerThatIsA: ScratchFrameMorph) ifNil: [ ^ self ].
+	(aString = frame selectedAttribute) ifTrue: [ frame selectDefaultAttribute ].
 	! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 9/9/2011 16:38'!

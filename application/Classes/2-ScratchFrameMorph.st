@@ -318,7 +318,7 @@ createViewModeButtonsPanel
 	self addMorph: viewModeButtonsPanel.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 5/14/2012 12:02'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 6/14/2012 12:50'!
 initialize
 
 	super initialize.
@@ -334,8 +334,6 @@ initialize
 	loginPassword _ ''.
 	viewMode _ #normal.
 	brushSize _ 2.
-	selectedAttribute _ ScratchFrameMorph defaultCellAttribute.
-
 
 	self createBasicPanes.
 	self createLogo.
@@ -346,6 +344,8 @@ initialize
 	self createPaintToolbar.
 	self createBrushSizeToolbar.
 	self createCellAttrToolbar.
+
+	self selectDefaultAttribute.
 
 	self extent: 1000@600.
 ! !
@@ -2464,7 +2464,7 @@ current project."
 	self importSpriteOrProject: response.
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 10/28/2011 09:41'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 6/14/2012 13:02'!
 installNewProject: newWorkpane
 	"Called after creating or reading a new project to clear the process scheduler, pick an object to view, clear the library thumbnails, and perform other housekeeping."
 
@@ -2553,7 +2553,10 @@ installNewProject: newWorkpane
 	"ensure the slider is set to the default position"
 	stageButtonsPanel submorphs do: [ :sub |  
 		(sub isKindOf: SimpleSliderMorph) ifTrue: [ sub setScaledValue: workPane cellSizeIndex ].
-	]! !
+	].
+
+	"select the default cell attribute"
+	self selectDefaultAttribute! !
 
 !ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 5/22/2012 12:35'!
 nameFromFileName: fileName
@@ -5756,7 +5759,7 @@ importSpriteOrProject: fileNameOrData
 	workPane layoutChanged.
 ! !
 
-!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 5/14/2012 12:02'!
+!ScratchFrameMorph methodsFor: 'intialization' stamp: 'JM 6/14/2012 12:50'!
 initialize
 
 	super initialize.
@@ -5772,8 +5775,6 @@ initialize
 	loginPassword _ ''.
 	viewMode _ #normal.
 	brushSize _ 2.
-	selectedAttribute _ ScratchFrameMorph defaultCellAttribute.
-
 
 	self createBasicPanes.
 	self createLogo.
@@ -5784,6 +5785,8 @@ initialize
 	self createPaintToolbar.
 	self createBrushSizeToolbar.
 	self createCellAttrToolbar.
+
+	self selectDefaultAttribute.
 
 	self extent: 1000@600.
 ! !
@@ -5807,7 +5810,7 @@ initializeWatcherPositions
 			put: {w. p. w layoutStyle. w sliderRange}].
 ! !
 
-!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 10/28/2011 09:41'!
+!ScratchFrameMorph methodsFor: 'file read/write' stamp: 'JM 6/14/2012 13:02'!
 installNewProject: newWorkpane
 	"Called after creating or reading a new project to clear the process scheduler, pick an object to view, clear the library thumbnails, and perform other housekeeping."
 
@@ -5896,7 +5899,10 @@ installNewProject: newWorkpane
 	"ensure the slider is set to the default position"
 	stageButtonsPanel submorphs do: [ :sub |  
 		(sub isKindOf: SimpleSliderMorph) ifTrue: [ sub setScaledValue: workPane cellSizeIndex ].
-	]! !
+	].
+
+	"select the default cell attribute"
+	self selectDefaultAttribute! !
 
 !ScratchFrameMorph methodsFor: 'byob' stamp: 'jens 5/26/2010 21:06'!
 isDevelopmentMode
@@ -7070,6 +7076,11 @@ scriptsStringForUpload
 			s cr]].
 	^ s contents
 ! !
+
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 6/14/2012 12:50'!
+selectDefaultAttribute
+
+	selectedAttribute _ ScratchFrameMorph defaultCellAttribute.! !
 
 !ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/27/2011 10:44'!
 selectedAttribute
@@ -8337,6 +8348,11 @@ queryTool
 		offset _ (offset * 1.5) rounded].
 
 	hand showTemporaryCursor: cursorForm hotSpotOffset: offset.! !
+
+!ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 6/14/2012 12:50'!
+selectDefaultAttribute
+
+	selectedAttribute _ ScratchFrameMorph defaultCellAttribute.! !
 
 !ScratchFrameMorph methodsFor: 'Cellular' stamp: 'JM 10/27/2011 10:44'!
 selectedAttribute
