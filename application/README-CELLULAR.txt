@@ -31,6 +31,16 @@ Releasing
 RELEASE NOTES
 ****************************************
 
+0.0.6 - 2012-06-14
+
+- Duplicating a sprite type changes its name to next available (instead of duplicating name) [Issue #11]
+- Fixed problem where selected cell attribute is invalid after deleting attribute or opening / creating new project [Issue #7]
+- Disabled "allow sprites off stage" functionality due to unpredictable behaviour when enabled [Issue #5]
+- Default cell attribute set to zero spread [Issue #3]
+- Improved validation on create new cell attribute screen [Issue #2]
+- Added block to sensing category for querying number of sprites / sprites of type [Issue #1]
+
+
 0.0.5 - 2012-06-05
 
 - Fixed bug where renaming agent costume does not propagate to agents already instantiated
