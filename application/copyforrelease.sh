@@ -12,7 +12,7 @@
 #DIR=$1
 #shift
 
-DEST="../installers/mac/Cellular/"
+DEST="../deployment/mac/Cellular/"
 rsync -a ./ $DEST --delete --exclude-from=../.gitignore --exclude-from=omit-from-release $@
 cp ./Cellular.image $DEST
 cp ./Icon* $DEST

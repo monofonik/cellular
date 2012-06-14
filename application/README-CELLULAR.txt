@@ -39,6 +39,7 @@ RELEASE NOTES
 - Default cell attribute set to zero spread [Issue #3]
 - Improved validation on create new cell attribute screen [Issue #2]
 - Added block to sensing category for querying number of sprites / sprites of type [Issue #1]
+- Fixed bug where clicking "touching __" block produced an error message
 
 
 0.0.5 - 2012-06-05
