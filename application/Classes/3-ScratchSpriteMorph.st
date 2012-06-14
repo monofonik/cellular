@@ -776,14 +776,14 @@ pointTowards: anObject
 
 ! !
 
-!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 8/19/2011 15:00'!
+!ScratchSpriteMorph methodsFor: 'motion ops' stamp: 'JM 6/14/2012 15:00'!
 touching: anObject
 	"Answer true if any visible part of me touches a visible part of the given sprite."
 	"Details: Currently uses the bounding box; should follow this up with comparison of visible pixels."
 
 	| aSpriteOrSymbol stage intersection f1 f2 map oldVis result |
 
-	self prototype ifNil: [ ^ self ].
+	self prototype ifNil: [ ^ false ].
 
 	aSpriteOrSymbol _ self coerceSpriteArg: anObject.
 
