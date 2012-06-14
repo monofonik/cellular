@@ -2877,6 +2877,13 @@ spawnSomewhere
 	^ clone
 ! !
 
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 6/14/2012 13:27'!
+spriteCount
+
+	| stage |
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ 0 ].
+	^ stage spriteCount! !
+
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 10/28/2011 15:34'!
 syncToPrototype
 
@@ -2890,6 +2897,13 @@ syncToPrototype
 		do: [ :block |
 			block setReceiversForClone: self.
 		]! !
+
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 6/14/2012 13:27'!
+typeCount: aString
+
+	| stage |
+	(stage _ self ownerThatIsA: ScratchStageMorph) ifNil: [ ^ 0 ].
+	^ stage typeCount: aString! !
 
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 5/22/2012 11:00'!
 wearingCostume: aCostume
@@ -2925,7 +2939,7 @@ yposCell
 ScratchSpriteMorph class
 	instanceVariableNames: ''!
 
-!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 5/22/2012 11:01'!
+!ScratchSpriteMorph class methodsFor: 'block specs' stamp: 'JM 6/14/2012 13:28'!
 blockSpecs
 
 	| blocks |
@@ -3039,6 +3053,9 @@ blockSpecs
 			('costume # in cell %4'			r	costumeNoInCell: )
 			('costume name in cell %4'		r	costumeNameInCell: )
 		'sensing'
+			('sprite count'					r	spriteCount )
+			('%5 count'						r	typeCount: )
+			-
 			('touching %m?' 				b	touching:)
 			('touching color %C?' 			b	touchingColor:)
 			('color %C is touching %C?'		b	color:sees:)

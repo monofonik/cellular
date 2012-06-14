@@ -3578,6 +3578,11 @@ showScene: sceneName
 			m setScene: sceneName]].
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/14/2012 13:24'!
+spriteCount
+
+	^ (sprites reject: [ :s | s prototype = nil ]) size! !
+
 !ScratchStageMorph methodsFor: 'accessing' stamp: 'tis 11/2/2006 18:44'!
 sprites
 
@@ -3934,6 +3939,11 @@ tryToOpenMidiPort
 			
 	[midiPort _ SimpleMIDIPort openOnPortNumber: portNum] ifError: [midiPort _ nil].
 ! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/14/2012 13:26'!
+typeCount: aString
+
+	^ (sprites reject: [ :s | s prototype = nil | (s className ~= aString)]) size! !
 
 !ScratchStageMorph methodsFor: 'byob' stamp: 'jens 8/5/2010 11:30'!
 unloadAllUnusedCustomBlocks
@@ -4649,6 +4659,11 @@ showGrid: aBoolean
 		ifFalse: [ gridForm _ nil . self invalidRect: self bounds ].
 ! !
 
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/14/2012 13:24'!
+spriteCount
+
+	^ (sprites reject: [ :s | s prototype = nil ]) size! !
+
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 5/10/2012 16:07'!
 spritesAtCell: aCell
 
@@ -4667,6 +4682,11 @@ toggleAttribute: aString
 
 	attr hidden ifTrue: [ self showAttribute: attr name ]
 		ifFalse: [ self hideAttribute: attr name ].! !
+
+!ScratchStageMorph methodsFor: 'cells' stamp: 'JM 6/14/2012 13:26'!
+typeCount: aString
+
+	^ (sprites reject: [ :s | s prototype = nil | (s className ~= aString)]) size! !
 
 !ScratchStageMorph methodsFor: 'cells' stamp: 'JM 3/27/2012 11:08'!
 unpauseCellUpdates
@@ -4697,7 +4717,7 @@ updateCellsForm
 ScratchStageMorph class
 	instanceVariableNames: ''!
 
-!ScratchStageMorph class methodsFor: 'block specs' stamp: 'JM 5/11/2012 16:39'!
+!ScratchStageMorph class methodsFor: 'block specs' stamp: 'JM 6/14/2012 13:25'!
 blockSpecs
 
 	| blocks |
@@ -4705,6 +4725,9 @@ blockSpecs
 		'cells'
 			('clear cells'		-	clearCells)
 		'sensing'
+			('sprite count'					r	spriteCount )
+			('%5 count'						r	typeCount: )
+			-
 			('ask %s and wait'			s	doAsk 'What''s your name?')
 			('answer'					r	answer)
 			-
