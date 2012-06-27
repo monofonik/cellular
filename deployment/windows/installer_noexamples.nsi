@@ -58,7 +58,7 @@ ShowUninstDetails hide
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
-    File /r /x Base* /x Cellular.app /x cellular_development /x Classes /x copyforrelease.sh /x omit-from-release /x ScratchSkin /x .DS_Store /x Icon* /x "Cellular Projects" ..\..\application\*
+    File /r /x Base* /x Cellular.app /x cellular_development /x Classes /x copyforrelease.sh /x omit-from-release /x ScratchSkin /x .DS_Store /x Icon* /x ants.cel /x bacteria.cel /x bushfire.cel /x schelling.cel /x virus.cel ..\..\application\*
     SetOutPath $SMPROGRAMS\$StartMenuGroup
     CreateShortcut $SMPROGRAMS\$StartMenuGroup\Cellular.lnk $INSTDIR\Cellular.exe
     SetOutPath $DESKTOP
