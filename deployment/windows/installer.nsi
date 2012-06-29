@@ -2,7 +2,7 @@ Name Cellular
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.0.6
+!define VERSION 0.0.7
 !define COMPANY "Monash University FIT"
 !define URL ""
 
@@ -39,6 +39,7 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
+# OutFile "C:\Users\Jono\Desktop\Cellular-${VERSION}.exe"
 OutFile "Cellular-${VERSION}.exe"
 InstallDir Cellular
 CRCCheck on
