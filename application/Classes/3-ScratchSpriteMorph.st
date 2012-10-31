@@ -2611,6 +2611,15 @@ currentCell
 
 	^ stage cellBehind: self! !
 
+!ScratchSpriteMorph methodsFor: 'cellular' stamp: 'al 10/31/2012 14:52'!
+deleteSprite
+	"Ensure proper cleanup in Cellular:"
+	"If this is the prototype (and thus it's prototype variable is nil), then ensure that all clones are deleted first."
+
+	self prototype ifNil: [ self cloneCount: 0 ].
+	super deleteSprite.
+! !
+
 !ScratchSpriteMorph methodsFor: 'cellular' stamp: 'JM 8/26/2011 15:45'!
 die
 

@@ -3,7 +3,7 @@ Object subclass: #ScratchMedia
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Scratch-Objects'!
-!ScratchMedia commentStamp: 'jm 5/10/2004 18:45' prior: 0!
+!ScratchMedia commentStamp: '<historical>' prior: 0!
 I define the behavior common to all Scratch media objects. There are subclasses of me for still images, movies, and sounds.
 
 All media objects have an editable name.

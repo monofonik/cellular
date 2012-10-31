@@ -31,6 +31,16 @@ Releasing
 RELEASE NOTES
 ****************************************
 
+0.0.8 - 2012-10-31
+
+- Fixed bug where saving would fail with messages like: "Unknown class UTF32 - Receiver: an ObjStream". It was due to "clone" sprites not being deleted when the user deleted their "prototype".
+- Revised About dialog text, replacing Jonathan's email address with Bernd's (which did appear in the 0.0.7 release but it seems like it was never committed to the source code repository).
+- Corrected the OSX application bundle to report the correct version (now 0.0.8, was 0.0.4)
+
+
+0.0.7 - 2012-06-29
+
+
 0.0.6 - 2012-06-14
 
 - Duplicating a sprite type changes its name to next available (instead of duplicating name) [Issue #11]

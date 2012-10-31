@@ -4175,6 +4175,29 @@ viewerPageForMotion
 	^ bin
 ! !
 
+!ScriptableScratchMorph methodsFor: 'blocks' stamp: 'jens 1/7/2010 03:16'!
+viewerPageForSensing
+	"Answer a morph containing mtion blocks for the given category for use in the given ScratchViewer."
+
+	| bin x y |
+	bin _ ScratchBlockPaletteMorph new.
+	x _ 12.
+	y _ 10.
+	(self blocksFor: 'sensing') do: [:blockOrSym |
+		(blockOrSym = #-) | (blockOrSym = #~) |  (blockOrSym = #=)
+			ifTrue: [
+				(blockOrSym = #-) ifTrue: [y _ y + 15].  "insert a full space"
+				(blockOrSym = #~) ifTrue: [y _ y + 5].  "insert a half space"
+				(blockOrSym = #=) ifTrue: [
+					y _ y + 7.
+					bin addMorph: ((ImageMorph new form: (ScratchFrameMorph skinAt: #connector)) position: x@y).
+					y _ y + 20]]  "insert a line"
+			ifFalse: [
+				y _ self createBlock: blockOrSym atPosition: x@y onPage: bin]].
+
+	^ bin
+! !
+
 !ScriptableScratchMorph methodsFor: 'blocks' stamp: 'jens 12/18/2009 04:45'!
 wholeBlockSpecForSelector: aSymbol
 	"Answer a block specification string (in English) for the give selector or nil if there is no spec that has the given selector."

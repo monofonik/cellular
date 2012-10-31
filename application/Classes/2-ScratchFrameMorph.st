@@ -637,7 +637,7 @@ workPane
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 5/22/2012 11:55'!
+!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'al 10/31/2012 15:03'!
 aboutScratch
 
 	| dialogBox |
@@ -647,10 +647,19 @@ aboutScratch
 	dialogBox
 		message: 'Cellular ', Version, '
 
-Cellular - an extension to BYOB (Scratch) for simulation
+Cellular - an extension to BYOB (Scratch)
 Copyright 2012 Monash University
+Faculty of Information Technology
 All rights reserved
-j.mullins@gmx.com
+
+Implementation: Jonathan Mullins
+
+Concept and Design:
+David Albrecht
+Bernd Meyer
+Jonathan Mullins
+
+contact: bernd.meyer@monash.edu
 
 Build Your Own Blocks - an extension to Scratch
 
@@ -4022,7 +4031,7 @@ makeExe
 ! !
 
 
-!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'JM 5/22/2012 11:55'!
+!ScratchFrameMorph methodsFor: 'menu/button actions' stamp: 'al 10/31/2012 15:03'!
 aboutScratch
 
 	| dialogBox |
@@ -4032,10 +4041,19 @@ aboutScratch
 	dialogBox
 		message: 'Cellular ', Version, '
 
-Cellular - an extension to BYOB (Scratch) for simulation
+Cellular - an extension to BYOB (Scratch)
 Copyright 2012 Monash University
+Faculty of Information Technology
 All rights reserved
-j.mullins@gmx.com
+
+Implementation: Jonathan Mullins
+
+Concept and Design:
+David Albrecht
+Bernd Meyer
+Jonathan Mullins
+
+contact: bernd.meyer@monash.edu
 
 Build Your Own Blocks - an extension to Scratch
 
@@ -8881,9 +8899,9 @@ version
 	^ Version
 ! !
 
-!ScratchFrameMorph class methodsFor: 'utilities' stamp: 'JM 6/5/2012 14:41'!
+!ScratchFrameMorph class methodsFor: 'utilities' stamp: 'al 10/31/2012 14:56'!
 version: aString
-	"self version: '0.0.5 (', (Date today printFormat: #(1 2 3 $- 2 2)), ')'"
+	"self version: '0.0.8 (', (Date today printFormat: #(1 2 3 $- 2 2)), ')'"
 	"self version: '1.0'"
 
 	Version _ aString.
