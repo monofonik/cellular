@@ -2,7 +2,7 @@ Name Cellular
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.0.7
+!define VERSION 0.0.8
 !define COMPANY "Monash University FIT"
 !define URL ""
 
