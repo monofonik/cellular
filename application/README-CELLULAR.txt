@@ -22,8 +22,7 @@ Releasing
 - Select the first line of text, press <Ctrl> D
 - Re-comment the first line of text
 - Select <Shift> Edit - "Save image for end user". The Squeak image will be saved in the release state and closed.
-- Run ./copyforrelease.sh
-- Run installers/mac/compile.sh to create Mac disk image (From Mac only)
+- Run ./copyforrelease.sh and then installers/mac/compile.sh to create Mac disk image (From Mac only)
 - Run installers/windows/installer.nsi to create Windows installer (From Windows only - requires NSI)
 
 
@@ -31,7 +30,7 @@ Releasing
 RELEASE NOTES
 ****************************************
 
-0.0.8 - 2012-10-31
+0.0.8 - 2012-11-01
 
 - Fixed bug where saving would fail with messages like: "Unknown class UTF32 - Receiver: an ObjStream". It was due to "clone" sprites not being deleted when the user deleted their "prototype".
 - Revised About dialog text, replacing Jonathan's email address with Bernd's (which did appear in the 0.0.7 release but it seems like it was never committed to the source code repository).
